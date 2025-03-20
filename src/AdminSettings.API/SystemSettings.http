@@ -1,0 +1,6 @@
+@SystemSettings_HostAddress = http://localhost:5026
+
+GET {{SystemSettings_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
