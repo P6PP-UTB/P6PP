@@ -1,85 +1,44 @@
-using AdminSettings.Data;
-using AdminSettings.Persistence;
-using AdminSettings.Persistence.Repository;
-using AdminSettings.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-
-
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
-// Configure port here + launchSettings.json ( + later Dockerfile EXPOSE XXXX)
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(8080);
-});
-
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "AdminSettings API",
-        Version = "v1"
-    });
-});
-
-builder.Services.AddControllers();
-
-builder.Services.AddDbContext<AdminSettingsDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 25)))); 
-
-builder.Services.AddHttpClient("UserApi", client =>
-{
-    client.BaseAddress = new Uri("http://localhost:5189/");
-});
-
-builder.Services.AddHttpClient<UserService>();
-
-builder.Services.AddMemoryCache();
-builder.Services.AddSingleton<DapperContext>();
-
-builder.Services.AddScoped<SystemSettingsSeeder>();
-
-builder.Services.AddScoped<SystemSettingsService>();
-builder.Services.AddScoped<AuditLogService>();
-builder.Services.AddScoped<AuditLogRepository>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<DatabaseBackupService>();
-
-builder.Services.AddScoped<DatabaseInitializer>();
-
-
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "AdminSettings API v1");
-    });
+    app.UseSwaggerUI();
 }
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var databaseInitializer = services.GetRequiredService<DatabaseInitializer>();
-
-    await databaseInitializer.InitializeDatabaseAsync();
-    
-    var seeder = services.GetRequiredService<SystemSettingsSeeder>();
-    await seeder.SeedAsync();
-}
-
 
 app.UseHttpsRedirection();
-app.MapControllers();
+
+var summaries = new[]
+{
+    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+};
+
+app.MapGet("/weatherforecast", () =>
+    {
+        var forecast = Enumerable.Range(1, 5).Select(index =>
+                new WeatherForecast
+                (
+                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                    Random.Shared.Next(-20, 55),
+                    summaries[Random.Shared.Next(summaries.Length)]
+                ))
+            .ToArray();
+        return forecast;
+    })
+    .WithName("GetWeatherForecast")
+    .WithOpenApi();
 
 app.Run();
 
+record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
