@@ -15,7 +15,9 @@ public class SystemSetting
     public int CurrencyId { get; set; }
     public Currency currency { get; set; }
 
-    public string SystemLanguage { get; } = "en-US";
+    [ForeignKey("Language")]
+    public int LanguageId { get; set; }
+    public Language language { get; set; }
 }
 
 

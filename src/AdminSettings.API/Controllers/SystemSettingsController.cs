@@ -1,144 +1,121 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using SystemService.API.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using SystemService.API.Persistence.Entities;
+using AdminSettings.Data;
+using AdminSettings.Persistence.Entities;
+using AdminSettings.Services;
 
-namespace SystemManagement.API.Controllers
+namespace AdminSettings.Controllers;
+
+[ApiController]
+[Route("api")]
+public class SystemSettingsController : ControllerBase
 {
-    [ApiController]
-    [Route("api")]
-    public class SystemController : ControllerBase
+    private readonly AdminSettingsDbContext _context;
+
+    public SystemSettingsController(AdminSettingsDbContext context)
     {
-        private readonly SystemDbContext _context;
+        _context = context;
+    }
 
-        public SystemController(SystemDbContext context)
-        {
-            _context = context;
-        }
+    [HttpGet("system-settings")]
+    public async Task<IActionResult> GetSystemSettings()
+    {
+        var settings = await _context.SystemSettings
+            .Include(s => s.timezone) 
+            .Include(s => s.currency) 
+            .FirstOrDefaultAsync();
+        return settings == null ? NotFound("System settings not found.") : Ok(settings);
+    }
 
-        [HttpGet("system-settings")]
-        public async Task<IActionResult> GetSystemSettings()
-        {
-            var settings = await _context.SystemSettings
-                .Include(s => s.timezone) 
-                .Include(s => s.currency) 
-                .Include(s => s.openingHours) 
-                .FirstOrDefaultAsync();
-            return settings == null ? NotFound("System settings not found.") : Ok(settings);
-        }
+    [HttpPut("system-settings")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateSystemSettings([FromBody] SystemSetting settings)
+    {
+        if (!ModelState.IsValid || settings == null)
+            return BadRequest("Invalid data.");
 
-        [HttpPut("system-settings")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateSystemSettings([FromBody] SystemSetting settings)
-        {
-            if (!ModelState.IsValid || settings == null)
-                return BadRequest("Invalid data.");
+        var existingSettings = await _context.SystemSettings.FirstOrDefaultAsync();
+        if (existingSettings == null)
+            return NotFound("System settings not found.");
 
-            var existingSettings = await _context.SystemSettings.FirstOrDefaultAsync();
-            if (existingSettings == null)
-                return NotFound("System settings not found.");
+        existingSettings.TimezoneId = settings.TimezoneId;
+        existingSettings.CurrencyId = settings.CurrencyId;
 
-            existingSettings.TimezoneId = settings.TimezoneId;
-            existingSettings.CurrencyId = settings.CurrencyId;
-            existingSettings.TaxRate = settings.TaxRate;
-            existingSettings.OpeningHoursId = settings.OpeningHoursId;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
+    [HttpGet("system-settings/timezones")]
+    public async Task<IActionResult> GetTimezones()
+    {
+        var timezones = await _context.Timezones.ToListAsync();
+        return timezones.Any() ? Ok(timezones) : NotFound("No timezones available.");
+    }
 
-        [HttpGet("timezones")]
-        public async Task<IActionResult> GetTimezones()
-        {
-            var timezones = await _context.Timezones.ToListAsync();
-            return timezones.Any() ? Ok(timezones) : NotFound("No timezones available.");
-        }
+    [HttpPut("system-settings/timezones")]
+    public async Task<IActionResult> UpdateTimezone([FromBody] Timezone timezone)
+    {
+        if (!ModelState.IsValid || timezone == null)
+            return BadRequest("Invalid timezone data.");
 
-        [HttpPut("timezones")]
-        public async Task<IActionResult> UpdateTimezone([FromBody] Timezone timezone)
-        {
-            if (!ModelState.IsValid || timezone == null)
-                return BadRequest("Invalid timezone data.");
+        var existingTimezone = await _context.Timezones.FirstOrDefaultAsync(t => t.Id == timezone.Id);
+        if (existingTimezone == null)
+            return NotFound("Timezone not found.");
 
-            var existingTimezone = await _context.Timezones.FirstOrDefaultAsync(t => t.Id == timezone.Id);
-            if (existingTimezone == null)
-                return NotFound("Timezone not found.");
+        existingTimezone.Name = timezone.Name;
+        existingTimezone.UtcOffset = timezone.UtcOffset;
 
-            existingTimezone.Name = timezone.Name;
-            existingTimezone.UtcOffset = timezone.UtcOffset;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
+    [HttpGet("system-settings/currencies")]
+    public async Task<IActionResult> GetCurrencies()
+    {
+        var currencies = await _context.Currencies.ToListAsync();
+        return currencies.Any() ? Ok(currencies) : NotFound("No currencies available.");
+    }
 
-        [HttpGet("currencies")]
-        public async Task<IActionResult> GetCurrencies()
-        {
-            var currencies = await _context.Currencies.ToListAsync();
-            return currencies.Any() ? Ok(currencies) : NotFound("No currencies available.");
-        }
+    [HttpPut("system-settings/currencies")]
+    public async Task<IActionResult> UpdateCurrency([FromBody] Currency currency)
+    {
+        if (!ModelState.IsValid || currency == null)
+            return BadRequest("Invalid currency data.");
 
-        [HttpPut("currencies")]
-        public async Task<IActionResult> UpdateCurrency([FromBody] Currency currency)
-        {
-            if (!ModelState.IsValid || currency == null)
-                return BadRequest("Invalid currency data.");
+        var existingCurrency = await _context.Currencies.FirstOrDefaultAsync(c => c.Id == currency.Id);
+        if (existingCurrency == null)
+            return NotFound("Currency not found.");
 
-            var existingCurrency = await _context.Currencies.FirstOrDefaultAsync(c => c.Id == currency.Id);
-            if (existingCurrency == null)
-                return NotFound("Currency not found.");
+        existingCurrency.Name = currency.Name;
+        existingCurrency.Symbol = currency.Symbol;
 
-            existingCurrency.Name = currency.Name;
-            existingCurrency.Symbol = currency.Symbol;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
+    [HttpGet("system-settings/languages")]
+    public async Task<IActionResult> GetLanguages()
+    {
+        var languages = await _context.Languages.ToListAsync();
+        return languages.Any() ? Ok(languages) : NotFound("No languages available.");
+    }
 
-        [HttpPut("tax-rate")]
-        public async Task<IActionResult> UpdateTaxRate([FromBody] decimal taxRate)
-        {
-            if (taxRate < 0)
-                return BadRequest("Tax rate cannot be negative.");
+    [HttpPut("system-settings/languages")]
+    public async Task<IActionResult> UpdateLanguage([FromBody] Language language)
+    {
+        if (!ModelState.IsValid || language == null)
+            return BadRequest("Invalid language data.");
 
-            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
-            if (settings == null)
-                return NotFound("System settings not found.");
+        var existingLanguage = await _context.Languages.FirstOrDefaultAsync(l => l.Id == language.Id);
+        if (existingLanguage == null)
+            return NotFound("Language not found.");
 
-            settings.TaxRate = taxRate;
+        existingLanguage.Locale = language.Locale;
 
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        [HttpGet("opening-hours")]
-        public async Task<IActionResult> GetOpeningHours()
-        {
-            var hours = await _context.OpeningHours.FirstOrDefaultAsync();
-            return hours == null ? NotFound("Opening hours not found.") : Ok(hours);
-        }
-
-        [HttpPut("opening-hours")]
-        public async Task<IActionResult> UpdateOpeningHours([FromBody] OpeningHours openingHours)
-        {
-            if (!ModelState.IsValid || openingHours == null)
-                return BadRequest("Invalid opening hours data.");
-
-            var existingOpeningHours = await _context.OpeningHours.FirstOrDefaultAsync(o => o.Id == openingHours.Id);
-            if (existingOpeningHours == null)
-                return NotFound("Opening hours not found.");
-
-            existingOpeningHours.DayOfWeek = openingHours.DayOfWeek;
-            existingOpeningHours.OpenTime = openingHours.OpenTime;
-            existingOpeningHours.CloseTime = openingHours.CloseTime;
-
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        // Zbytek je z ostatních databází
+        await _context.SaveChangesAsync();
+        return NoContent();
     }
 }
