@@ -2,7 +2,7 @@
 using Dapper;
 using System.Data;
 
-namespace AdminSettings.Persistence.Repositories;
+namespace AdminSettings.Persistence.Repository;
 
 public class AuditLogRepository
 {
