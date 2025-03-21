@@ -1,8 +1,6 @@
-﻿using AdminSettings.Data;
-using AdminSettings.Persistence.Entities;
+﻿using AdminSettings.Persistence.Entities;
 using AdminSettings.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AdminSettings.Controllers;
 
@@ -10,31 +8,30 @@ namespace AdminSettings.Controllers;
 [ApiController]
 public class AuditController : ControllerBase
 {
-    private readonly AdminSettingsDbContext _context;
+    private readonly AuditLogService _auditLogService;
     private readonly UserService _userService;
 
-    public AuditController(AdminSettingsDbContext context, UserService userService)
+    public AuditController(AuditLogService auditLogService, UserService userService)
     {
-        _context = context;
+        _auditLogService = auditLogService;
         _userService = userService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAuditLogs()
     {
-        var auditLogs = await _context.AuditLogs.ToListAsync();
-        return Ok(auditLogs);
+        var logs = await _auditLogService.GetAllAsync();
+        return Ok(logs);
     }
 
     [HttpPost]
     public async Task<IActionResult> AddAuditLog([FromBody] AuditLog auditLog)
     {
         if (auditLog == null || string.IsNullOrEmpty(auditLog.UserId) || string.IsNullOrEmpty(auditLog.Action))
-            return BadRequest("Invalid audit log data");
+            return BadRequest("Invalid data");
 
-        await _context.AuditLogs.AddAsync(auditLog);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetAuditLogs), new { id = auditLog.Id }, auditLog);
+        var id = await _auditLogService.CreateAsync(auditLog);
+        return CreatedAtAction(nameof(GetAuditLogs), new { id }, auditLog);
     }
 
     [HttpGet("user/{userId}")]
@@ -44,30 +41,21 @@ public class AuditController : ControllerBase
         if (user == null)
             return NotFound("User not found");
 
-        var auditLogs = await _context.AuditLogs
-            .Where(a => a.UserId == user.Id)
-            .ToListAsync();
-
-        return Ok(new { User = user, AuditLogs = auditLogs });
-    }
-
-    [HttpPut("{id}/archive")]
-    public async Task<IActionResult> ArchiveAuditLog(int id)
-    {
-        var auditLog = await _context.AuditLogs.FindAsync(id);
-        if (auditLog == null)
-            return NotFound();
-
-        auditLog.Action = "Archived";
-        _context.Entry(auditLog).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return Ok(auditLog);
+        var logs = await _auditLogService.GetByUserAsync(userId);
+        return Ok(new { User = user, AuditLogs = logs });
     }
 
     [HttpGet("action/{action}")]
     public async Task<IActionResult> GetAuditLogsByAction(string action)
     {
-        var auditLogs = await _context.AuditLogs.Where(a => a.Action == action).ToListAsync();
-        return Ok(auditLogs);
+        var logs = await _auditLogService.GetByActionAsync(action);
+        return Ok(logs);
+    }
+
+    [HttpPut("{id}/archive")]
+    public async Task<IActionResult> ArchiveAuditLog(int id)
+    {
+        await _auditLogService.ArchiveAsync(id);
+        return Ok();
     }
 }

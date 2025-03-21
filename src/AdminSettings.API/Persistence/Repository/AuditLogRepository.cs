@@ -1,9 +1,8 @@
 ﻿using AdminSettings.Persistence.Entities;
 using Dapper;
 using System.Data;
-using System.Text;
 
-namespace AdminSettings.Persistence.Repository;
+namespace AdminSettings.Persistence.Repositories;
 
 public class AuditLogRepository
 {
@@ -14,54 +13,19 @@ public class AuditLogRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<AuditLog>> GetAllAsync(int pageNumber, int pageSize, DateTime? fromDate, DateTime? toDate)
+    public async Task<IEnumerable<AuditLog>> GetAllAsync()
     {
         using var connection = await _context.CreateConnectionAsync();
-
-        var query = new StringBuilder("SELECT * FROM AuditLogs WHERE 1=1");
-
-        if (fromDate.HasValue)
-            query.Append(" AND TimeStamp >= @FromDate");
-
-        if (toDate.HasValue)
-            query.Append(" AND TimeStamp <= @ToDate");
-
-        query.Append(" ORDER BY TimeStamp DESC LIMIT @Offset, @PageSize;");
-
-        return await connection.QueryAsync<AuditLog>(query.ToString(), new
-        {
-            FromDate = fromDate,
-            ToDate = toDate,
-            Offset = (pageNumber - 1) * pageSize,
-            PageSize = pageSize
-        });
+        const string query = "SELECT * FROM AuditLogs;";
+        return await connection.QueryAsync<AuditLog>(query);
     }
 
-
-    public async Task<IEnumerable<AuditLog>> GetByUserIdAsync(string userId, int pageNumber, int pageSize, DateTime? fromDate, DateTime? toDate)
+    public async Task<IEnumerable<AuditLog>> GetByUserIdAsync(string userId)
     {
         using var connection = await _context.CreateConnectionAsync();
-
-        var query = new StringBuilder("SELECT * FROM AuditLogs WHERE UserId = @UserId");
-
-        if (fromDate.HasValue)
-            query.Append(" AND TimeStamp >= @FromDate");
-
-        if (toDate.HasValue)
-            query.Append(" AND TimeStamp <= @ToDate");
-
-        query.Append(" ORDER BY TimeStamp DESC LIMIT @Offset, @PageSize;");
-
-        return await connection.QueryAsync<AuditLog>(query.ToString(), new
-        {
-            UserId = userId,
-            FromDate = fromDate,
-            ToDate = toDate,
-            Offset = (pageNumber - 1) * pageSize,
-            PageSize = pageSize
-        });
+        const string query = "SELECT * FROM AuditLogs WHERE UserId = @UserId;";
+        return await connection.QueryAsync<AuditLog>(query, new { UserId = userId });
     }
-
 
     public async Task<IEnumerable<AuditLog>> GetByActionAsync(string action)
     {

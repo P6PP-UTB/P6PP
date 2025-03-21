@@ -1,5 +1,5 @@
 ﻿using AdminSettings.Persistence.Entities;
-using AdminSettings.Persistence.Repository;
+using AdminSettings.Persistence.Repositories;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AdminSettings.Services;
@@ -16,15 +16,13 @@ public class AuditLogService
         _memoryCache = memoryCache;
     }
 
-    public async Task<IEnumerable<AuditLog>> GetAllAsync(int pageNumber, int pageSize, DateTime? fromDate, DateTime? toDate)
+    public async Task<IEnumerable<AuditLog>> GetAllAsync()
     {
-        string cacheKey = $"{CacheKey}-page{pageNumber}-size{pageSize}-from{fromDate}-to{toDate}";
-
-        if (!_memoryCache.TryGetValue(cacheKey, out IEnumerable<AuditLog>? logs))
+        if (!_memoryCache.TryGetValue(CacheKey, out IEnumerable<AuditLog>? logs))
         {
-            logs = await _repository.GetAllAsync(pageNumber, pageSize, fromDate, toDate);
+            logs = await _repository.GetAllAsync();
 
-            _memoryCache.Set(cacheKey, logs, new MemoryCacheEntryOptions
+            _memoryCache.Set(CacheKey, logs, new MemoryCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
             });
@@ -32,7 +30,6 @@ public class AuditLogService
 
         return logs!;
     }
-
 
     public async Task<int> CreateAsync(AuditLog log)
     {
@@ -49,23 +46,10 @@ public class AuditLogService
         return id;
     }
 
-    public async Task<IEnumerable<AuditLog>> GetByUserAsync(string userId, int pageNumber, int pageSize, DateTime? fromDate, DateTime? toDate)
+    public async Task<IEnumerable<AuditLog>> GetByUserAsync(string userId)
     {
-        string cacheKey = $"{CacheKey}-user{userId}-page{pageNumber}-size{pageSize}-from{fromDate}-to{toDate}";
-
-        if (!_memoryCache.TryGetValue(cacheKey, out IEnumerable<AuditLog>? logs))
-        {
-            logs = await _repository.GetByUserIdAsync(userId, pageNumber, pageSize, fromDate, toDate);
-
-            _memoryCache.Set(cacheKey, logs, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-            });
-        }
-
-        return logs!;
+        return await _repository.GetByUserIdAsync(userId);
     }
-
 
     public async Task<IEnumerable<AuditLog>> GetByActionAsync(string action)
     {
