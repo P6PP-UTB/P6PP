@@ -1,6 +1,8 @@
+using AdminSettings.Data;
 using AdminSettings.Persistence;
 using AdminSettings.Persistence.Repository;
 using AdminSettings.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 
@@ -18,6 +20,11 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddControllers();
+
+builder.Services.AddDbContext<AdminSettingsDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 25)))); 
 
 builder.Services.AddHttpClient("UserApi", client =>
 {
@@ -45,7 +52,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "AdminSettings API v1");
-        c.RoutePrefix = string.Empty;
     });
 }
 
