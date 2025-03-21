@@ -1,5 +1,5 @@
 ﻿using AdminSettings.Persistence.Entities;
-using AdminSettings.Persistence.Repositories;
+using AdminSettings.Persistence.Repository;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AdminSettings.Services;

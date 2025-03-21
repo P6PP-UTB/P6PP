@@ -1,5 +1,5 @@
 using AdminSettings.Persistence;
-using AdminSettings.Persistence.Repositories;
+using AdminSettings.Persistence.Repository;
 using AdminSettings.Services;
 using Microsoft.OpenApi.Models;
 
@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -48,9 +49,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-
 app.UseHttpsRedirection();
-
 app.MapControllers();
 
 app.Run();
