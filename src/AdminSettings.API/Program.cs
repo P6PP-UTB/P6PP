@@ -10,6 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 
+// Configure port here + launchSettings.json ( + later Dockerfile EXPOSE XXXX)
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(8080);
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -31,7 +37,6 @@ builder.Services.AddHttpClient("UserApi", client =>
     client.BaseAddress = new Uri("http://localhost:5189/");
 });
 
-
 builder.Services.AddHttpClient<UserService>();
 
 builder.Services.AddMemoryCache();
@@ -41,12 +46,14 @@ builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddScoped<AuditLogRepository>();
 builder.Services.AddScoped<UserService>();
 
+builder.Services.AddScoped<DatabaseInitializer>();
+
 
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
@@ -54,6 +61,15 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "AdminSettings API v1");
     });
 }
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var databaseInitializer = services.GetRequiredService<DatabaseInitializer>();
+
+    await databaseInitializer.InitializeDatabaseAsync();
+}
+
 
 app.UseHttpsRedirection();
 app.MapControllers();
