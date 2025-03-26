@@ -46,21 +46,85 @@ public class DatabaseInitializer
             await using var conn = new MySqlConnection(_connectionString);
             await conn.OpenAsync();
 
-            const string tableSql = @"
-                CREATE TABLE IF NOT EXISTS AuditLogs (
-                    Id INT AUTO_INCREMENT PRIMARY KEY,
-                    UserId VARCHAR(255) NOT NULL,
-                    TimeStamp DATETIME NOT NULL,
-                    Action VARCHAR(255) NOT NULL
-                );";
-
-            await conn.ExecuteAsync(tableSql);
-            _logger.LogInformation("Table 'AuditLogs' ensured.");
+            await CreateAuditLogsTableAsync(conn);
+            await CreateTimezoneTableAsync(conn);
+            await CreateLanguageTableAsync(conn);
+            await CreateCurrencyTableAsync(conn);
+            await CreateSystemSettingsTableAsync(conn);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Database initialization failed.");
             throw;
         }
+    }
+
+    private async Task CreateAuditLogsTableAsync(MySqlConnection conn)
+    {
+        const string tableSql = @"
+        CREATE TABLE IF NOT EXISTS AuditLogs (
+            Id INT AUTO_INCREMENT PRIMARY KEY,
+            UserId VARCHAR(255) NOT NULL,
+            TimeStamp DATETIME NOT NULL,
+            Action VARCHAR(255) NOT NULL
+        );";
+
+        await conn.ExecuteAsync(tableSql);
+        _logger.LogInformation("Table 'AuditLogs' ensured.");
+    }
+
+    private async Task CreateTimezoneTableAsync(MySqlConnection conn)
+    {
+        const string tableSql = @"
+        CREATE TABLE IF NOT EXISTS Timezones (
+            Id INT AUTO_INCREMENT PRIMARY KEY,
+            Name VARCHAR(255) NOT NULL,
+            UtcOffset VARCHAR(255) NOT NULL
+        );";
+
+        await conn.ExecuteAsync(tableSql);
+        _logger.LogInformation("Table 'Timezone' ensured.");
+    }
+
+    private async Task CreateLanguageTableAsync(MySqlConnection conn)
+    {
+        const string tableSql = @"
+        CREATE TABLE IF NOT EXISTS Languages (
+            Id INT AUTO_INCREMENT PRIMARY KEY,
+            Locale VARCHAR(255) NOT NULL
+        );";
+
+        await conn.ExecuteAsync(tableSql);
+        _logger.LogInformation("Table 'Language' ensured.");
+    }
+
+    private async Task CreateCurrencyTableAsync(MySqlConnection conn)
+    {
+        const string tableSql = @"
+        CREATE TABLE IF NOT EXISTS Currencies (
+            Id INT AUTO_INCREMENT PRIMARY KEY,
+            Name VARCHAR(255) NOT NULL,
+            Symbol VARCHAR(255) NOT NULL
+        );";
+
+        await conn.ExecuteAsync(tableSql);
+        _logger.LogInformation("Table 'Currency' ensured.");
+    }
+
+    private async Task CreateSystemSettingsTableAsync(MySqlConnection conn)
+    {
+        const string tableSql = @"
+        CREATE TABLE IF NOT EXISTS SystemSettings (
+            Id INT AUTO_INCREMENT PRIMARY KEY,
+            TimezoneId INT NOT NULL,
+            CurrencyId INT NOT NULL,
+            LanguageId INT NOT NULL,
+            FOREIGN KEY (TimezoneId) REFERENCES Timezones(Id),
+            FOREIGN KEY (CurrencyId) REFERENCES Currencies(Id),
+            FOREIGN KEY (LanguageId) REFERENCES Languages(Id)
+        );";
+
+        await conn.ExecuteAsync(tableSql);
+        _logger.LogInformation("Table 'SystemSettings' ensured.");
     }
 }
