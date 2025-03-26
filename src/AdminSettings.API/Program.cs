@@ -42,6 +42,8 @@ builder.Services.AddHttpClient<UserService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<DapperContext>();
 
+builder.Services.AddScoped<SystemSettingsSeeder>();
+
 builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddScoped<AuditLogRepository>();
 builder.Services.AddScoped<UserService>();
@@ -68,6 +70,9 @@ using (var scope = app.Services.CreateScope())
     var databaseInitializer = services.GetRequiredService<DatabaseInitializer>();
 
     await databaseInitializer.InitializeDatabaseAsync();
+    
+    var seeder = services.GetRequiredService<SystemSettingsSeeder>();
+    await seeder.SeedAsync();
 }
 
 
