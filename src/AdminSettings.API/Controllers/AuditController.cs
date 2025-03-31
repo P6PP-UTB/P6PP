@@ -18,11 +18,12 @@ public class AuditController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAuditLogs()
+    public async Task<IActionResult> GetAuditLogs([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] DateTime? fromDate = null, [FromQuery] DateTime? toDate = null)
     {
-        var logs = await _auditLogService.GetAllAsync();
+        var logs = await _auditLogService.GetAllAsync(pageNumber, pageSize, fromDate, toDate);
         return Ok(logs);
     }
+
 
     [HttpPost]
     public async Task<IActionResult> AddAuditLog([FromBody] AuditLog auditLog)
@@ -35,15 +36,16 @@ public class AuditController : ControllerBase
     }
 
     [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetUserAuditLogs(string userId)
+    public async Task<IActionResult> GetUserAuditLogs(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] DateTime? fromDate = null, [FromQuery] DateTime? toDate = null)
     {
         var user = await _userService.GetUserById(userId);
         if (user == null)
             return NotFound("User not found");
 
-        var logs = await _auditLogService.GetByUserAsync(userId);
+        var logs = await _auditLogService.GetByUserAsync(userId, pageNumber, pageSize, fromDate, toDate);
         return Ok(new { User = user, AuditLogs = logs });
     }
+
 
     [HttpGet("action/{action}")]
     public async Task<IActionResult> GetAuditLogsByAction(string action)
