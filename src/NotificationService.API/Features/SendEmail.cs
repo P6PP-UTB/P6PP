@@ -1,9 +1,9 @@
 //using NotificationService.API.Persistence;
 using NotificationService.API.Services;
 using FluentValidation;
-using System.Net;
 using ReservationSystem.Shared.Results;
 using NotificationService.API.Persistence;
+using NotificationService.API.Persistence.Entities.DB;
 
 namespace NotificationService.API.Features;
 
@@ -24,7 +24,6 @@ public class SendEmailRequestValidator : AbstractValidator<SendEmailRequest>
 public class SendEmailHandler
 {
     private readonly MailAppService _mailAppService;
-
     public SendEmailHandler(MailAppService mailAppService)
     {
         _mailAppService = mailAppService;
@@ -42,6 +41,7 @@ public class SendEmailHandler
         };
         try
         {
+            
             await _mailAppService.SendEmailAsync(emailArgs);
             return new ApiResult<SendEmailResponse>(new SendEmailResponse());
         }

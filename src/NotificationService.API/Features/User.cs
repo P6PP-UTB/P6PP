@@ -1,21 +1,17 @@
-//using NotificationService.API.Persistence;
+using NotificationService.API.Persistence;
 using NotificationService.API.Services;
 using FluentValidation;
-using System.Net;
 using ReservationSystem.Shared.Results;
-using NotificationService.API.Persistence;
-
 namespace NotificationService.API.Features;
 
-public record SendRegistrationEmail(string address, string name, string? language);
+public record SendRegistrationEmail(int id, string? language);
 public record SendRegistrationEmailResponse(int? Id=null);
 
 public class SendRegistrationEmailValidator : AbstractValidator<SendRegistrationEmail>
 {
     public SendRegistrationEmailValidator()
     {
-        RuleFor(x => x.address).NotEmpty().EmailAddress();
-        RuleFor(x => x.name).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.id).GreaterThan(0);
     }
 }
 
@@ -23,23 +19,28 @@ public class SendRegistrationEmailHandler
 {
     private readonly MailAppService _mailAppService;
     private readonly TemplateAppService _templateAppService;
+    private readonly UserAppService _userAppService;
 
-    public SendRegistrationEmailHandler(MailAppService mailAppService, TemplateAppService templateAppService)
+    public SendRegistrationEmailHandler(MailAppService mailAppService,
+        TemplateAppService templateAppService, UserAppService userAppService)
     {
         _mailAppService = mailAppService;
         _templateAppService = templateAppService;
+        _userAppService = userAppService;
+        
     }
 
     public async Task<ApiResult<SendRegistrationEmailResponse>> Handle(SendRegistrationEmail request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        var user = await _userAppService.GetUserByIdAsync(request.id);
         var template = await _templateAppService.GetTemplateAsync("Registration", request.language);
 
-        template.Text = template.Text.Replace("{name}", request.name);
+        template.Text = template.Text.Replace("{name}", user.FirstName + user.LastName);
 
         var emailArgs = new EmailArgs
         {
-            Address = new List<string> { request.address },
+            Address = new List<string> { user.Email },
             Subject = template.Subject,
             Body = template.Text
         };
