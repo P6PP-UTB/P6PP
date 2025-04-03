@@ -1,0 +1,24 @@
+<div id="head-div">
+    <button id="logo" routerLink="">REZERVACE+</button>
+  
+    <nav id="navigation-bar">
+      <button class="nav-btn" routerLink="">Home</button>
+      <button class="nav-btn">Courses</button>
+      <button class="nav-btn">Coaches</button>
+      <button class="nav-btn">Profile</button>
+    </nav>
+  
+    <div id="log-btns" *ngIf="!isLoggedIn">
+      <button id="login-btn" class="nav-btn" routerLink="login">Log in</button>
+      <button id="signup-btn" class="nav-btn" routerLink="signup">Sign up</button>
+    </div>
+  
+    <button class="menu-btn" *ngIf="isLoggedIn" (click)="toggleMenu()">
+        <mat-icon>menu</mat-icon>
+    </button>
+</div>
+
+<app-header></app-header>
+  
+<!-- <app-sidebar-menu [isOpen]="isMenuOpen" (menuClosed)="onMenuClosed()"></app-sidebar-menu> -->
+<app-footer></app-footer>

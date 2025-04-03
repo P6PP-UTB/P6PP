@@ -1,0 +1,82 @@
+<div id="info">
+    <div class="container" class="pb-2 pt-4 px-4 flex-fill">
+        <div class="row">
+            <div class="col">
+                <div id="logo">REZERVACE+</div>
+                <hr>
+                <div>
+                    <a href="https://www.google.com/maps/place/%D0%93%D1%83%D1%80%D1%82%D0%BE%D0%B6%D0%B8%D1%82%D0%BE%D0%BA+U12/@49.220161,17.6664961,21z/data=!4m15!1m8!3m7!1s0x4713734f9fa0105f:0xb82e0844e79e996!2sn%C3%A1m.+T.+G.+Masaryka+3050,+760+01+Zl%C3%ADn+1!3b1!8m2!3d49.2199574!4d17.666486!16s%2Fg%2F11c258ggxh!3m5!1s0x4713734f7851ad95:0x90dd7c1b62a9ab28!8m2!3d49.2200393!4d17.6664126!16s%2Fg%2F1ptzpyt1y?entry=ttu&g_ep=EgoyMDI1MDMxOC4wIKXMDSoASAFQAw%3D%3D" target="_blank">
+                        nám. T. G. Masaryka 3050, Zlín, <br>760 01
+                    </a>
+                </div>
+                <div>
+                    <a href="tel:+420123123123">
+                        +420 917 680 097
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col">
+                <div class="top">QUICK LINKS</div>
+                <hr>
+                <p><button class="ps-0 pe-0" routerLink="">Home</button></p>
+                <p><button class="ps-0 pe-0" routerLink="">Cources</button><p>
+                <p><button class="ps-0 pe-0" routerLink="">Coaches</button></p>
+            </div>
+            
+            <div class="col">
+                <div class="top">SERVICES</div>
+                <hr>
+                <p><button class="ps-0 pe-0" routerLink="">Personal Training</button></p>
+                <p><button class="ps-0 pe-0" routerLink="">Group Training</button><p>
+            </div>
+            
+            <div class="col">
+                <div class="top">FOLLOW US</div>
+                <hr>
+                <p>
+                    <a class="socsit" href="https://www.facebook.com/">
+                    <i class="me-2 fs-4 bi bi-facebook"></i>
+                    </a>
+                    <a class="socsit" href="https://www.instagram.com/">
+                    <i class="me-2 fs-4 bi bi-instagram"></i>
+                    </a>
+                    <a class="socsit" href="https://desktop.telegram.org/">
+                    <i class="me-2 fs-4 bi bi-telegram"></i>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="pt-2 pb-4 px-4 flex-fill">
+        <div class="col" id="footerBot">
+            <p class="pt-2">
+                <button class="scroll-top ps-0 pe-0" onclick="scrollToTop()">Back to Top</button>
+
+                <!--WILL BE MOVED TO .TS LATER-->
+                <script>
+                    window.addEventListener("scroll", function() {
+                        let btn = document.querySelector(".scroll-top");
+                        if (window.scrollY > 200) {
+                            btn.classList.add("show");
+                        } else {
+                            btn.classList.remove("show");
+                        }
+                    });
+
+                    function scrollToTop() {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                </script>
+            </p>
+            <div>
+                <a href="https://termify.io/">
+                    Privacy Policy
+                </a>
+            </div>
+            <div>Created by students of UTB in Zlín to serve educational needs</div>
+            <div>© 2025 Fitness Zlin</div>
+        </div>
+    </div>
+</div>
