@@ -13,5 +13,5 @@ public class Template : Entity
     [StringLength(1500)]
     public required string Text { get; set; }
     [StringLength(10)]
-    public string Language { get; set; } = "cs";
+    public string Language { get; set; } = "en";
 }
