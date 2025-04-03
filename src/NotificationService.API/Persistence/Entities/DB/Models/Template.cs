@@ -8,7 +8,7 @@ public class Template : Entity
     [StringLength(100)]
     public required string Name { get; set; }
     [StringLength(75)]
-    public string? Subject { get; set; }
+    public required string Subject { get; set; }
     //Budou vytvoreny zastupne znaky pro vlozeni promennych(jmeno,datum,atd.)
     [StringLength(1500)]
     public required string Text { get; set; }

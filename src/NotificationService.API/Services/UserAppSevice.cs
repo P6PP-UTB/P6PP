@@ -1,14 +1,12 @@
 ﻿using NotificationService.API.Persistence.Entities;
-using ReservationSystem.Shared.Results;
 using ReservationSystem.Shared.Clients;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+using ReservationSystem.Shared;
 
 namespace NotificationService.API.Services
 {
     public class UserAppService
     {
-        public record GetUserRespond(User user);
+        public record GetUserRespond(User User);
 
         private readonly NetworkHttpClient _httpClient;
 
@@ -18,10 +16,8 @@ namespace NotificationService.API.Services
         }
         public async Task<User?> GetUserByIdAsync(int id)
         {
-            Console.WriteLine($"GetUserByIdAsync called with id: {id}");
-            var response = await _httpClient.GetAsync<ApiResult<GetUserRespond>>($"http://localhost:5189/api/user/{id}");   
-            return response.Data?.Data?.user;
-            
+            var response = await _httpClient.GetAsync<GetUserRespond>(ServiceEndpoints.UserService.GetUserById(id));   
+            return response.Data?.User;
         }
     }
 }

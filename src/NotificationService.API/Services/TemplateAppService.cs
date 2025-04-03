@@ -13,14 +13,14 @@ namespace NotificationService.API.Services
             _notificationDbContext = notificationDbContext;
         }
 
-        public async Task<Template?> GetTemplateAsync(string name, string? language = "cs")
+        public async Task<Template> GetTemplateAsync(string name, string? language = "cs")
         {
             if (string.IsNullOrEmpty(language))
             {
                 language = "cs";
             }
             var template = await _notificationDbContext.Templates
-                .FirstOrDefaultAsync(x => x.Name == name && x.Language == language);
+                .FirstAsync(x => x.Name == name && x.Language == language);
 
             return template;
         }
