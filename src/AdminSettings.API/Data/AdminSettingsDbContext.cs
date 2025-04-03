@@ -13,5 +13,4 @@ public class AdminSettingsDbContext : DbContext
     public DbSet<SystemSetting> SystemSettings { get; set; }
     public DbSet<Timezone> Timezones { get; set; }
     public DbSet<Currency> Currencies { get; set; }
-    public DbSet<Language> Languages { get; set; }
 }
