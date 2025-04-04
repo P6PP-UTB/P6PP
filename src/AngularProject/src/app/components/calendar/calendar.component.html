@@ -1,0 +1,39 @@
+<div class="calendar-container">
+    <aside class="calendar-sidebar">
+      <h3>{{ getMonthName() }} {{ year }}</h3>
+      <div class="event-list">
+        <h4>Today</h4>
+        <div *ngFor="let event of eventsToday" class="event-item">
+          <span class="dot" [style.backgroundColor]="event.color"></span>
+          <span>{{ event.title }}</span>
+          <span class="time">{{ event.time }}</span>
+        </div>
+  
+        <h4>Tomorrow</h4>
+        <div *ngFor="let event of eventsTomorrow" class="event-item">
+          <span class="dot" [style.backgroundColor]="event.color"></span>
+          <span>{{ event.title }}</span>
+          <span class="time">{{ event.time }}</span>
+        </div>
+      </div>
+    </aside>
+  
+    <main class="calendar-main">
+      <header class="calendar-header">
+        <button (click)="changeMonth(-1)">&#8592;</button>
+        <h2>{{ getMonthName() }} {{ year }}</h2>
+        <button (click)="changeMonth(1)">&#8594;</button>
+      </header>
+  
+      <div class="calendar-grid">
+        <div class="calendar-row calendar-weekdays">
+          <div *ngFor="let day of weekdays" class="calendar-cell">{{ day }}</div>
+        </div>
+        <div *ngFor="let week of weeks" class="calendar-row">
+          <div *ngFor="let day of week" class="calendar-cell" [class.today]="isToday(day!)">
+            {{ day || '' }}
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>

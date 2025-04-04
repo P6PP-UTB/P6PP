@@ -1,0 +1,88 @@
+
+body {
+    margin: 0;
+    padding: 0;
+  }
+  
+
+.video-wrapper {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+  
+  .video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+  }
+  .controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 2;
+  }
+  
+  .control-btn {
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  
+  .control-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .scroll-btn {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+
+.after-video {
+    height: 100vh;
+    background: #f0f0f0;
+}
+
+.scroll-container {
+    height: 100vh;
+    width: 100vw;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;
+  }
+  
+  .scroll-section {
+    height: 100vh;
+    width: 100vw;
+    scroll-snap-align: start;
+    position: relative;
+  }
+  
+  
+  footer{
+    position: absolute;
+    width: 100vw;
+    
+  }

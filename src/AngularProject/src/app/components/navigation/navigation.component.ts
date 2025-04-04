@@ -8,8 +8,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-navigation',
   imports: [RouterModule, 
-    FooterComponent, 
-    HeaderComponent,MatIconModule, CommonModule],
+    MatIconModule, CommonModule],
   templateUrl: './navigation.component.html',
   styleUrl: './navigation.component.scss'
 })

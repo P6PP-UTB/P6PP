@@ -1,0 +1,82 @@
+.calendar-container {
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    color: #333;
+  }
+  
+  .calendar-sidebar {
+    width: 250px;
+    border-right: 1px solid #ccc;
+    padding: 1rem;
+  }
+  
+  .event-list h4 {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .event-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+  }
+  
+  .event-item .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+  }
+  
+  .event-item .time {
+    color: #999;
+    font-size: 0.8rem;
+  }
+  
+  .calendar-main {
+    flex-grow: 1;
+    padding: 1rem;
+  }
+  
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .calendar-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .calendar-row {
+    display: flex;
+    gap: 0.3rem;
+  }
+  
+  .calendar-cell {
+    flex: 1;
+    height: 80px;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    position: relative;
+  }
+  
+  .calendar-cell.today {
+    background: #e0f7fa;
+    border: 2px solid #00acc1;
+    font-weight: bold;
+  }
+  
