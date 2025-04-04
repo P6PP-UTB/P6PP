@@ -48,7 +48,7 @@ public class SendPasswordResetEmailHandler
         var template = await _templateAppService.GetTemplateAsync("PasswordReset");
 
         template.Text = template.Text.Replace("{name}", user.FirstName + " " +  user.LastName);
-        template.Text = template.Text.Replace("{url}", request.url);
+        template.Text = template.Text.Replace("{link}", request.url);
 
         var emailArgs = new EmailArgs
         {
