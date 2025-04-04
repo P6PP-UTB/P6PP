@@ -34,7 +34,21 @@ services:
         condition: service_healthy
     networks:
       - backend
-
+  
+  booking-service:
+    build:
+      context: .
+      dockerfile: src/BookingService.API/Dockerfile
+    container_name: booking-service
+    ports:
+      - "8080:8081"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=booking_db;User=root;Password=password123;
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - backend
   notification-service:
     build:
       context: .
@@ -49,7 +63,7 @@ services:
         condition: service_healthy
     networks:
       - backend
-      
+
   mysql:
     image: mysql:latest
     container_name: mysql_local
