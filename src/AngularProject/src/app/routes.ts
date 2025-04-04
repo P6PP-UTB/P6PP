@@ -5,11 +5,12 @@ import { NavigationComponent } from './components/navigation/navigation.componen
 import { LoginPage } from './pages/login/login.page';
 import { SignupPage } from './pages/signup/signup.page';
 import { ProfilePage } from './pages/profile/profile.page';
+import {MainPageComponent} from './pages/main-page/main-page.component'
 
 const routeConfig: Routes = [
     {
         path: '',
-        component: NavigationComponent,
+        component: MainPageComponent,
         // loadChildren: () => import('./navigation/navigation.component').then(m => m.NavigationComponent),
         title: 'Main page'
     },

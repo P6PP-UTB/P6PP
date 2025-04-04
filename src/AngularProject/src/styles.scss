@@ -3,6 +3,24 @@
 
 body{
     margin: 0%;
+    overflow: hidden;
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* IE/Edge */
 }
-html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* Убираем полосы прокрутки глобально, но прокрутка остаётся */
+html, body {
+    overflow: auto;
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* IE 10+ */
+  }
+  
+  /* Chrome, Safari, Edge */
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent;
+    
+  }
+  

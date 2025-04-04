@@ -1,0 +1,50 @@
+<div class="scroll-container">
+    <section class="scroll-section">
+        <div class="video-wrapper">
+            <video
+              #bgVideo
+              class="video"
+              autoplay
+              muted
+              playsinline
+              (ended)="onVideoEnded()"
+              *ngIf="!isHidden"
+            >
+              <source src="assets/media/rezervace_comp.mp4" type="video/mp4" />
+              Your browser does not support HTML5 video.
+            </video>
+          
+            
+            <img
+              *ngIf="isHidden"
+              src="assets/media/rezervace_still.png"
+              alt="Video placeholder"
+              class="video"
+            />
+          
+            <div class="controls">
+                <button class="control-btn" (click)="toggleMute()">
+                  {{ isMuted ? 'Sound' : 'No Sound' }}
+                </button>
+            
+                <button class="control-btn" (click)="toggleVideo()">
+                  {{ isHidden ? 'Show' : ' Hide' }}
+                </button>
+            </div>
+          
+            
+            <button class="scroll-btn" (click)="scrollDown()">down</button>
+        </div>
+    </section>  
+      
+    <section class="scroll-section after-video">
+        <app-navigation></app-navigation>
+    </section>
+    <section class="scroll-section">
+        <app-calendar></app-calendar>
+        
+    </section>
+    <section class="scroll-section">
+        <app-footer></app-footer>
+    </section>
+</div>  
