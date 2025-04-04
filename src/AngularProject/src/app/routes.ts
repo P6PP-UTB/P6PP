@@ -1,8 +1,10 @@
 import { Routes } from '@angular/router';
 import { AppComponent } from './app.component';
-import { LoginPage } from './pages/login/login.page';
+
 import { NavigationComponent } from './components/navigation/navigation.component';
+import { LoginPage } from './pages/login/login.page';
 import { SignupPage } from './pages/signup/signup.page';
+import { ProfilePage } from './pages/profile/profile.page';
 
 const routeConfig: Routes = [
     {
@@ -22,6 +24,12 @@ const routeConfig: Routes = [
         component: SignupPage,
         //loadChildren: () => import('./pages/signup/signup.page').then(m => m.SignupPage),
         title: 'Sign up'
+    },
+    {
+        path: 'profile',
+        component: ProfilePage,
+        //loadChildren: () => import('./pages/signup/signup.page').then(m => m.SignupPage),
+        title: 'Profile'
     }
 ];
 
