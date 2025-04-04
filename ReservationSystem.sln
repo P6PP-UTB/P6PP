@@ -5,15 +5,17 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E4B02A74-09EF-44B9-ACAD-C05E6F9A0949}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleService.API", "src\ExampleService.API\ExampleService.API.csproj", "{E732E9A2-7BBF-4A54-9333-35276ABB1E16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleService.API", "src\ExampleService.API\ExampleService.API.csproj", "{E732E9A2-7BBF-4A54-9333-35276ABB1E16}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{39C3A90E-F58F-43A2-A09E-40F65572F828}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReservationSystem.Shared", "libs\ReservationSystem.Shared\ReservationSystem.Shared.csproj", "{CAB56059-5B44-4C64-B187-68586EA8667F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReservationSystem.Shared", "libs\ReservationSystem.Shared\ReservationSystem.Shared.csproj", "{CAB56059-5B44-4C64-B187-68586EA8667F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.API", "src\UserService.API\UserService.API.csproj", "{6EDAD038-CF26-47DB-B592-405A95D0C449}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserService.API", "src\UserService.API\UserService.API.csproj", "{6EDAD038-CF26-47DB-B592-405A95D0C449}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.API", "src\AuthService.API\AuthService.API.csproj", "{0DDD7049-0238-4DD5-B309-CC6E1C0C8DAB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthService.API", "src\AuthService.API\AuthService.API.csproj", "{0DDD7049-0238-4DD5-B309-CC6E1C0C8DAB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService.API", "src\BookingService.API\BookingService.API.csproj", "{95C134E3-57B6-4D92-B21A-19EE03A935A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.API", "src\NotificationService.API\NotificationService.API.csproj", "{139161C4-042F-429F-90F5-578C1A9999B7}"
 EndProject
@@ -46,6 +48,10 @@ Global
 		{0DDD7049-0238-4DD5-B309-CC6E1C0C8DAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DDD7049-0238-4DD5-B309-CC6E1C0C8DAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DDD7049-0238-4DD5-B309-CC6E1C0C8DAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95C134E3-57B6-4D92-B21A-19EE03A935A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95C134E3-57B6-4D92-B21A-19EE03A935A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95C134E3-57B6-4D92-B21A-19EE03A935A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95C134E3-57B6-4D92-B21A-19EE03A935A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,5 +62,6 @@ Global
 		{139161C4-042F-429F-90F5-578C1A9999B7} = {E4B02A74-09EF-44B9-ACAD-C05E6F9A0949}
 		{6EDAD038-CF26-47DB-B592-405A95D0C449} = {E4B02A74-09EF-44B9-ACAD-C05E6F9A0949}
 		{0DDD7049-0238-4DD5-B309-CC6E1C0C8DAB} = {E4B02A74-09EF-44B9-ACAD-C05E6F9A0949}
+		{95C134E3-57B6-4D92-B21A-19EE03A935A4} = {E4B02A74-09EF-44B9-ACAD-C05E6F9A0949}
 	EndGlobalSection
 EndGlobal
