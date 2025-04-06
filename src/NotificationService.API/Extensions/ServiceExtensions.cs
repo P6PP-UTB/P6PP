@@ -17,8 +17,10 @@ public static class ServiceExtensions
         services.AddScoped<SendEmailHandler>();
 
         // Register TemplateAppService
+        services.AddSingleton<EditTemplateValidator>();
         services.AddScoped<TemplateAppService>();
         services.AddScoped<GetAllTemplatesHandler>();
+        services.AddScoped<EditTemplateHandler>();
 
         // Register RegisterEmail Services
         services.AddSingleton<SendRegistrationEmailValidator>();

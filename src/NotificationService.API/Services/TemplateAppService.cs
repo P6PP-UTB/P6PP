@@ -27,14 +27,26 @@ namespace NotificationService.API.Services
 
         public async Task<List<Template>> GetAllTemplatesAsync()
         {
-            var templates = await _notificationDbContext.Templates.ToListAsync();
+            var templates = await _notificationDbContext.Templates.AsNoTracking().ToListAsync();
             return templates;
         }
 
-        public async Task EditTemplateAsync(Template template)
+        public async Task<bool> EditTemplateAsync(Template template)
         {
-            _notificationDbContext.Templates.Update(template);
+            // Our other services refer to templates by name so we lookup by name
+            var templateToEdit = await _notificationDbContext.Templates
+                .AsTracking()
+                .FirstOrDefaultAsync(t => t.Name == template.Name && t.Language == template.Language);
+
+            // Nothing to edit
+            if (templateToEdit == null) return false;
+
+            // Nothing else should be changed
+            templateToEdit.Text = template.Text;
+            templateToEdit.Subject = template.Subject;
+
             await _notificationDbContext.SaveChangesAsync();
+            return true;
         }
     }
 }
