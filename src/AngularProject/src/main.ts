@@ -8,6 +8,10 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 
 bootstrapApplication(AppComponent, { 
-  providers:[appConfig.providers,provideAnimations(),provideToastr()]  
+  providers:[
+    appConfig.providers,
+    provideAnimations(),
+    provideToastr()
+  ]  
 })
   .catch((err) => console.error(err));

@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,7 @@ export class LoginPage {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {
     this.loginForm = this.fb.group({
@@ -36,6 +38,14 @@ export class LoginPage {
         next: (res) => {
           const token = res.data; 
           this.authService.setToken(token);
+          console.log('📦 Токен засетан:', token);
+          const userId = this.userService.getUserIdFromToken();
+
+          if (userId) {
+            console.log('✅ User ID from token:', userId);
+          } else {
+            console.error('❌ Не удалось достать ID из токена');
+          }
           this.router.navigate(['']);
         },
         error: (err) => {

@@ -45,7 +45,7 @@ export class SignupPage {
       password: ['', [
         Validators.required, 
         Validators.minLength(8),
-        Validators.pattern('^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$')]],
+        Validators.pattern('^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$')]],
 
       repeatPassword: ['', [
         Validators.required]]

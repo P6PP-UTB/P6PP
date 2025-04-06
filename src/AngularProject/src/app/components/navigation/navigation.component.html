@@ -13,11 +13,14 @@
       <button id="signup-btn" class="nav-btn" routerLink="signup">Sign up</button>
     </div>
   
-    <button class="menu-btn" *ngIf="isLoggedIn" (click)="toggleMenu()">
-        <mat-icon>menu</mat-icon>
-    </button>
+    <div *ngIf="isLoggedIn" id="logout-btn">
+      <button class="nav-btn" (click)="logout()">
+        Log out
+      </button>
+    </div>
 </div>
 
+
 <!-- <app-header></app-header> -->
-  
 <!-- <app-sidebar-menu [isOpen]="isMenuOpen" (menuClosed)="onMenuClosed()"></app-sidebar-menu> -->
+<!-- <app-footer></app-footer> -->
