@@ -16,6 +16,8 @@ export class SignupPage {
   hidePassword = true;
   hideRepeatPassword = true;
   registrationError: string | null = null;
+  showVerifyMessage: boolean = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -68,7 +70,9 @@ export class SignupPage {
   
       this.authService.registerUser(payload).subscribe({
         next: () => {
-          this.router.navigate(['/login']); // или куда надо
+          this.showVerifyMessage = true;
+          //this.signupForm.reset();
+          //this.router.navigate(['/login']); // или куда надо
         },
         error: (err) => {
           if (err.status === 400 && err.error?.message) {
