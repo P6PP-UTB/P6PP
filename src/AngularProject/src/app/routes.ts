@@ -6,6 +6,7 @@ import { LoginPage } from './pages/login/login.page';
 import { SignupPage } from './pages/signup/signup.page';
 import { ProfilePage } from './pages/profile/profile.page';
 import {MainPageComponent} from './pages/main-page/main-page.component'
+import { AuthGuard } from './services/auth.guard';
 
 const routeConfig: Routes = [
     {
@@ -30,7 +31,8 @@ const routeConfig: Routes = [
         path: 'profile',
         component: ProfilePage,
         //loadChildren: () => import('./pages/signup/signup.page').then(m => m.SignupPage),
-        title: 'Profile'
+        title: 'Profile',
+        canActivate: [AuthGuard] 
     }
 ];
 

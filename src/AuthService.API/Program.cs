@@ -34,7 +34,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:4200")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); 
+              .AllowCredentials();
     });
 });
 
@@ -67,8 +67,8 @@ builder.Services.AddAuthentication(options =>
         var issuer = "Local";
         //var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
         var audience = "local";
-        
-        
+
+
         if (string.IsNullOrEmpty(jwtSecretKey) || string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience))
         {
             throw new ArgumentNullException("JWT configuration is missing.");
@@ -98,7 +98,7 @@ using (var scope = app.Services.CreateScope())
     {
         context.Database.Migrate();
         Console.WriteLine("✅ Database Migrations Applied Successfully.");
-        
+
         // Seed roles after ensuring database schema exists
         /*
         var roleManager = services.GetRequiredService<RoleManager<Role>>();

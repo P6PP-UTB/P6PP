@@ -1,2 +1,41 @@
 <app-navigation></app-navigation>
-<p>profile.page works!</p>
+
+<div class="profile-container">
+  <section class="profile-header">
+    <div class="user-info">
+      <img src="https://i.pravatar.cc/150?img=3" alt="Avatar" class="avatar" />
+      <div class="username">{{ "@" + user?.username }}</div>
+      <div class="name">{{ user?.firstName }} {{ user?.lastName }}</div>
+      <button class="edit-btn">Edit</button>
+    </div>
+    <button class="settings-btn">Settings</button>
+  </section>
+
+  <hr />
+
+  <section class="profile-main">
+    <div class="courses">
+      <h3>Your Courses</h3>
+      <div class="course-card">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh41yBS-mlfFbMI8mgEE4wZDexvPO8J_bVlg&s" alt="Yoga Course" />
+        <div class="course-info">
+          <strong>YOGA</strong>
+          <button class="more-info-btn">More Info</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="upcoming">
+      <h3>Coming up</h3>
+      <div class="upcoming-card">
+        <img src="https://akns-images.eonline.com/eol_images/Entire_Site/2019226/rs_1024x759-190326044524-1024-Conor-McGregor-LT-032619-GettyImages-1047272848.jpg?fit=around%7C1024:759&output-quality=90&crop=1024:759;center,top" alt="Coach" />
+        <div class="coach-info">
+          <strong>Conor McGregor</strong>
+          <p>Next Training</p>
+          <span class="training-date">3.12.2025</span>
+          <button class="calendar-btn">Open Calendar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

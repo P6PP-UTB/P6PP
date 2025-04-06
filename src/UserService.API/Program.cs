@@ -10,6 +10,16 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5189);
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -23,7 +33,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var databaseInitializer = services.GetRequiredService<DatabaseInitializer>();
     await databaseInitializer.InitializeDatabaseAsync();
-    
+
     // Seed the database
     var dbSeeder = services.GetRequiredService<DatabaseSeeder>();
     await dbSeeder.SeedAsync();
@@ -38,6 +48,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+app.UseCors("AllowAngularDevClient");
+
+
 app.UseRouting();
 
 app.UseEndpoints(endpoints =>
@@ -49,13 +63,13 @@ app.UseEndpoints(endpoints =>
     UpdateUserEndpoint.Register(endpoints);
     CreateUserEndpoint.Register(endpoints);
     AssignUserRoleEndpoint.Register(endpoints);
-    
-    
+
+
     // ROLE ENDPOINTS
     GetRoleByIdEndpoint.Register(endpoints);
     GetRolesEndpoint.Register(endpoints);
     CreateRoleEndpoint.Register(endpoints);
-    
+
 });
 
 app.Run();

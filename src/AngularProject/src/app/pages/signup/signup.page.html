@@ -48,7 +48,7 @@
             <label for="password">Password 
                 <span class="required">*</span>
                 <p class="error-message" *ngIf="signupForm.controls['password'].invalid && signupForm.controls['password'].touched && signupForm.get('password')?.value ">
-                    Password must be at least 8 characters long and contian at least number, uppercase and lowercase letters
+                    Password must be at least 8 characters long and contian at least number, uppercase and lowercase letters, at least one special character
                 </p>
             </label>
             <div class="container">
