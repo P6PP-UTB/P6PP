@@ -38,14 +38,7 @@ export class LoginPage {
         next: (res) => {
           const token = res.data; 
           this.authService.setToken(token);
-          console.log('📦 Токен засетан:', token);
           const userId = this.userService.getUserIdFromToken();
-
-          if (userId) {
-            console.log('✅ User ID from token:', userId);
-          } else {
-            console.error('❌ Не удалось достать ID из токена');
-          }
           this.router.navigate(['']);
         },
         error: (err) => {
