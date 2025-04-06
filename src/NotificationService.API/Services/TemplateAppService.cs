@@ -25,6 +25,12 @@ namespace NotificationService.API.Services
             return template;
         }
 
+        public async Task<List<Template>> GetAllTemplatesAsync()
+        {
+            var templates = await _notificationDbContext.Templates.ToListAsync();
+            return templates;
+        }
+
         public async Task EditTemplateAsync(Template template)
         {
             _notificationDbContext.Templates.Update(template);

@@ -73,6 +73,7 @@ app.UseEndpoints(endpoints =>
     SendRegistrationEmailEndpoint.SendRegistrationEmail(endpoints);
     SendVerificationEmailEndpoint.SendVerificationEmail(endpoints);
     SendPasswordResetEmailEndpoint.SendPasswordResetEmail(endpoints);
+    GetAllTemplatesEndpoint.GetAllTemplates(endpoints);
 });
 
 app.Run();
