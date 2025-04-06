@@ -2,6 +2,10 @@
 
 <div id="signup-block">
     <div id="create">Create an account</div>
+
+    <div *ngIf="showVerifyMessage" class="alert alert-info">
+        Prosím, zkontrolujte svou e-mailovou schránku a potvrďte registraci.
+      </div>
     <div class="form-container">
         <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
         
