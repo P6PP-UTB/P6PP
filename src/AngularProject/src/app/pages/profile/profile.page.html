@@ -6,34 +6,86 @@
       <img src="https://i.pravatar.cc/150?img=3" alt="Avatar" class="avatar" />
       <div class="username">{{ "@" + user?.username }}</div>
       <div class="name">{{ user?.firstName }} {{ user?.lastName }}</div>
-      <button class="edit-btn">Edit</button>
+      <button class="edit-btn" (click)="toggleEditForm()">Edit</button>
     </div>
-    <button class="settings-btn">Settings</button>
+    <div class="details">
+      <h3>User Details</h3>
+      <p *ngIf="user?.email">📧 Email: {{ user.email }}</p>
+      <p *ngIf="user?.phoneNumber">📱 Phone: {{ user.phoneNumber }}</p>
+      <p *ngIf="user?.sex">⚧ Gender: {{ user.sex }}</p>
+      <p *ngIf="user?.height">📏 Height: {{ user.height }} cm</p>
+      <p *ngIf="user?.weight">⚖️ Weight: {{ user.weight }} kg</p>
+    </div>
+    <button class="settings-btn" (click)="toggleSettingsForm()">Settings</button>
   </section>
 
   <hr />
 
   <section class="profile-main">
-    <div class="courses">
-      <h3>Your Courses</h3>
-      <div class="course-card">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh41yBS-mlfFbMI8mgEE4wZDexvPO8J_bVlg&s" alt="Yoga Course" />
-        <div class="course-info">
-          <strong>YOGA</strong>
-          <button class="more-info-btn">More Info</button>
+    <!-- 🔧 Edit Profile Form -->
+    <form *ngIf="showEditForm" [formGroup]="editForm" (ngSubmit)="onSaveProfile()" class="form-block">
+      <h3 class="form-title">Update Profile</h3>
+      <input type="text" formControlName="username" placeholder="Username" class="form-input" />
+      <input type="text" formControlName="firstName" placeholder="First Name" class="form-input" />
+      <input type="text" formControlName="lastName" placeholder="Last Name" class="form-input" />
+      <input type="email" formControlName="email" placeholder="Email" class="form-input" />
+      <input type="text" formControlName="phoneNumber" placeholder="Phone Number" class="form-input" />
+      <input type="number" formControlName="weight" placeholder="Weight (kg)" class="form-input" />
+      <input type="number" formControlName="height" placeholder="Height (cm)" class="form-input" />
+      <select formControlName="sex" class="form-input">
+        <option value="" disabled selected hidden>Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+      <button type="submit" class="form-button">Save</button>
+    </form>
+
+    <!-- ⚙️ Settings Form -->
+    <form *ngIf="showSettingsForm" [formGroup]="settingsForm" (ngSubmit)="onResetPassword()" class="form-block">
+      <h3 class="form-title">Reset Password</h3>
+
+      <input type="password" formControlName="newPassword" placeholder="New Password" class="form-input" />
+      
+      <p class="error-message"
+        *ngIf="settingsForm.get('newPassword')?.touched && settingsForm.get('newPassword')?.invalid">
+        <span *ngIf="settingsForm.get('newPassword')?.errors?.['required']">
+          Password is required.
+        </span>
+        <span *ngIf="settingsForm.get('newPassword')?.errors?.['minlength']">
+          Password must be at least 8 characters.
+        </span>
+        <span *ngIf="settingsForm.get('newPassword')?.errors?.['pattern']">
+          Must include uppercase, lowercase, number and special char.
+        </span>
+      </p>
+
+      <button type="submit" class="form-button">Reset</button>
+      <button type="button" class="form-button danger" (click)="onDeleteAccount()">Delete Account</button>
+    </form>
+
+    <!-- 📚 User Courses -->
+    <div class="profile-events">
+      <div class="courses">
+        <h3>Your Courses</h3>
+        <div class="course-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh41yBS-mlfFbMI8mgEE4wZDexvPO8J_bVlg&s" alt="Yoga Course" />
+          <div class="course-info">
+            <strong>YOGA</strong>
+            <button class="more-info-btn">More Info</button>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="upcoming">
-      <h3>Coming up</h3>
-      <div class="upcoming-card">
-        <img src="https://akns-images.eonline.com/eol_images/Entire_Site/2019226/rs_1024x759-190326044524-1024-Conor-McGregor-LT-032619-GettyImages-1047272848.jpg?fit=around%7C1024:759&output-quality=90&crop=1024:759;center,top" alt="Coach" />
-        <div class="coach-info">
-          <strong>Conor McGregor</strong>
-          <p>Next Training</p>
-          <span class="training-date">3.12.2025</span>
-          <button class="calendar-btn">Open Calendar</button>
+  
+      <div class="upcoming">
+        <h3>Coming up</h3>
+        <div class="upcoming-card">
+          <img src="https://akns-images.eonline.com/eol_images/Entire_Site/2019226/rs_1024x759-190326044524-1024-Conor-McGregor-LT-032619-GettyImages-1047272848.jpg?fit=around%7C1024:759&output-quality=90&crop=1024:759;center,top" alt="Coach" />
+          <div class="coach-info">
+            <strong>Conor McGregor</strong>
+            <p>Next Training</p>
+            <span class="training-date">3.12.2025</span>
+            <button class="calendar-btn">Open Calendar</button>
+          </div>
         </div>
       </div>
     </div>
