@@ -8,13 +8,24 @@ interface JwtPayload {
   name: string;
 }
 
+interface UpdateUserRequest {
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phoneNumber?: string;
+  weight?: number;
+  height?: number;
+  sex?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private userBaseUrl = 'http://localhost:5189/api/user';
+  private authBaseUrl = 'http://localhost:8005/api/auth';
 
   constructor(private http: HttpClient) {}
 
-  // 💉 Декодим userId из JWT токена
   getUserIdFromToken(): number | null {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -24,27 +35,36 @@ export class UserService {
 
     try {
       const decoded: any = jwtDecode(token);
-
-
-      // Используем ключ по полной ссылке, как в токене
       const userId = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
       return parseInt(userId);
     } catch (err) {
-      console.error('❌ Ошибка при декодировании токена:', err);
+      console.error('Decoding error: ', err);
       return null;
     }
   }
 
-  // 🔥 Получаем текущего пользователя через токен
   getCurrentUser(): Observable<any> {
     const id = this.getUserIdFromToken();
     if (!id) return of(null);
-
     return this.getUserById(id);
   }
 
-  // 🚚 Получаем пользователя по ID
   getUserById(id: number): Observable<any> {
     return this.http.get(`${this.userBaseUrl}/${id}`);
+  }
+
+  updateUser(id: number, payload: UpdateUserRequest): Observable<any> {
+    return this.http.put(`${this.userBaseUrl}/${id}`, payload);
+  }
+
+  resetPassword(userId: number, newPassword: string): Observable<any> {
+    return this.http.post(`${this.authBaseUrl}/reset-password`, {
+      userId,
+      newPassword
+    });
+  }
+
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete(`${this.userBaseUrl}/${id}`);
   }
 }

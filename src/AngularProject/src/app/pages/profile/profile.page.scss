@@ -50,8 +50,13 @@
   display: flex;
   justify-content: space-between;
   margin-top: 2rem;
+  flex-direction: column;
   gap: 50px;
 
+  .profile-events {
+    display: flex; 
+    gap: 50px;
+  }
   .courses, .upcoming {
     flex: 1;
   }
@@ -102,4 +107,62 @@
       border-radius: 50%
     }
   }
+  .form-block {
+    align-self: center;
+    padding: 20px;
+    background: #f2f2f2;
+    border-radius: 10px;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #333;
+  }
+  
+  .form-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+  
+    &:focus {
+      border-color: #EA2839;
+    }
+  }
+  
+  .form-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #EA2839;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+  
+    &:hover {
+      background-color: #b71c1c;
+    }
+  
+    &.danger {
+      background-color: #555;
+  
+      &:hover {
+        background-color: #222;
+      }
+    }
+  }
+  
 }

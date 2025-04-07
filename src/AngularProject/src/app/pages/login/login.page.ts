@@ -38,7 +38,6 @@ export class LoginPage {
         next: (res) => {
           const token = res.data; 
           this.authService.setToken(token);
-          const userId = this.userService.getUserIdFromToken();
           this.router.navigate(['']);
         },
         error: (err) => {
