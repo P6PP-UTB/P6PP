@@ -27,12 +27,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              {
-                "glob": "**/*",
-                "input": "node_modules/bootstrap-icons/font/fonts",
-                "output": "assets/fonts"
-              }
+              "src/assets"
             ],
             "styles": [
               "@angular/material/prebuilt-themes/rose-red.css",
