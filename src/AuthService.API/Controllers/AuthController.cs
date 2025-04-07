@@ -107,7 +107,7 @@ public class AuthController : Controller
 
         var claims = new List<Claim>
         {
-            new Claim("userid", user.Id),
+            new Claim("userid", user.UserId.ToString()), //Změněno na UserId a ToString()
             new Claim("username", user.UserName!)
         };
 
@@ -134,25 +134,22 @@ public class AuthController : Controller
 
         var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
 
-        if (userIdClaim == null)
-            return Unauthorized(new ApiResult<object>(null, false, "Token does not contain user ID."));
+        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized(new ApiResult<object>(null, false, "Token does not contain valid user ID."));
 
-        var userId = userIdClaim.Value;
-
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
 
         if (user == null)
             return BadRequest(new ApiResult<object>(null, false, "User not found."));
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
         var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
 
         if (!result.Succeeded)
             return BadRequest(new ApiResult<object>(result.Errors, false, "Password reset failed."));
 
         return Ok(new ApiResult<object>(
-            new { UserId = user.Id, Email = user.Email },
+            new { UserId = user.UserId, Email = user.Email },
             true,
             "Password reset successfully."));
     }
@@ -168,8 +165,7 @@ public class AuthController : Controller
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
             var usernameClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username");
 
-
-            if (userIdClaim == null || usernameClaim == null)
+            if (userIdClaim == null || usernameClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
             {
                 return Unauthorized(new
                 {
@@ -178,7 +174,7 @@ public class AuthController : Controller
                 });
             }
 
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userIdClaim.Value);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null)
             {
@@ -196,7 +192,8 @@ public class AuthController : Controller
 
             var tokenBlackList = new TokenBlackList
             {
-                UserId = user.Id,
+                UserId = user.Id, // string (Identity GUID)
+                UserNumericId = user.UserId, //int (Vlastní ID)
                 Token = token,
                 ExpirationDate = expirationDateUtc
             };
@@ -207,14 +204,15 @@ public class AuthController : Controller
             return Ok(new
             {
                 message = "User logged out successfully.",
-                userid = user.Id,
+                userid = user.UserId,
+                identityId = user.Id,
                 username = user.UserName,
                 claims = HttpContext.User.Claims.Select(c => new { c.Type, c.Value })
             });
         }
         catch (Exception ex)
         {
-            Console.WriteLine($" Exception in Logout: {ex.Message}");
+            Console.WriteLine($"Exception in Logout: {ex.Message}");
             return StatusCode(500, new { message = "An error occurred.", exception = ex.Message });
         }
     }
