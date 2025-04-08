@@ -13,13 +13,13 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: AuthService
+          - image: authservice
             context: src/AuthService.API
-          - image: BookingService
+          - image: bookingservice
             context: src/BookingService.API
-          - image: NotificationService
+          - image: notificationService
             context: src/NotificationService.API
-          - image: UserService
+          - image: userservice
             context: src/UserService.API
     name: 'Build and Push ${{ matrix.image }} to ACR'
     runs-on: ubuntu-latest
