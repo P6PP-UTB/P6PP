@@ -17,7 +17,7 @@ jobs:
             context: src/AuthService.API
           - image: bookingservice
             context: src/BookingService.API
-          - image: notificationService
+          - image: notificationservice
             context: src/NotificationService.API
           - image: userservice
             context: src/UserService.API
