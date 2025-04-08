@@ -5,6 +5,8 @@ on:
       - 'main'
     tags:
       - '*'
+  workflow_dispatch:
+
 jobs:
   push_image:
     environment: 'Development'
