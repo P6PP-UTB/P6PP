@@ -36,6 +36,8 @@ public static class ServiceEndpoints
         public static string SendVerificationEmail => $"{BaseUrl}/api/notification/user/sendverificationemail";
         public static string SendPasswordResetEmail => $"{BaseUrl}/api/notification/user/sendpasswordresetemail";
         public static string SendRegistrationEmail(int id) => $"{BaseUrl}/api/notification/user/sendregistrationemail/{id}";
+        public static string GetAllTemplates => $"{BaseUrl}/api/notification/templates/getalltemplates";
+        public static string EditTemplate => $"{BaseUrl}/api/notification/templates/getalltemplates";
     }
     
 }
