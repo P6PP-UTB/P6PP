@@ -108,7 +108,7 @@ public class TemplateInit
         templates.Add(new Template
         {
             Id = 4,
-            Name = "ReservationConfirmation",
+            Name = "BookingConfirmation",
             Subject = "Reservation confirmation",
             Text = @"
                     <html>
@@ -127,7 +127,7 @@ public class TemplateInit
                         <body>
                             <p style=""padding-bottom: 16px;"">Hello <strong>{name}</strong>,</p>
 
-                            <p>Your reservation has been successfully created.</p>
+                            <p>Your reservation on event {eventname}, has been was created.</p>
                             <p><strong>Date and time:</strong> {datetime}</p>
                             <p>If you have any questions or need to modify your reservation, feel free to contact us.</p>
 
@@ -140,7 +140,7 @@ public class TemplateInit
         templates.Add(new Template
         {
             Id = 5,
-            Name = "ReservationCancellation",
+            Name = "BookingCancellation",
             Subject = "Reservation cancelation",
             Text = @"
                     <html>
@@ -159,9 +159,8 @@ public class TemplateInit
                         <body>
                             <p style=""padding-bottom: 16px;"">Hello <strong>{name}</strong>,</p>
 
-                            <p>Your reservation has been canceled.</p>
+                            <p>Your reservation on event{eventname}, has been canceled.</p>
                             <p><strong>Date and time:</strong> {datetime}</p>
-                            <p>If you did not submit this request, please ignore this email.</p>
 
                             <p>Thank you,</p>
                             <p style=""padding-top: 16px;"">Best regards,<br/>

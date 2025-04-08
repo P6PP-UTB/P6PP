@@ -33,7 +33,15 @@ public static class ServiceExtensions
         // Register PasswordResetEmail Services
         services.AddSingleton<SendPasswordResetEmailValidator>();
         services.AddScoped<SendPasswordResetEmailHandler>();
+        
+        //Register BookingConfrimationEmail Services
+        services.AddSingleton<SendBookingConfirmationEmailValidator>();
+        services.AddScoped<SendBookingConfirmationEmailHandler>();
 
+        // Register BookingCancellationEmail Services
+        services.AddSingleton<SendBookingCancellationEmailValidator>();
+        services.AddScoped<SendBookingCancellationEmailHandler>();
+        
         // Register NetworkHttpClient
         services.AddHttpClient<NetworkHttpClient>();
     }

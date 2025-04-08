@@ -75,6 +75,8 @@ app.UseEndpoints(endpoints =>
     SendPasswordResetEmailEndpoint.SendPasswordResetEmail(endpoints);
     GetAllTemplatesEndpoint.GetAllTemplates(endpoints);
     EditTemplateEndpoint.EditTemplate(endpoints);
+    SendBookingConfirmationEmailEndpoint.SendBookingConfirmationEmail(endpoints);
+    SendBookingCancellationEmailEndpoint.SendBookingCancellationEmail(endpoints);
 });
 
 app.Run();
