@@ -507,7 +507,7 @@ public class AuthControllerTests
         var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
         var apiResult = Assert.IsType<ApiResult<object>>(unauthorizedResult.Value);
         Assert.False(apiResult.Success);
-        Assert.Equal("Token does not contain user ID.", apiResult.Message);
+        Assert.Equal("Token does not contain valid user ID.", apiResult.Message);
     }
 
     /// <summary>
