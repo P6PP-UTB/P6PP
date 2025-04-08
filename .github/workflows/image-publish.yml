@@ -38,4 +38,4 @@ jobs:
           context: .
           file: ${{ matrix.dockerfile }}
           push: true
-          tags: cicd/${{ matrix.image }}:${{ vars.IMAGE_TAG }}
+          tags: ${{ secrets.ACR_URL }}/cicd/${{ matrix.image }}:${{ vars.IMAGE_TAG }}
