@@ -48,7 +48,6 @@ public class DatabaseInitializer
 
             await CreateAuditLogsTableAsync(conn);
             await CreateTimezoneTableAsync(conn);
-            await CreateLanguageTableAsync(conn);
             await CreateCurrencyTableAsync(conn);
             await CreateSystemSettingsTableAsync(conn);
         }
@@ -86,18 +85,6 @@ public class DatabaseInitializer
         _logger.LogInformation("Table 'Timezone' ensured.");
     }
 
-    private async Task CreateLanguageTableAsync(MySqlConnection conn)
-    {
-        const string tableSql = @"
-        CREATE TABLE IF NOT EXISTS Languages (
-            Id INT AUTO_INCREMENT PRIMARY KEY,
-            Locale VARCHAR(255) NOT NULL
-        );";
-
-        await conn.ExecuteAsync(tableSql);
-        _logger.LogInformation("Table 'Language' ensured.");
-    }
-
     private async Task CreateCurrencyTableAsync(MySqlConnection conn)
     {
         const string tableSql = @"
@@ -118,10 +105,8 @@ public class DatabaseInitializer
             Id INT AUTO_INCREMENT PRIMARY KEY,
             TimezoneId INT NOT NULL,
             CurrencyId INT NOT NULL,
-            LanguageId INT NOT NULL,
             FOREIGN KEY (TimezoneId) REFERENCES Timezones(Id),
-            FOREIGN KEY (CurrencyId) REFERENCES Currencies(Id),
-            FOREIGN KEY (LanguageId) REFERENCES Languages(Id)
+            FOREIGN KEY (CurrencyId) REFERENCES Currencies(Id)
         );";
 
         await conn.ExecuteAsync(tableSql);

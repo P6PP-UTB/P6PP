@@ -37,15 +37,6 @@ public class SystemSettingsSeeder
             );
         }
 
-        // Seed Language
-        if (!await _context.Languages.AnyAsync())
-        {
-            _context.Languages.AddRange(
-                new Language { Locale = "en-US" },
-                new Language { Locale = "cs-CZ" }
-            );
-        }
-
         await _context.SaveChangesAsync();
 
         // Seed SystemSettings
@@ -53,13 +44,11 @@ public class SystemSettingsSeeder
         {
             var timezone = await _context.Timezones.FirstAsync();
             var currency = await _context.Currencies.FirstAsync();
-            var language = await _context.Languages.FirstAsync();
 
             _context.SystemSettings.Add(new SystemSetting
             {
                 TimezoneId = timezone.Id,
                 CurrencyId = currency.Id,
-                LanguageId = language.Id
             });
 
             await _context.SaveChangesAsync();

@@ -44,6 +44,7 @@ builder.Services.AddSingleton<DapperContext>();
 
 builder.Services.AddScoped<SystemSettingsSeeder>();
 
+builder.Services.AddScoped<SystemSettingsService>();
 builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddScoped<AuditLogRepository>();
 builder.Services.AddScoped<UserService>();
