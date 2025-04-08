@@ -14,13 +14,13 @@ jobs:
       matrix:
         include:
           - image: authservice
-            context: src/AuthService.API
+            dockerfile: src/AuthService.API/Dockerfile
           - image: bookingservice
-            context: src/BookingService.API
+            dockerfile: src/BookingService.API/Dockerfile
           - image: notificationservice
-            context: src/NotificationService.API
+            dockerfile: src/NotificationService.API/Dockerfile
           - image: userservice
-            context: src/UserService.API
+            dockerfile: src/UserService.API/Dockerfile
     name: 'Build and Push ${{ matrix.image }} to ACR'
     runs-on: ubuntu-latest
     steps:
@@ -35,7 +35,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.context }}
+          context: .
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: cicd/${{ matrix.image }}:${{ vars.IMAGE_TAG }}
-
