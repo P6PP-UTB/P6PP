@@ -47,6 +47,7 @@ builder.Services.AddScoped<SystemSettingsSeeder>();
 builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddScoped<AuditLogRepository>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DatabaseBackupService>();
 
 builder.Services.AddScoped<DatabaseInitializer>();
 
