@@ -5,6 +5,7 @@ using ReservationSystem.Shared.Results;
 namespace NotificationService.API.Features;
 
 public record SendBookingConfirmationEmailRequest(int UserId, string Name, DateTime Datetime);
+//TODO: migrate to BookingId and read property from BookingService
 public record SendBookingConfirmationEmailResponse(int? Id = null);
 
 public class SendBookingConfirmationEmailValidator : AbstractValidator<SendBookingConfirmationEmailRequest>
@@ -63,9 +64,9 @@ public class SendBookingConfirmationEmailHandler
             await _mailAppService.SendEmailAsync(emailArgs);
             return new ApiResult<SendBookingConfirmationEmailResponse>(new SendBookingConfirmationEmailResponse());
         }
-        catch
+        catch (Exception e)
         {
-            return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Email was not sent");
+            return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Email was not sent: " + e);
         }
     }
 }
@@ -77,7 +78,6 @@ public static class SendBookingConfirmationEmailEndpoint
         app.MapPost("/api/notification/booking/sendbookingconfirmationemail",
             async (SendBookingConfirmationEmailRequest request, SendBookingConfirmationEmailHandler handler, SendBookingConfirmationEmailValidator validator, CancellationToken cancellationToken) =>
             {
-                Console.WriteLine("request");
                 var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
                 if (!validationResult.IsValid)

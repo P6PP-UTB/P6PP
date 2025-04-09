@@ -47,6 +47,7 @@ namespace NotificationService.API.Services
             using (var smtpClient = new SmtpClient(_smtpSettings.Host, _smtpSettings.Port))
             {
                 smtpClient.EnableSsl = _smtpSettings.EnableSsl;
+                smtpClient.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
                 await smtpClient.SendMailAsync(mailMessage);
 
             }

@@ -5,6 +5,7 @@ using ReservationSystem.Shared.Results;
 namespace NotificationService.API.Features;
 
 public record SendBookingCancellationEmailRequest(int UserId, string Name, DateTime Datetime);
+//TODO: migrate to BookingId and read property from BookingService
 public record SendBookingCancellationEmailResponse(int? Id = null);
 
 public class SendBookingCancellationEmailValidator : AbstractValidator<SendBookingCancellationEmailRequest>
@@ -76,7 +77,6 @@ public static class SendBookingCancellationEmailEndpoint
         app.MapPost("/api/notification/booking/sendbookingcancellationemail",
             async (SendBookingCancellationEmailRequest request, SendBookingCancellationEmailHandler handler, SendBookingCancellationEmailValidator validator, CancellationToken cancellationToken) =>
             {
-                Console.WriteLine("request");
                 var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
                 if (!validationResult.IsValid)
