@@ -82,8 +82,13 @@ public class AuthController : Controller
             Url = $"https://frontend:port/verify-email?token={encodedToken}&userId={user.UserId}"
         };
         
-        
-        
+        var verificationResult = await _httpClient.PostAsync<object, object>(verificationUrl, body, CancellationToken.None);
+
+        if (!verificationResult.Success)
+        {
+            Console.WriteLine("Failed to send verification email.");
+        }
+            
 
         Console.WriteLine("Preparing to send registration email...");
         var registrationUrl = ServiceEndpoints.NotificationService.SendRegistrationEmail(user.UserId);
@@ -97,11 +102,6 @@ public class AuthController : Controller
         {
             Console.WriteLine("Registration email sent successfully.");
         }
-        
-        
-        
-        
-        
         
         Console.WriteLine($"Email verification token for user {user.Email}:");
         Console.WriteLine(encodedToken);
