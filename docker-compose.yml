@@ -56,6 +56,7 @@ services:
     container_name: notification-service
     ports:
       - "5181:5181"
+      - "56000:56000"  # Debug port
     environment:
       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=notification_db;User=root;Password=password123;
     depends_on:

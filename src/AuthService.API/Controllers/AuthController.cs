@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using AuthService.API.Data;
@@ -73,8 +74,35 @@ public class AuthController : Controller
 
         var verifyToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(verifyToken));
+        
+        var verificationUrl = ServiceEndpoints.NotificationService.SendVerificationEmail;
+        var body = new
+        {
+            Id = user.UserId,
+            Url = $"https://frontend:port/verify-email?token={encodedToken}&userId={user.UserId}"
+        };
+        
+        
+        
 
-        // TODO: Send email with the token to the user using notification service
+        Console.WriteLine("Preparing to send registration email...");
+        var registrationUrl = ServiceEndpoints.NotificationService.SendRegistrationEmail(user.UserId);
+        var message = await _httpClient.GetAsync<object>(registrationUrl);
+
+        if (!message.Success)
+        {
+            Console.WriteLine("Failed to send registration email.");
+        }
+        else
+        {
+            Console.WriteLine("Registration email sent successfully.");
+        }
+        
+        
+        
+        
+        
+        
         Console.WriteLine($"Email verification token for user {user.Email}:");
         Console.WriteLine(encodedToken);
         
@@ -133,6 +161,41 @@ public class AuthController : Controller
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+
+    [Authorize]
+    [HttpGet("require-password-change")]
+    public async Task<IActionResult> RequirePasswordChange()
+    {
+        var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
+        
+        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized(new ApiResult<object>(null, false, "Token does not contain valid user ID."));
+        
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+        
+        if (user == null)
+            return BadRequest(new ApiResult<object>(null, false, "User not found."));
+
+        var notificationUrl = ServiceEndpoints.NotificationService.SendPasswordResetEmail;
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        Console.WriteLine($"Generated password reset token: {token}");
+        
+        // TODO: GET LINK FOR FRONTEND
+        var resetUrl = $"https://frontend:port/reset-password?token={token}";
+        var body = new
+        {
+            Id = user.UserId,
+            Url = resetUrl
+        };
+        
+        var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
+        
+        if (!response.Success) 
+            return BadRequest(new ApiResult<object>(null, false, response.Message));
+
+        return Ok(new ApiResult<object>(null));
+    }
+
     [Authorize]
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
@@ -149,9 +212,8 @@ public class AuthController : Controller
 
         if (user == null)
             return BadRequest(new ApiResult<object>(null, false, "User not found."));
-
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+        
+        var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
 
         if (!result.Succeeded)
             return BadRequest(new ApiResult<object>(result.Errors, false, "Password reset failed."));
@@ -178,9 +240,9 @@ public class AuthController : Controller
     }
     
     [HttpPost("verify-email/{userId}/{token}")]
-    public async Task<IActionResult> VerifyEmail(string userId, string token)
+    public async Task<IActionResult> VerifyEmail(int userId, string token)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (user == null)
             return NotFound(new ApiResult<object>(null, false, "User not found."));
 
