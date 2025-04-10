@@ -1,0 +1,60 @@
+
+
+.wrapper {
+    max-width: 100%;
+    display: flex;
+    scroll-snap-align: start;
+    justify-content: center;
+}
+  
+
+.container{
+   
+    width: 1000px;
+    background-color: white;
+    min-height: 100vh;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: flex-start;
+}
+
+.account-rep #pay-btn{
+    background-color: #EA2839;
+    border: none;
+    color: white;
+}
+.account-rep, .func {
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;  
+    justify-content: center;
+    text-align: center;
+    gap: 10px; 
+}
+.account-rep{
+    width: 100vh;
+    font-weight: bold;
+    margin-top: 10vh;
+}
+
+input[type="text"] {
+    padding: 8px 12px;
+    font-size: 1rem;
+    width: 100%;
+    text-align: center;
+}
+
+#pay-btn {
+    width: 100%;
+    background-color: #EA2839;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}

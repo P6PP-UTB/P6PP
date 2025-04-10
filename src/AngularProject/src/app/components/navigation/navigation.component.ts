@@ -14,7 +14,7 @@ import { AuthService } from '../../services/auth.service';
 export class NavigationComponent {
   isMenuOpen = false;
   isLoggedIn = false;
-
+  MoneyBalance = 123;
   constructor(
     private authService: AuthService,
     private toastr: ToastrService,

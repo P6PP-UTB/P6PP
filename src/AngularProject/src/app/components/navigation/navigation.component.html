@@ -1,23 +1,31 @@
 <div id="head-div">
-    <button id="logo" routerLink="">REZERVACE+</button>
+  <button id="logo" routerLink="">REZERVACE+</button>
+
+  <nav id="navigation-bar">
+    <button class="nav-btn" routerLink="">Home</button>
+    <button class="nav-btn">Courses</button>
+    <button class="nav-btn">Coaches</button>
+    <button class="nav-btn" routerLink="profile">Profile</button>
+  </nav>
   
-    <nav id="navigation-bar">
-      <button class="nav-btn" routerLink="">Home</button>
-      <button class="nav-btn">Courses</button>
-      <button class="nav-btn">Coaches</button>
-      <button class="nav-btn" routerLink="profile">Profile</button>
-    </nav>
   
-    <div id="log-btns" *ngIf="!isLoggedIn">
-      <button id="login-btn" class="nav-btn" routerLink="login">Log in</button>
-      <button id="signup-btn" class="nav-btn" routerLink="signup">Sign up</button>
-    </div>
+  <button *ngIf="isLoggedIn" class="nav-btn" id="balance" routerLink="payment">
+    {{MoneyBalance}},-
+    <img src="assets/icons/robucks.svg" alt="money" class="icon" />
+  </button>
   
-    <div *ngIf="isLoggedIn" id="logout-btn">
-      <button class="nav-btn" (click)="logout()">
-        Log out
-      </button>
-    </div>
+
+  <div id="log-btns" *ngIf="!isLoggedIn">
+    <button id="login-btn" class="nav-btn" routerLink="login">Log in</button>
+    <button id="signup-btn" class="nav-btn" routerLink="signup">Sign up</button>
+  </div>
+  
+
+  <div *ngIf="isLoggedIn" id="logout-btn">
+    <button class="nav-btn" (click)="logout()">
+      Log out
+    </button>
+  </div>
 </div>
 
 

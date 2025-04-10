@@ -7,7 +7,9 @@ body{
     scrollbar-width: none;       /* Firefox */
     -ms-overflow-style: none;    /* IE/Edge */
 }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+body { margin: 0; font-family: 'Source Sans 3'; }
 /* Убираем полосы прокрутки глобально, но прокрутка остаётся */
 html, body {
     overflow: auto;

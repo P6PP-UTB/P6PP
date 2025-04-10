@@ -1,0 +1,15 @@
+<app-navigation></app-navigation>
+<div class="wrapper">
+    <div class="container">
+        <div class="account-rep">
+            <h3 style="font-weight: bolder;">Accoun replenishment</h3>
+
+            <div class="func">
+                <h5 style="font-weight: bold;">Buy Robux</h5>
+                <p>Enter Amount</p>
+                <input type="text" placeholder="0,0 CZK" (input)="onInput($event)" />
+                <button id="pay-btn">Pay {{paymentAmount}}</button>
+            </div>
+        </div>
+    </div>
+</div>

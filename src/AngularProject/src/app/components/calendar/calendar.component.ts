@@ -14,8 +14,8 @@ export class CalendarComponent {
   month: number = this.today.getMonth();
   year: number = this.today.getFullYear();
 
-  weeks: (number | null)[][] = [];
   weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  daysWithPadding: (number | null)[] = [];
 
   eventsToday: { title: string, time: string, color: string }[] = [];
   eventsTomorrow: { title: string, time: string, color: string }[] = [];
@@ -33,12 +33,10 @@ export class CalendarComponent {
       { title: 'KickBoxing', time: '09:00', color: 'red' },
       { title: 'Yoga', time: '10:00', color: 'orange' },
     ];
-
     const eventsTomorrow = [
       { title: 'Hobby Horsing', time: '13:00', color: 'seagreen' },
       { title: 'Chess', time: '14:00', color: 'purple' },
     ];
-
     return [eventsToday, eventsTomorrow];
   }
 
@@ -47,18 +45,18 @@ export class CalendarComponent {
     const lastDay = new Date(this.year, this.month + 1, 0);
     const daysInMonth = lastDay.getDate();
 
-    const days: number[] = [];
+    const startDay = (firstDay.getDay() + 6) % 7; // Monday = 0
+    const days: (number | null)[] = Array(startDay).fill(null);
+
     for (let i = 1; i <= daysInMonth; i++) {
       days.push(i);
     }
 
-    const startDay = (firstDay.getDay() + 6) % 7; // Monday = 0
-    const paddedDays = Array(startDay).fill(null).concat(days);
-
-    this.weeks = [];
-    while (paddedDays.length) {
-      this.weeks.push(paddedDays.splice(0, 7));
+    while (days.length % 7 !== 0) {
+      days.push(null);
     }
+
+    this.daysWithPadding = days;
   }
 
   changeMonth(offset: number) {
@@ -77,10 +75,12 @@ export class CalendarComponent {
     return new Date(this.year, this.month).toLocaleString('default', { month: 'long' });
   }
 
-  isToday(day: number): boolean {
-    return day === this.today.getDate() &&
-           this.month === this.today.getMonth() &&
-           this.year === this.today.getFullYear();
+  isToday(day: number | null): boolean {
+    if (day == null) return false;
+    return (
+      day === this.today.getDate() &&
+      this.month === this.today.getMonth() &&
+      this.year === this.today.getFullYear()
+    );
   }
-
 }
