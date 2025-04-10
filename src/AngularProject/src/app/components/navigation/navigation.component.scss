@@ -23,15 +23,8 @@ body{
     border-radius: 0px;
 }
 
-.nav-btn:active{
-    background: #e0e0e0;
-    box-shadow: inset 2px 2px 6px #bebebe,
-            inset -2px -2px 6px #ffffff;
-}
-
 .nav-btn:hover{
     color: #EA2839;
-    box-shadow: 0px 1px 20px #cecece;
 }
 
 #navigation-bar{
@@ -74,3 +67,15 @@ body{
     align-self: flex-end;
 }
 
+#balance{
+    background-color: #EA2839;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 5vw;
+    padding: 0%;
+}
+#balance .icon {
+    width: 16px;
+    height: 16px;
+  }

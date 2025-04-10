@@ -7,6 +7,7 @@ import { SignupPage } from './pages/signup/signup.page';
 import { ProfilePage } from './pages/profile/profile.page';
 import {MainPageComponent} from './pages/main-page/main-page.component'
 import { AuthGuard } from './services/auth.guard';
+import { PaymentComponent } from './payment/payment.component';
 
 const routeConfig: Routes = [
     {
@@ -32,6 +33,12 @@ const routeConfig: Routes = [
         component: ProfilePage,
         //loadChildren: () => import('./pages/signup/signup.page').then(m => m.SignupPage),
         title: 'Profile',
+        canActivate: [AuthGuard] 
+    },
+    {
+        path: 'payment',
+        component: PaymentComponent,
+        title: 'Get Robux',
         canActivate: [AuthGuard] 
     }
 ];

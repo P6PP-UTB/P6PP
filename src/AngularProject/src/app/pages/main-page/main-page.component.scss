@@ -79,10 +79,27 @@ body {
     scroll-snap-align: start;
     position: relative;
   }
+
+
   
+.scroll-section-content {
+  max-width: 100%;
+  display: flex;
+  scroll-snap-align: start;
+  justify-content: center;
+}
+
+
+.container-back {
+  width: 1000px;
+  background-color: white;
+  min-height: 100vh;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+footer{
+  position: absolute;
+  width: 100vw;
   
-  footer{
-    position: absolute;
-    width: 100vw;
-    
-  }
+}

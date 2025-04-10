@@ -1,8 +1,4 @@
-<div class="scroll-container">
-    <!-- <section class="scroll-section">
-        
-    </section>   -->
-      
+<div class="scroll-container">      
     <section class="scroll-section after-video">
         <app-navigation style="position: absolute; z-index:20; width: 100%"></app-navigation>
         <div class="video-wrapper">
@@ -41,9 +37,16 @@
           <button class="scroll-btn" (click)="scrollDown()">down</button>
       </div>
     </section>
-    <section class="scroll-section">
+    <section class="scroll-section-content">
+      <div class="container-back">
         <app-calendar></app-calendar>
-        
+      </div>  
+    </section>
+    
+    <section class="scroll-section-content">
+      <div class="container-back">
+        <app-calendar></app-calendar>
+      </div>  
     </section>
     <section class="scroll-section">
         <app-footer></app-footer>
