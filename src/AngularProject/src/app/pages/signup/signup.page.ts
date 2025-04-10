@@ -28,7 +28,7 @@ export class SignupPage {
       name: ['', [
         Validators.required,
         Validators.minLength(2),
-        Validators.pattern('^[A-Z][a-zA-Z]{1,}$')]],
+        Validators.pattern('^[a-zA-Z]{2,}$')]],
 
       surname: ['', [
         Validators.required,

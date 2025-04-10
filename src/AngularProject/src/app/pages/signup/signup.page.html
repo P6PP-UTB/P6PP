@@ -12,22 +12,32 @@
             <label for="name">Name 
                 <span class="required">*</span>
                 <p class="error-message" *ngIf="signupForm.controls['name'].invalid && signupForm.controls['name'].touched && signupForm.get('name')?.value">
-                    Name must be at least 2 characters long and contain at the first letter should be uppercase
+                    Name must be at least 2 characters long
                 </p>
             </label>
+
             <div class="container">
-                <input id="name" type="text" formControlName="name" placeholder="Enter your name" required>
+                <input id="name" type="text" formControlName="name" placeholder="Enter your name" required
+                    [ngClass]="{'error-input': signupForm.controls['name'].invalid && 
+                        signupForm.controls['name'].touched && 
+                        signupForm.get('name')?.value}">
             </div>
             
+
             <label for="surname">Surname 
                 <span class="required">*</span>
                 <p class="error-message" *ngIf="signupForm.controls['surname'].invalid && signupForm.controls['surname'].touched && signupForm.get('surname')?.value">
-                    Surname must be at least 2 characters long and contain at the first letter should be uppercase
+                    Surname must be at least 2 characters long
                 </p>
             </label>
+
             <div class="container">
-                <input id="surname" type="text" formControlName="surname" placeholder="Enter your surname" required>
+                <input id="surname" type="text" formControlName="surname" placeholder="Enter your surname" required
+                    [ngClass]="{'error-input': signupForm.controls['surname'].invalid && 
+                        signupForm.controls['surname'].touched && 
+                        signupForm.get('surname')?.value}">
             </div>
+
 
             <label for="username">Username 
                 <span class="required">*</span>
@@ -35,30 +45,45 @@
                     Username must be at least 2 characters long. Characters ".", "_" and "-" are allowed
                 </p>
             </label>
+
             <div class="container">
-                <input id="username" type="text" formControlName="username" placeholder="Enter your username" required>
+                <input id="username" type="text" formControlName="username" placeholder="Enter your username" required
+                    [ngClass]="{'error-input': signupForm.controls['username'].invalid && 
+                        signupForm.controls['username'].touched && 
+                        signupForm.get('username')?.value}">
             </div>
         
+
             <label for="email">Email 
                 <span class="required">*</span>
                 <p class="error-message" *ngIf="signupForm.controls['email'].invalid && signupForm.controls['email'].touched && signupForm.get('email')?.value">
                     Invalid email format
                 </p>
             </label>
+
             <div class="container">
-                <input id="email" type="email" formControlName="email" placeholder="Enter your email" required>
+                <input id="email" type="email" formControlName="email" placeholder="example@mail.com" required
+                    [ngClass]="{'error-input': signupForm.controls['email'].invalid && 
+                        signupForm.controls['email'].touched && 
+                        signupForm.get('email')?.value}">
             </div>
         
+
             <label for="password">Password 
                 <span class="required">*</span>
                 <p class="error-message" *ngIf="signupForm.controls['password'].invalid && signupForm.controls['password'].touched && signupForm.get('password')?.value ">
                     Password must be at least 8 characters long and contian at least number, uppercase and lowercase letters, at least one special character
                 </p>
             </label>
+
             <div class="container">
-                <input id="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Password" required>
+                <input id="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Password" required
+                    [ngClass]="{'error-input': signupForm.controls['password'].invalid && 
+                        signupForm.controls['password'].touched && 
+                        signupForm.get('password')?.value}">
                 <button type="button" class="toggle-password" (click)="hidePassword = !hidePassword">👁</button>
             </div>
+
 
             <label for="repeatPassword">Repeat password 
                 <span class="required">*</span>
@@ -71,10 +96,14 @@
             </label>
             
             <div class="container">
-                <input id="repeatPassword" [type]="hideRepeatPassword ? 'password' : 'text'" formControlName="repeatPassword" placeholder="Password" required>
+                <input id="repeatPassword" [type]="hideRepeatPassword ? 'password' : 'text'" formControlName="repeatPassword" placeholder="Password" required
+                    [ngClass]="{'error-input': signupForm.get('repeatPassword')?.value 
+                        && signupForm.get('password')?.value !== signupForm.get('repeatPassword')?.value
+                        && signupForm.get('repeatPassword')?.touched}">
                 <button type="button" class="toggle-password" (click)="hideRepeatPassword = !hideRepeatPassword">👁</button>
             </div>
         
+
             <div class="container">
                 <button id="submit" type="submit" class="sign-up-btn">Sign up</button>
             </div>
