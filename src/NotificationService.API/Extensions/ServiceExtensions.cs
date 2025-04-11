@@ -1,6 +1,7 @@
 using NotificationService.API.Services;
 using NotificationService.API.Features;
 using ReservationSystem.Shared.Clients;
+using src.NotificationService.API.Services;
 
 namespace NotificationService.API.Extensions;
 
@@ -21,6 +22,11 @@ public static class ServiceExtensions
         services.AddScoped<TemplateAppService>();
         services.AddScoped<GetAllTemplatesHandler>();
         services.AddScoped<EditTemplateHandler>();
+
+        // Register NotificationLogs
+        services.AddSingleton<GetAllNotificationsValidator>();
+        services.AddScoped<NotificationLogService>();
+        services.AddScoped<GetAllNotificationsHandler>();
 
         // Register RegisterEmail Services
         services.AddSingleton<SendRegistrationEmailValidator>();

@@ -2,6 +2,8 @@ using NotificationService.API.Persistence;
 using NotificationService.API.Services;
 using FluentValidation;
 using ReservationSystem.Shared.Results;
+using src.NotificationService.API.Services;
+using src.NotificationService.API.Persistence.Entities.DB.Models;
 namespace NotificationService.API.Features;
 
 public record SendVerificationEmail(int Id, string url);
@@ -21,21 +23,25 @@ public class SendVerificationEmailHandler
     private readonly MailAppService _mailAppService;
     private readonly TemplateAppService _templateAppService;
     private readonly UserAppService _userAppService;
+    private readonly NotificationLogService _notificationLogService;
 
     public SendVerificationEmailHandler(MailAppService mailAppService,
-        TemplateAppService templateAppService, UserAppService userAppService)
+                                        TemplateAppService templateAppService,
+                                        UserAppService userAppService,
+                                        NotificationLogService notificationLogService
+    )
     {
         _mailAppService = mailAppService;
         _templateAppService = templateAppService;
         _userAppService = userAppService;
-        
+        _notificationLogService = notificationLogService;
     }
 
     public async Task<ApiResult<SendVerificationEmailResponse>> Handle(SendVerificationEmail request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var user = await _userAppService.GetUserByIdAsync(request.Id);
-        
+
         if (user == null)
         {
             return new ApiResult<SendVerificationEmailResponse>(null, false, "User not found");
@@ -60,6 +66,11 @@ public class SendVerificationEmailHandler
         try
         {
             await _mailAppService.SendEmailAsync(emailArgs);
+            await _notificationLogService.LogNotification(user.Id,
+                                                          NotificationType.EmailVerification,
+                                                          template.Subject,
+                                                          template.Text
+            );
             return new ApiResult<SendVerificationEmailResponse>(new SendVerificationEmailResponse());
         }
         catch

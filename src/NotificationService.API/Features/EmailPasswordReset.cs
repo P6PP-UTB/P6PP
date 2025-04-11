@@ -2,6 +2,8 @@ using NotificationService.API.Persistence;
 using NotificationService.API.Services;
 using FluentValidation;
 using ReservationSystem.Shared.Results;
+using src.NotificationService.API.Persistence.Entities.DB.Models;
+using src.NotificationService.API.Services;
 namespace NotificationService.API.Features;
 
 public record SendPasswordResetEmail(int Id, string url);
@@ -21,14 +23,18 @@ public class SendPasswordResetEmailHandler
     private readonly MailAppService _mailAppService;
     private readonly TemplateAppService _templateAppService;
     private readonly UserAppService _userAppService;
+    private readonly NotificationLogService _notificationLogService;
 
     public SendPasswordResetEmailHandler(MailAppService mailAppService,
-        TemplateAppService templateAppService, UserAppService userAppService)
+                                         TemplateAppService templateAppService,
+                                         UserAppService userAppService,
+                                         NotificationLogService notificationLogService
+    )
     {
         _mailAppService = mailAppService;
         _templateAppService = templateAppService;
         _userAppService = userAppService;
-        
+        _notificationLogService = notificationLogService;
     }
 
     public async Task<ApiResult<SendPasswordResetEmailResponse>> Handle(SendPasswordResetEmail request, CancellationToken cancellationToken)
@@ -60,6 +66,11 @@ public class SendPasswordResetEmailHandler
         try
         {
             await _mailAppService.SendEmailAsync(emailArgs);
+            await _notificationLogService.LogNotification(user.Id,
+                                                          NotificationType.EmailPasswordReset,
+                                                          template.Subject,
+                                                          template.Text
+            );
             return new ApiResult<SendPasswordResetEmailResponse>(new SendPasswordResetEmailResponse());
         }
         catch

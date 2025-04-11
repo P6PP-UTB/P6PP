@@ -2,6 +2,8 @@ using NotificationService.API.Persistence;
 using NotificationService.API.Services;
 using FluentValidation;
 using ReservationSystem.Shared.Results;
+using src.NotificationService.API.Services;
+using src.NotificationService.API.Persistence.Entities.DB.Models;
 namespace NotificationService.API.Features;
 
 public record SendBookingConfirmationEmailRequest(int UserId, string Name, DateTime Datetime);
@@ -23,13 +25,18 @@ public class SendBookingConfirmationEmailHandler
     private readonly MailAppService _mailAppService;
     private readonly TemplateAppService _templateAppService;
     private readonly UserAppService _userAppService;
+    private readonly NotificationLogService _notificationLogService;
 
     public SendBookingConfirmationEmailHandler(MailAppService mailAppService,
-        TemplateAppService templateAppService, UserAppService userAppService)
+                                               TemplateAppService templateAppService,
+                                               UserAppService userAppService,
+                                               NotificationLogService notificationLogService
+    )
     {
         _mailAppService = mailAppService;
         _templateAppService = templateAppService;
         _userAppService = userAppService;
+        _notificationLogService = notificationLogService;
     }
 
     public async Task<ApiResult<SendBookingConfirmationEmailResponse>> Handle(SendBookingConfirmationEmailRequest request, CancellationToken cancellationToken)
@@ -62,6 +69,11 @@ public class SendBookingConfirmationEmailHandler
         try
         {
             await _mailAppService.SendEmailAsync(emailArgs);
+            await _notificationLogService.LogNotification(user.Id,
+                                                          NotificationType.ReservationConfirmed,
+                                                          template.Subject,
+                                                          template.Text
+            );
             return new ApiResult<SendBookingConfirmationEmailResponse>(new SendBookingConfirmationEmailResponse());
         }
         catch (Exception e)
