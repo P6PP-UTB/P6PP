@@ -77,6 +77,7 @@ app.UseEndpoints(endpoints =>
     EditTemplateEndpoint.EditTemplate(endpoints);
     SendBookingConfirmationEmailEndpoint.SendBookingConfirmationEmail(endpoints);
     SendBookingCancellationEmailEndpoint.SendBookingCancellationEmail(endpoints);
+    GetAllNotificationsEndpoint.GetAllNotifications(endpoints);
 });
 
 app.Run();
