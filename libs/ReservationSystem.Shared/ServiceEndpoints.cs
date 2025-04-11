@@ -40,6 +40,7 @@ public static class ServiceEndpoints
         public static string EditTemplate => $"{BaseUrl}/api/notification/templates/getalltemplates";
         public static string SendBookingConfirmationEmail => $"{BaseUrl}/api/notification/user/sendbookingconfirmationemail";
         public static string SendBookingCancellationEmail => $"{BaseUrl}/api/notification/user/sendbookingcancellationemail";
+        public static string GetAllNotifications(int UserId) => $"{BaseUrl}/api/notification/logs/getallnotifications/{UserId}";
     }
     
 }
