@@ -31,7 +31,7 @@ public class DatabaseInitializer
 
             await using var adminConn = new MySqlConnection(_adminConnectionString);
             await adminConn.OpenAsync();
-            _logger.LogInformation("Tady");
+            _logger.LogInformation("Admin database connection opened successfully.");
             var dbExists = await adminConn.ExecuteScalarAsync<string>(
                 "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = @DatabaseName",
                 new { DatabaseName = _databaseName });
