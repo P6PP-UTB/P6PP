@@ -1,5 +1,6 @@
 using AdminSettings.Data;
 using AdminSettings.Persistence;
+using AdminSettings.Persistence.Interface;
 using AdminSettings.Persistence.Repository;
 using AdminSettings.Services;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 // Configure port here + launchSettings.json ( + later Dockerfile EXPOSE XXXX)
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(8080);
+    options.ListenAnyIP(9090);
 });
 
 builder.Services.AddSwaggerGen(c =>
@@ -32,12 +33,12 @@ builder.Services.AddDbContext<AdminSettingsDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 25)))); 
 
-builder.Services.AddHttpClient("UserApi", client =>
+builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5189/");
+    client.BaseAddress = new Uri("http://user-service:5189");
 });
 
-builder.Services.AddHttpClient<UserService>();
+
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<DapperContext>();
@@ -47,7 +48,6 @@ builder.Services.AddScoped<SystemSettingsSeeder>();
 builder.Services.AddScoped<SystemSettingsService>();
 builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddScoped<AuditLogRepository>();
-builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<DatabaseBackupService>();
 
 builder.Services.AddScoped<DatabaseInitializer>();

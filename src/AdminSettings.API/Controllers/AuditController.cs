@@ -1,4 +1,5 @@
 ﻿using AdminSettings.Persistence.Entities;
+using AdminSettings.Persistence.Interface;
 using AdminSettings.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,12 +10,12 @@ namespace AdminSettings.Controllers;
 public class AuditController : ControllerBase
 {
     private readonly AuditLogService _auditLogService;
-    private readonly UserService _userService;
-
-    public AuditController(AuditLogService auditLogService, UserService userService)
+    private readonly IUserServiceClient _userServiceClient;
+    
+    public AuditController(AuditLogService auditLogService, IUserServiceClient userServiceClient)
     {
         _auditLogService = auditLogService;
-        _userService = userService;
+        _userServiceClient = userServiceClient;
     }
 
     [HttpGet]
@@ -28,23 +29,27 @@ public class AuditController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddAuditLog([FromBody] AuditLog auditLog)
     {
-        if (auditLog == null || string.IsNullOrEmpty(auditLog.UserId) || string.IsNullOrEmpty(auditLog.Action))
+        if (auditLog == null || string.IsNullOrEmpty(auditLog.Action))
             return BadRequest("Invalid data");
+
+        if (!int.TryParse(auditLog.UserId, out int userId) || !await _userServiceClient.UserExistsAsync(userId))
+            return NotFound($"Uživatel s ID {auditLog.UserId} neexistuje.");
 
         var id = await _auditLogService.CreateAsync(auditLog);
         return CreatedAtAction(nameof(GetAuditLogs), new { id }, auditLog);
     }
 
+
     [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetUserAuditLogs(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] DateTime? fromDate = null, [FromQuery] DateTime? toDate = null)
     {
-        var user = await _userService.GetUserById(userId);
-        if (user == null)
-            return NotFound("User not found");
+        if (!int.TryParse(userId, out int id) || !await _userServiceClient.UserExistsAsync(id))
+            return NotFound("Uživatel neexistuje");
 
         var logs = await _auditLogService.GetByUserAsync(userId, pageNumber, pageSize, fromDate, toDate);
-        return Ok(new { User = user, AuditLogs = logs });
+        return Ok(logs);
     }
+
 
 
     [HttpGet("action/{action}")]

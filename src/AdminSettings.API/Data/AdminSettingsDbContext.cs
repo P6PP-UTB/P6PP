@@ -9,7 +9,6 @@ public class AdminSettingsDbContext : DbContext
         : base(options) { }
 
     public DbSet<AuditLog> AuditLogs { get; set; }
-    public DbSet<User> Users { get; set; }
     public DbSet<SystemSetting> SystemSettings { get; set; }
     public DbSet<Timezone> Timezones { get; set; }
     public DbSet<Currency> Currencies { get; set; }
