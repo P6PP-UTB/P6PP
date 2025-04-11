@@ -40,7 +40,7 @@ public class DatabaseInitializer
             {
                 _logger.LogInformation("Creating database '{Database}'...", _databaseName);
                 await adminConn.ExecuteAsync($"CREATE DATABASE `{_databaseName}`;");
-                _logger.LogInformation("Database '{Database}' created.");
+                _logger.LogInformation("Database '{Database}' created.", _databaseName);
             }
 
             await using var conn = new MySqlConnection(_connectionString);
