@@ -31,12 +31,18 @@ public class GetAllNotificationsHandler
     {
         cancellationToken.ThrowIfCancellationRequested();
         var notifications = await _notificationLogService.GetNotificationsFor(request.UserId);
-        bool success = notifications == null || notifications.Count == 0;
+
+        string message = "";
+        if (notifications == null) {
+            message = $"Error while getting notification logs for {request.UserId}";
+        } else if (notifications.Count == 0) {
+            message = $"No notifications for user id: {request.UserId}";
+        }
 
         return new ApiResult<GetAllNotifictionsResponse>(
             new GetAllNotifictionsResponse(notifications),
-            success,
-            notifications?.Count == 0 ? $"No notifications for user id: {request.UserId}" : $"Error while getting notification logs for {request.UserId}"
+            notifications != null,
+            message
         );
     }
 }
