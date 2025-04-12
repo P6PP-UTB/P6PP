@@ -16,7 +16,8 @@ namespace NotificationService.API.Services
         }
         public async Task<User?> GetUserByIdAsync(int id)
         {
-            var response = await _httpClient.GetAsync<GetUserRespond>(ServiceEndpoints.UserService.GetUserById(id));   
+            var response = await _httpClient.GetAsync<GetUserRespond>(ServiceEndpoints.UserService.GetUserById(id)); 
+            Console.WriteLine("User response: " + System.Text.Json.JsonSerializer.Serialize(response));
             return response.Data?.User;
         }
     }

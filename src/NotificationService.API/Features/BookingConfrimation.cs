@@ -2,11 +2,12 @@ using NotificationService.API.Persistence;
 using NotificationService.API.Services;
 using FluentValidation;
 using ReservationSystem.Shared.Results;
+using NotificationService.API.Persistence.Entities;
 using src.NotificationService.API.Services;
 using src.NotificationService.API.Persistence.Entities.DB.Models;
 namespace NotificationService.API.Features;
 
-public record SendBookingConfirmationEmailRequest(int UserId, string Name, DateTime Datetime);
+public record SendBookingConfirmationEmailRequest(int UserId, int BookingId);
 //TODO: migrate to BookingId and read property from BookingService
 public record SendBookingConfirmationEmailResponse(int? Id = null);
 
@@ -15,8 +16,8 @@ public class SendBookingConfirmationEmailValidator : AbstractValidator<SendBooki
     public SendBookingConfirmationEmailValidator()
     {
         RuleFor(x => x.UserId).GreaterThan(0);
-        RuleFor(x => x.Name).NotEmpty();
-        RuleFor(x => x.Datetime).NotEmpty();
+        RuleFor(x => x.BookingId).GreaterThan(0);
+        
     }
 }
 
@@ -26,17 +27,21 @@ public class SendBookingConfirmationEmailHandler
     private readonly TemplateAppService _templateAppService;
     private readonly UserAppService _userAppService;
     private readonly NotificationLogService _notificationLogService;
+    private readonly BookingAppService _bookingAppService;
 
     public SendBookingConfirmationEmailHandler(MailAppService mailAppService,
                                                TemplateAppService templateAppService,
                                                UserAppService userAppService,
-                                               NotificationLogService notificationLogService
+                                               NotificationLogService notificationLogService,
+                                               BookingAppService bookingAppService
+                                               
     )
     {
         _mailAppService = mailAppService;
         _templateAppService = templateAppService;
         _userAppService = userAppService;
         _notificationLogService = notificationLogService;
+        _bookingAppService = bookingAppService;
     }
 
     public async Task<ApiResult<SendBookingConfirmationEmailResponse>> Handle(SendBookingConfirmationEmailRequest request, CancellationToken cancellationToken)
@@ -52,12 +57,26 @@ public class SendBookingConfirmationEmailHandler
         {
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "User email or name not found");
         }
-
+        
+        ServiceResponse? service = null;
+        try
+        {
+            service = await _bookingAppService.GetServiceByBookingIdAsync(request.BookingId);
+            
+        }
+        catch (Exception ex)
+        {
+            return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Event failed to load");
+        }
+        if (service == null)
+        { 
+            return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Service not found in booking");
+        }
         var template = await _templateAppService.GetTemplateAsync("BookingConfirmation");
 
         template.Text = template.Text.Replace("{name}", user.FirstName + " " + user.LastName);
-        template.Text = template.Text.Replace("{eventname}", request.Name);
-        template.Text = template.Text.Replace("{datetime}", request.Datetime.ToString());
+        template.Text = template.Text.Replace("{eventname}", service.serviceName);
+        template.Text = template.Text.Replace("{datetime}", service.start.ToString());
 
         var emailArgs = new EmailArgs
         {

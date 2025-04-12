@@ -159,7 +159,7 @@ public class TemplateInit
                         <body>
                             <p style=""padding-bottom: 16px;"">Hello <strong>{name}</strong>,</p>
 
-                            <p>Your reservation on event{eventname}, has been canceled.</p>
+                            <p>Your reservation on event {eventname}, has been canceled.</p>
                             <p><strong>Date and time:</strong> {datetime}</p>
 
                             <p>Thank you,</p>

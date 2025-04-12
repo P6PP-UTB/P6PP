@@ -12,6 +12,7 @@ public static class ServiceExtensions
         // Register MailAppService
         services.AddSingleton<MailAppService>();
         services.AddSingleton<UserAppService>();
+        services.AddSingleton<BookingAppService>();
 
         // Register SendEmail Services
         services.AddSingleton<SendEmailRequestValidator>();
