@@ -1,6 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using AuthService.API.Data;
 using AuthService.API.DTO;
 using AuthService.API.Models;
@@ -12,7 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ReservationSystem.Shared;
 using ReservationSystem.Shared.Clients;
+using ReservationSystem.Shared.Constants;
 using ReservationSystem.Shared.Results;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace AuthService.API.Controllers;
 
@@ -77,7 +78,7 @@ public class AuthController : Controller
         // TODO: Send email with the token to the user using notification service
         Console.WriteLine($"Email verification token for user {user.Email}:");
         Console.WriteLine(encodedToken);
-        
+
         return Ok(new ApiResult<object>(new { Id = user.UserId }));
     }
 
@@ -115,8 +116,8 @@ public class AuthController : Controller
 
         var claims = new List<Claim>
         {
-            new Claim("userid", user.UserId.ToString()), //Změněno na UserId a ToString()
-            new Claim("username", user.UserName!)
+            new(AuthConstants.UserId, user.UserId.ToString()), //Změněno na UserId a ToString()
+            new(AuthConstants.UserId, user.UserName!)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
@@ -162,7 +163,7 @@ public class AuthController : Controller
             "Password reset successfully."));
     }
 
-    
+
     [HttpGet("isVerified/{userId}")]
     public async Task<IActionResult> IsVerified(string userId)
     {
@@ -172,11 +173,11 @@ public class AuthController : Controller
 
         var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
         if (!isEmailConfirmed)
-            return Ok(new ApiResult<object>(new {verified = false }, false, "Email not verified."));
+            return Ok(new ApiResult<object>(new { verified = false }, false, "Email not verified."));
 
         return Ok(new ApiResult<object>(new { verified = true }, true, "User is verified."));
     }
-    
+
     [HttpPost("verify-email/{userId}/{token}")]
     public async Task<IActionResult> VerifyEmail(string userId, string token)
     {
@@ -214,8 +215,8 @@ public class AuthController : Controller
         {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
 
-            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
-            var usernameClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username");
+            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == AuthConstants.UserId);
+            var usernameClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == AuthConstants.Username);
 
             if (userIdClaim == null || usernameClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
             {
