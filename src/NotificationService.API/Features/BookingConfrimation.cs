@@ -8,6 +8,7 @@ using src.NotificationService.API.Persistence.Entities.DB.Models;
 namespace NotificationService.API.Features;
 
 public record SendBookingConfirmationEmailRequest(int UserId, int BookingId);
+//TODO: Userid can be read from booking, if booking team add userId to API respond
 public record SendBookingConfirmationEmailResponse(int? Id = null);
 
 public class SendBookingConfirmationEmailValidator : AbstractValidator<SendBookingConfirmationEmailRequest>

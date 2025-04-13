@@ -25,7 +25,7 @@ namespace NotificationService.API.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var bookingAppService = scope.ServiceProvider.GetRequiredService<BookingAppService>();
-                await bookingAppService.SednReminder24HourBefore();
+                await bookingAppService.SendReminder24HourBefore();
             }
         }
 

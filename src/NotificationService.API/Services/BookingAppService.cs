@@ -74,15 +74,15 @@ namespace NotificationService.API.Services
         }
 
         public async Task SaveToTimer(int bookingId, int userId)
-        { 
+        {
             var booking = await GetBookingByIdAsync(bookingId);
-            
+
             if (booking == null)
             {
                 //TODO: ADD LOGGING
                 return;
             }
-            
+
             var service = await GetServiceByIdAsync(booking.serviceId);
             if (service == null)
             {
@@ -96,6 +96,16 @@ namespace NotificationService.API.Services
                 Start = service.start,
                 UserId = userId,
             };
+
+            if (await _notificationDbContext.Bookings
+                    .AnyAsync(b => b.BookingId == bookingTimer.BookingId))
+            {
+                return;
+            }
+            if(bookingTimer.Start < DateTime.UtcNow.AddHours(30))
+            {
+                bookingTimer.Notice24H = true;
+            }
             var bookingTimerDb = await _notificationDbContext.Bookings.AddAsync(bookingTimer);
         }
 
@@ -110,14 +120,14 @@ namespace NotificationService.API.Services
             }
         }
 
-        public async Task SednReminder24HourBefore()
+        public async Task SendReminder24HourBefore()
         {
             var bookings = await _notificationDbContext.Bookings
                 .Where(b => b.Start <= DateTime.UtcNow.AddHours(24) && b.Notice24H == false)
                 .ToListAsync();
             foreach (var booking in bookings)
             {
-                var succes = await SendRemiderEmail(booking);
+                var succes = await SendReminderEmail(booking);
                 if (succes)
                 {
                     booking.Notice24H = true;
@@ -128,7 +138,7 @@ namespace NotificationService.API.Services
            
         }
 
-        public async Task<bool> SendRemiderEmail(Booking bookingLocal)
+        public async Task<bool> SendReminderEmail(Booking bookingLocal)
         {
             var booking = await GetBookingByIdAsync(bookingLocal.BookingId);
             
@@ -153,6 +163,7 @@ namespace NotificationService.API.Services
                 return false;
             }
             
+            //TODO: CHANGE TEMPLATE NAME. WAITING FOR CREATION
             var template = await _templateAppService.GetTemplateAsync("BookingConfirmation");
             
             
