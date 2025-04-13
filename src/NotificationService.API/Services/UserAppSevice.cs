@@ -1,6 +1,8 @@
-﻿using NotificationService.API.Persistence.Entities;
+﻿using System.Net.Mail;
+using NotificationService.API.Persistence.Entities;
 using ReservationSystem.Shared.Clients;
 using ReservationSystem.Shared;
+using ReservationSystem.Shared.Results;
 
 namespace NotificationService.API.Services
 {
@@ -16,8 +18,16 @@ namespace NotificationService.API.Services
         }
         public async Task<User?> GetUserByIdAsync(int id)
         {
-            var response = await _httpClient.GetAsync<GetUserRespond>(ServiceEndpoints.UserService.GetUserById(id)); 
-            Console.WriteLine("User response: " + System.Text.Json.JsonSerializer.Serialize(response));
+            ApiResult<GetUserRespond>? response = null;
+            try
+            {
+                response = await _httpClient.GetAsync<GetUserRespond>(ServiceEndpoints.UserService.GetUserById(id));
+            }
+            catch (Exception e)
+            {
+                //TODO: ADD LOGGING
+                return null;
+            }
             return response.Data?.User;
         }
     }

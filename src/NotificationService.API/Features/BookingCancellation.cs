@@ -8,7 +8,6 @@ using src.NotificationService.API.Services;
 namespace NotificationService.API.Features;
 
 public record SendBookingCancellationEmailRequest(int UserId, int BookingId);
-//TODO: migrate to BookingId and read property from BookingService
 public record SendBookingCancellationEmailResponse(int? Id = null);
 
 public class SendBookingCancellationEmailValidator : AbstractValidator<SendBookingCancellationEmailRequest>
@@ -71,7 +70,7 @@ public class SendBookingCancellationEmailHandler
         {
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "Event not found");
         }
-
+        await _bookingAppService.DeleteTimer(request.BookingId);
         var template = await _templateAppService.GetTemplateAsync("BookingCancellation");
 
         template.Text = template.Text.Replace("{name}", user.FirstName + " " + user.LastName);

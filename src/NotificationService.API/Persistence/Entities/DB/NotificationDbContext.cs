@@ -10,6 +10,7 @@ public class NotificationDbContext : DbContext
 {
     public DbSet<Template> Templates { get; set; }
     public DbSet<NotificationLog> NotificationLogs { get; set; }
+    public DbSet<Booking> Bookings { get; set; }
     public NotificationDbContext(DbContextOptions options)
         : base(options) { }
 

@@ -8,7 +8,6 @@ using src.NotificationService.API.Persistence.Entities.DB.Models;
 namespace NotificationService.API.Features;
 
 public record SendBookingConfirmationEmailRequest(int UserId, int BookingId);
-//TODO: migrate to BookingId and read property from BookingService
 public record SendBookingConfirmationEmailResponse(int? Id = null);
 
 public class SendBookingConfirmationEmailValidator : AbstractValidator<SendBookingConfirmationEmailRequest>
@@ -72,6 +71,7 @@ public class SendBookingConfirmationEmailHandler
         { 
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Service not found in booking");
         }
+        await _bookingAppService.SaveToTimer(request.BookingId, user.Id);
         var template = await _templateAppService.GetTemplateAsync("BookingConfirmation");
 
         template.Text = template.Text.Replace("{name}", user.FirstName + " " + user.LastName);

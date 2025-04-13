@@ -1,5 +1,6 @@
 using NotificationService.API.Services;
 using NotificationService.API.Features;
+using NotificationService.API.Persistence.Entities.DB;
 using ReservationSystem.Shared.Clients;
 using src.NotificationService.API.Services;
 
@@ -12,7 +13,8 @@ public static class ServiceExtensions
         // Register MailAppService
         services.AddSingleton<MailAppService>();
         services.AddSingleton<UserAppService>();
-        services.AddSingleton<BookingAppService>();
+        services.AddScoped<BookingAppService>();
+        services.AddHostedService<TimerAppService>();
 
         // Register SendEmail Services
         services.AddSingleton<SendEmailRequestValidator>();
@@ -51,6 +53,8 @@ public static class ServiceExtensions
         
         // Register NetworkHttpClient
         services.AddHttpClient<NetworkHttpClient>();
+        
+
     }
 }
 
