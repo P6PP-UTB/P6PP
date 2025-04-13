@@ -96,6 +96,12 @@ namespace NotificationService.API.Services
                 Start = service.start,
                 UserId = userId,
             };
+            
+            if ( await _notificationDbContext.Bookings
+                    .AnyAsync(b => b.BookingId == bookingTimer.BookingId))
+            {
+                return;
+            }
             var bookingTimerDb = await _notificationDbContext.Bookings.AddAsync(bookingTimer);
         }
 
@@ -153,6 +159,7 @@ namespace NotificationService.API.Services
                 return false;
             }
             
+            //TODO: CHANGE TEMPLATE NAME. WAITING FOR CREATION
             var template = await _templateAppService.GetTemplateAsync("BookingConfirmation");
             
             

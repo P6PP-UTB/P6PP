@@ -8,6 +8,7 @@ using src.NotificationService.API.Services;
 namespace NotificationService.API.Features;
 
 public record SendBookingCancellationEmailRequest(int UserId, int BookingId);
+//TODO: Userid can be read from booking, if booking team add userId to API respond
 public record SendBookingCancellationEmailResponse(int? Id = null);
 
 public class SendBookingCancellationEmailValidator : AbstractValidator<SendBookingCancellationEmailRequest>
