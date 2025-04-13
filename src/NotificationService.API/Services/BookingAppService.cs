@@ -142,11 +142,17 @@ namespace NotificationService.API.Services
         {
             var booking = await GetBookingByIdAsync(bookingLocal.BookingId);
             
-            if (booking == null || booking.status == "Cancelled")
+            if (booking == null)
             {
                 //TODO: ADD LOGGING
                 return false;
             }
+
+            if (booking.status == "Cancelled")
+            {
+                return true;
+            }
+            
             var service = await GetServiceByIdAsync(booking.serviceId);
       
             if (service == null)
