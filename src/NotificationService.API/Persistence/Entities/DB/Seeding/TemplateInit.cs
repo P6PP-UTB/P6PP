@@ -63,7 +63,7 @@ public class TemplateInit
                             <p style=""padding-bottom: 16px;"">Hello <strong>{name}</strong>,</p>
 
                             <p>Please verify your email address by clicking the following link:</p>
-                            <p><a href=""{link}"" style=""color: #1a73e8;"">{link}</a></p>
+                            <p><a href=""{token}"" style=""color: #1a73e8;"">{token}</a></p>
                             <p>If you did not make this request, you can safely ignore this email.</p>
 
                             <p>Thank you,</p>
@@ -96,7 +96,7 @@ public class TemplateInit
                             <p style=""padding-bottom: 16px;"">Hello <strong>{name}</strong>,</p>
 
                             <p>To reset your password, click the following link:</p>
-                            <p><a href=""{link}"" style=""color: #1a73e8;"">{link}</a></p>
+                            <p><a href=""{token}"" style=""color: #1a73e8;"">{token}</a></p>
                             <p>If you did not make this request, please ignore this email.</p>
 
                             <p>Thank you,</p>

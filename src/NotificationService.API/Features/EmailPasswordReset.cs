@@ -6,7 +6,7 @@ using src.NotificationService.API.Persistence.Entities.DB.Models;
 using src.NotificationService.API.Services;
 namespace NotificationService.API.Features;
 
-public record SendPasswordResetEmail(int Id, string url);
+public record SendPasswordResetEmail(int Id, string token);
 public record SendPasswordResetEmailResponse(int? Id=null);
 
 public class SendPasswordResetEmailValidator : AbstractValidator<SendPasswordResetEmail>
@@ -14,7 +14,7 @@ public class SendPasswordResetEmailValidator : AbstractValidator<SendPasswordRes
     public SendPasswordResetEmailValidator()
     {
         RuleFor(x => x.Id).GreaterThan(0);
-        RuleFor(x => x.url).NotEmpty();
+        RuleFor(x => x.token).NotEmpty();
     }
 }
 
@@ -54,7 +54,7 @@ public class SendPasswordResetEmailHandler
         var template = await _templateAppService.GetTemplateAsync("PasswordReset");
 
         template.Text = template.Text.Replace("{name}", user.FirstName + " " +  user.LastName);
-        template.Text = template.Text.Replace("{link}", request.url);
+        template.Text = template.Text.Replace("{link}", request.token);
 
         var emailArgs = new EmailArgs
         {

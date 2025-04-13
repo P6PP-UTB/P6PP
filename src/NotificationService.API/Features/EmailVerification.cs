@@ -6,7 +6,7 @@ using src.NotificationService.API.Services;
 using src.NotificationService.API.Persistence.Entities.DB.Models;
 namespace NotificationService.API.Features;
 
-public record SendVerificationEmail(int Id, string url);
+public record SendVerificationEmail(int Id, string token);
 public record SendVerificationEmailResponse(int? Id=null);
 
 public class SendVerificationEmailValidator : AbstractValidator<SendVerificationEmail>
@@ -14,7 +14,7 @@ public class SendVerificationEmailValidator : AbstractValidator<SendVerification
     public SendVerificationEmailValidator()
     {
         RuleFor(x => x.Id).GreaterThan(0);
-        RuleFor(x => x.url).NotEmpty();
+        RuleFor(x => x.token).NotEmpty();
     }
 }
 
@@ -54,7 +54,7 @@ public class SendVerificationEmailHandler
         var template = await _templateAppService.GetTemplateAsync("Verification");
 
         template.Text = template.Text.Replace("{name}", user.FirstName + " " +  user.LastName);
-        template.Text = template.Text.Replace("{link}", request.url);
+        template.Text = template.Text.Replace("{link}", request.token);
 
         var emailArgs = new EmailArgs
         {
