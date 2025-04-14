@@ -80,7 +80,7 @@ public class AuthController : Controller
         var body = new
         {
             Id = user.UserId,
-            Url = $"https://frontend:port/verify-email?token={encodedToken}&userId={user.UserId}"
+            Url = encodedToken,
         };
         
         var verificationResult = await _httpClient.PostAsync<object, object>(verificationUrl, body, CancellationToken.None);
