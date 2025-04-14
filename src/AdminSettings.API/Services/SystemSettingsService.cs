@@ -18,19 +18,22 @@ namespace AdminSettings.Services
         public async Task<SystemSetting?> GetSystemSettingsAsync()
         {
             return await _context.SystemSettings
-                .Include(s => s.timezone)
-                .Include(s => s.currency)
+                .Include(s => s.Timezone)
+                .Include(s => s.DatabaseBackupSetting)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<bool> UpdateSystemSettingsAsync(SystemSetting settings)
         {
             var existingSettings = await _context.SystemSettings.FirstOrDefaultAsync();
+
             if (existingSettings == null)
                 return false;
 
             existingSettings.TimezoneId = settings.TimezoneId;
-            existingSettings.CurrencyId = settings.CurrencyId;
+            existingSettings.AuditLogEnabled = settings.AuditLogEnabled;
+            existingSettings.NotificationEnabled = settings.NotificationEnabled;
+            existingSettings.DatabaseBackupSettingId = settings.DatabaseBackupSettingId;
 
             await _context.SaveChangesAsync();
             return true;
@@ -44,6 +47,7 @@ namespace AdminSettings.Services
         public async Task<bool> UpdateTimezoneAsync(Timezone timezone)
         {
             var existingTimezone = await _context.Timezones.FirstOrDefaultAsync(t => t.Id == timezone.Id);
+
             if (existingTimezone == null)
                 return false;
 
@@ -54,19 +58,33 @@ namespace AdminSettings.Services
             return true;
         }
 
-        public async Task<List<Currency>> GetCurrenciesAsync()
+        public async Task<bool> GetAuditLogEnabledAsync()
         {
-            return await _context.Currencies.ToListAsync();
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            return settings?.AuditLogEnabled ?? false;
         }
 
-        public async Task<bool> UpdateCurrencyAsync(Currency currency)
+        public async Task<bool> GetNotificationEnabledAsync()
         {
-            var existingCurrency = await _context.Currencies.FirstOrDefaultAsync(c => c.Id == currency.Id);
-            if (existingCurrency == null)
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            return settings?.NotificationEnabled ?? false;
+        }
+
+        public async Task<List<DatabaseBackupSetting>> GetDatabaseBackupSettingsAsync()
+        {
+            return await _context.DatabaseBackupSettings.ToListAsync();
+        }
+
+        public async Task<bool> UpdateDatabaseBackupSettingAsync(DatabaseBackupSetting backupSetting)
+        {
+            var existingBackupSetting = await _context.DatabaseBackupSettings.FirstOrDefaultAsync(b => b.Id == backupSetting.Id);
+
+            if (existingBackupSetting == null)
                 return false;
 
-            existingCurrency.Name = currency.Name;
-            existingCurrency.Symbol = currency.Symbol;
+            existingBackupSetting.BackupEnabled = backupSetting.BackupEnabled;
+            existingBackupSetting.BackupFrequency = backupSetting.BackupFrequency;
+            existingBackupSetting.BackupTime = backupSetting.BackupTime;
 
             await _context.SaveChangesAsync();
             return true;

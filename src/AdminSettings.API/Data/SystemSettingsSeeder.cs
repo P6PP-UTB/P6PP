@@ -24,17 +24,22 @@ public class SystemSettingsSeeder
         {
             _context.Timezones.AddRange(
                 new Timezone { Name = "UTC", UtcOffset = "+00:00" },
-                new Timezone { Name = "CET", UtcOffset = "+01:00" }
+                new Timezone { Name = "CET", UtcOffset = "+01:00" },
+                new Timezone { Name = "CEST", UtcOffset = "+02:00" }
             );
         }
 
-        // Seed Currency
-        if (!await _context.Currencies.AnyAsync())
+        // Seed DatabaseBackupSetting
+        if (!await _context.DatabaseBackupSettings.AnyAsync())
         {
-            _context.Currencies.AddRange(
-                new Currency { Name = "Euro", Symbol = "€" },
-                new Currency { Name = "Dollar", Symbol = "$" }
-            );
+            _context.DatabaseBackupSettings.Add(new DatabaseBackupSetting
+            {
+                BackupEnabled = true,
+                BackupFrequency = "monthly",
+                BackupTime = new TimeOnly(0, 0)
+            });
+
+            await _context.SaveChangesAsync();
         }
 
         await _context.SaveChangesAsync();
@@ -43,12 +48,12 @@ public class SystemSettingsSeeder
         if (!await _context.SystemSettings.AnyAsync())
         {
             var timezone = await _context.Timezones.FirstAsync();
-            var currency = await _context.Currencies.FirstAsync();
+            var databaseBackupSetting = await _context.DatabaseBackupSettings.FirstAsync();
 
             _context.SystemSettings.Add(new SystemSetting
             {
                 TimezoneId = timezone.Id,
-                CurrencyId = currency.Id,
+                DatabaseBackupSettingId = databaseBackupSetting.Id
             });
 
             await _context.SaveChangesAsync();

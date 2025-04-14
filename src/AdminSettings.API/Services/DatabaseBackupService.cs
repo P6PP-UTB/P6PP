@@ -1,7 +1,16 @@
-﻿using System.Diagnostics;
+﻿using AdminSettings.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 public class DatabaseBackupService
 {
+    private readonly SystemSettingsService _systemSettingsService;
+
+    public DatabaseBackupService(SystemSettingsService systemSettingsService)
+    {
+        _systemSettingsService = systemSettingsService;
+    }
+
     public async Task<bool> BackupDatabaseAsync(string dbName, string user, string password)
     {
         string backupFilePath = $"/backups/{dbName}_backup_{DateTime.Now:yyyyMMdd_HHmmss}.sql";
@@ -46,8 +55,22 @@ public class DatabaseBackupService
         }
     }
 
-    public async Task BackupAllAsync()
+    public async Task<bool> BackupAllAsync()
     {
+        var systemSettings = await _systemSettingsService.GetSystemSettingsAsync();
+
+        if (systemSettings?.DatabaseBackupSetting == null)
+        {
+            Console.WriteLine("❌ Nastavení zálohování nenalezeno.");
+            return false;
+        }
+
+        if (!systemSettings.DatabaseBackupSetting.BackupEnabled)
+        {
+            Console.WriteLine("❌ Zálohování není povoleno.");
+            return false;
+        }
+
         var databases = new List<(string DbName, string User, string Password)>
         {
             ("admin_db", "root", "password123"),
@@ -59,5 +82,7 @@ public class DatabaseBackupService
         {
             await BackupDatabaseAsync(db.DbName, db.User, db.Password);
         }
+
+        return true;
     }
 }
