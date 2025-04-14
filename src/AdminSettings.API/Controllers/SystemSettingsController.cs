@@ -37,7 +37,7 @@ namespace AdminSettings.Controllers
         public async Task<IActionResult> GetTimezones()
         {
             var timezones = await _systemSettingsService.GetTimezonesAsync();
-            return timezones.Any() ? Ok(timezones) : NotFound("No timezones available.");
+            return timezones.Count > 0 ? Ok(timezones) : NotFound("No timezones available.");
         }
 
         [HttpPut("system-settings/timezones")]
@@ -50,21 +50,27 @@ namespace AdminSettings.Controllers
             return result ? NoContent() : NotFound("Timezone not found.");
         }
 
-        [HttpGet("system-settings/currencies")]
-        public async Task<IActionResult> GetCurrencies()
+        [HttpGet("system-settings/BackupSetting")]
+        public async Task<IActionResult> GetDatabaseBackupSetting()
         {
-            var currencies = await _systemSettingsService.GetCurrenciesAsync();
-            return currencies.Any() ? Ok(currencies) : NotFound("No currencies available.");
+            var databaseBackupSetting = await _systemSettingsService.GetDatabaseBackupSettingsAsync();
+            return Ok(databaseBackupSetting);
         }
 
-        [HttpPut("system-settings/currencies")]
-        public async Task<IActionResult> UpdateCurrency([FromBody] Currency currency)
+        [HttpPut("system-settings/BackupSetting")]
+        public async Task<IActionResult> UpdateDatabaseBackupSetting([FromBody] DatabaseBackupSetting backupSetting)
         {
-            if (!ModelState.IsValid || currency == null)
-                return BadRequest("Invalid currency data.");
+            if (!ModelState.IsValid || backupSetting == null)
+                return BadRequest("Invalid backup setting data.");
+            var result = await _systemSettingsService.UpdateDatabaseBackupSettingAsync(backupSetting);
+            return result ? NoContent() : NotFound("Backup setting not found.");
+        }
 
-            var result = await _systemSettingsService.UpdateCurrencyAsync(currency);
-            return result ? NoContent() : NotFound("Currency not found.");
+        [HttpGet("system-settings/notification-enabled")]
+        public async Task<IActionResult> GetNotificationEnabled()
+        {
+            var notificationEnabled = await _systemSettingsService.GetNotificationEnabledAsync();
+            return Ok(notificationEnabled);
         }
     }
 }
