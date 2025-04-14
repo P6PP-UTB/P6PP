@@ -15,5 +15,9 @@ public sealed class RoomRequestValidator : AbstractValidator<RoomRequest>
             .NotEmpty()
             .LessThan(1_000)
             .GreaterThan(0);
+
+        RuleFor(r => r.Status)
+            .NotNull()
+            .IsInEnum();
     }
 }
