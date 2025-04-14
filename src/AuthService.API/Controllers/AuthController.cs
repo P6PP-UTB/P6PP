@@ -75,21 +75,22 @@ public class AuthController : Controller
         var verifyToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(verifyToken));
         Console.WriteLine("Encoded token for email verification: " + encodedToken);
-        
+
         var verificationUrl = ServiceEndpoints.NotificationService.SendVerificationEmail;
         var body = new
         {
             Id = user.UserId,
             Url = encodedToken,
         };
-        
-        var verificationResult = await _httpClient.PostAsync<object, object>(verificationUrl, body, CancellationToken.None);
+
+        var verificationResult =
+            await _httpClient.PostAsync<object, object>(verificationUrl, body, CancellationToken.None);
 
         if (!verificationResult.Success)
         {
             Console.WriteLine("Failed to send verification email.");
         }
-            
+
 
         Console.WriteLine("Preparing to send registration email...");
         var registrationUrl = ServiceEndpoints.NotificationService.SendRegistrationEmail(user.UserId);
@@ -103,8 +104,8 @@ public class AuthController : Controller
         {
             Console.WriteLine("Registration email sent successfully.");
         }
-        
-        
+
+
         return Ok(new ApiResult<object>(new { Id = user.UserId }));
     }
 
@@ -115,24 +116,24 @@ public class AuthController : Controller
             return BadRequest(new ApiResult<object>(null, false, "Invalid data."));
 
         ApplicationUser user = null;
-        
+
 
         if (!string.IsNullOrEmpty(model.UsernameOrEmail))
         {
             user = await _userManager.FindByEmailAsync(model.UsernameOrEmail)
                    ?? await _userManager.FindByNameAsync(model.UsernameOrEmail);
         }
-        
+
         if (user == null)
             return BadRequest(new ApiResult<object>(null, false, "Invalid username/email or password."));
-        
+
         if (user.EmailConfirmed == false)
             return BadRequest(new ApiResult<object>(null, false, "Email not verified."));
-        
-        
+
+
         var userUrl = ServiceEndpoints.UserService.GetUserById(user.UserId);
         var userResponse = await _httpClient.GetAsync<UserResponse>(userUrl);
-        
+
         if (!userResponse.Success)
             return BadRequest(new ApiResult<object>(null, false, userResponse.Message));
 
@@ -175,33 +176,36 @@ public class AuthController : Controller
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-
+  // This endpoint is for authenticated users to request a password change.
     [Authorize]
     [HttpGet("require-password-change")]
     public async Task<IActionResult> RequirePasswordChange()
     {
         var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
-        
+
         if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
             return Unauthorized(new ApiResult<object>(null, false, "Token does not contain valid user ID."));
-        
+
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-        
+
         if (user == null)
             return BadRequest(new ApiResult<object>(null, false, "User not found."));
 
         var notificationUrl = ServiceEndpoints.NotificationService.SendPasswordResetEmail;
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        
+        var rawToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(rawToken));
+        var resetUrl = $"://mojeapp.cz/reset-password?userId={user.UserId}&token={encodedToken}";
+
         var body = new
         {
             Id = user.UserId,
-            Url = token
+            Email = user.Email,
+            Url = encodedToken
         };
-        
+
         var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
-        
-        if (!response.Success) 
+
+        if (!response.Success)
             return BadRequest(new ApiResult<object>(null, false, response.Message));
 
         return Ok(new ApiResult<object>(null));
@@ -224,7 +228,8 @@ public class AuthController : Controller
         if (user == null)
             return BadRequest(new ApiResult<object>(null, false, "User not found."));
         
-        var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
 
         if (!result.Succeeded)
             return BadRequest(new ApiResult<object>(result.Errors, false, "Password reset failed."));
@@ -235,21 +240,77 @@ public class AuthController : Controller
             "Password reset successfully."));
     }
 
-    
-    [HttpGet("isVerified/{userId}")]
-    public async Task<IActionResult> IsVerified(string userId)
+    // This endpoint is for anonymous users to request a password reset email.
+    [AllowAnonymous]
+    [HttpGet("require-password-change-anonymous")]
+    public async Task<IActionResult> RequirePasswordReset([FromQuery] string email)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        if (string.IsNullOrEmpty(email))
+        {
+            return BadRequest(new ApiResult<object>(null, false, "Email is required."));
+        }
+
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user == null)
+            return BadRequest(new ApiResult<object>(null, false, "User with this email does not exist."));
+
+        var notificationUrl = ServiceEndpoints.NotificationService.SendPasswordResetEmail;
+        
+        var rawToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(rawToken));
+        var resetUrl = $"://mojeapp.cz/reset-password?userId={user.UserId}&token={encodedToken}";
+        var body = new
+        {
+            Id = user.UserId,
+            Email = user.Email,
+            Url = resetUrl,
+            UrlToken = encodedToken
+        };
+
+        var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
+
+        if (!response.Success)
+            return BadRequest(new ApiResult<object>(null, false, response.Message));
+        Console.WriteLine($"token: {encodedToken}");
+        return Ok(new ApiResult<object>(null));
+    }
+
+    [HttpPost("reset-password-anonymous")]
+    public async Task<IActionResult> ResetPasswordAnonymous([FromBody] ResetPasswordModelAnonymous model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == model.userId);
+        if (user == null)
+            return BadRequest(new ApiResult<object>(null, false, "User not found."));
+
+        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
+        if (!result.Succeeded)
+            return BadRequest(new ApiResult<object>(result.Errors, false, "Password reset failed."));
+
+        return Ok(new ApiResult<object>(
+            new { UserId = user.UserId },
+            true,
+            "Password reset successfully."));
+    }
+
+
+    [HttpGet("isVerified/{userId}")]
+    public async Task<IActionResult> IsVerified(int userId)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (user == null)
             return BadRequest(new ApiResult<object>(null, false, "User not found."));
 
         var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
         if (!isEmailConfirmed)
-            return Ok(new ApiResult<object>(new {verified = false }, false, "Email not verified."));
+            return Ok(new ApiResult<object>(new { verified = false }, false, "Email not verified."));
 
         return Ok(new ApiResult<object>(new { verified = true }, true, "User is verified."));
     }
-    
+
     [HttpPost("verify-email/{userId}/{token}")]
     public async Task<IActionResult> VerifyEmail(int userId, string token)
     {
@@ -276,7 +337,6 @@ public class AuthController : Controller
             return StatusCode(500, new ApiResult<object>(null, false, "An unexpected error occurred."));
         }
     }
-
 
 
     [Authorize]
@@ -341,13 +401,13 @@ public class AuthController : Controller
             return StatusCode(500, new { message = "An error occurred.", exception = ex.Message });
         }
     }
-    
+
     // This endpoint is for user service only
     [HttpDelete("delete/{userId}")]
     public async Task<IActionResult> DeleteUser(int userId)
     {
         // Check if admin tries to do it
-        
+
         var user = await _dbContext.Users
             .FirstOrDefaultAsync(u => u.UserId == userId);
 
@@ -355,12 +415,9 @@ public class AuthController : Controller
         {
             return BadRequest(new ApiResult<string>("User not found.", false, "User not found."));
         }
-        
+
         var result = await _userManager.DeleteAsync(user);
 
         return Ok(new ApiResult<bool>(true, true, "User deleted successfully."));
     }
-    
-    
-
 }
