@@ -13,6 +13,7 @@ public sealed class RoomRequestValidator : AbstractValidator<RoomRequest>
 
         RuleFor(r => r.Capacity)
             .NotEmpty()
-            .LessThan(1_000);
+            .LessThan(1_000)
+            .GreaterThan(0);
     }
 }
