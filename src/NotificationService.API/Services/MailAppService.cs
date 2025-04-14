@@ -24,7 +24,7 @@ namespace NotificationService.API.Services
             _smtpSettings = configuration.GetSection("SmtpSettings").Get<SmtpSettings>();
         }
 
-        public async Task SendEmailAsync(EmailArgs emailArgs)
+        public async Task SendEmailAsync(EmailArgs emailArgs, IList<Attachment> attachments = null)
         {
 
             var mailMessage = new MailMessage
@@ -42,6 +42,14 @@ namespace NotificationService.API.Services
             if (!mailMessage.To.Any())
             {
                 return;
+            }
+
+            if (attachments != null)
+            {
+                foreach (var attachment in attachments)
+                {
+                    mailMessage.Attachments.Add(attachment);
+                }
             }
 
             using (var smtpClient = new SmtpClient(_smtpSettings.Host, _smtpSettings.Port))

@@ -70,6 +70,7 @@ app.UseRouting();
 app.UseEndpoints(endpoints =>
 {
     SendEmailEndpoint.SendEmail(endpoints);
+    SendEmailWithAttachmentEndpoint.SendEmailWithAttachment(endpoints);
     SendRegistrationEmailEndpoint.SendRegistrationEmail(endpoints);
     SendVerificationEmailEndpoint.SendVerificationEmail(endpoints);
     SendPasswordResetEmailEndpoint.SendPasswordResetEmail(endpoints);

@@ -53,7 +53,11 @@ public static class ServiceExtensions
         
         // Register NetworkHttpClient
         services.AddHttpClient<NetworkHttpClient>();
-        
+
+        // Register SendEmailWithAttachment Services
+        services.AddSingleton<SendEmailWithAttachmentRequestValidator>();
+        services.AddScoped<SendEmailWithAttachmentHandler>();
+
 
     }
 }
