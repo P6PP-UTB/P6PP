@@ -51,6 +51,12 @@ public static class ServiceExtensions
 
         services.AddScoped<AssignUserRoleHandler>();
         services.AddSingleton<AssignUserRoleValidator>();
+        
+        services.AddScoped<DeactivateUserHandler>();
+        services.AddSingleton<DeactivateUserValidator>();
+        
+        services.AddScoped<ActivateUserHandler>();
+        services.AddSingleton<ActivateUserValidator>();
 
         // HttpClient
         services.AddHttpClient<NetworkHttpClient>();

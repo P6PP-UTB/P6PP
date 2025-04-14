@@ -74,6 +74,7 @@ public class AuthController : Controller
 
         var verifyToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(verifyToken));
+        Console.WriteLine("Encoded token for email verification: " + encodedToken);
         
         var verificationUrl = ServiceEndpoints.NotificationService.SendVerificationEmail;
         var body = new
@@ -103,8 +104,6 @@ public class AuthController : Controller
             Console.WriteLine("Registration email sent successfully.");
         }
         
-        Console.WriteLine($"Email verification token for user {user.Email}:");
-        Console.WriteLine(encodedToken);
         
         return Ok(new ApiResult<object>(new { Id = user.UserId }));
     }
@@ -116,16 +115,31 @@ public class AuthController : Controller
             return BadRequest(new ApiResult<object>(null, false, "Invalid data."));
 
         ApplicationUser user = null;
+        
 
         if (!string.IsNullOrEmpty(model.UsernameOrEmail))
         {
-            // No manual normalization here
             user = await _userManager.FindByEmailAsync(model.UsernameOrEmail)
                    ?? await _userManager.FindByNameAsync(model.UsernameOrEmail);
         }
-
+        
         if (user == null)
             return BadRequest(new ApiResult<object>(null, false, "Invalid username/email or password."));
+        
+        if (user.EmailConfirmed == false)
+            return BadRequest(new ApiResult<object>(null, false, "Email not verified."));
+        
+        
+        var userUrl = ServiceEndpoints.UserService.GetUserById(user.UserId);
+        var userResponse = await _httpClient.GetAsync<UserResponse>(userUrl);
+        
+        if (!userResponse.Success)
+            return BadRequest(new ApiResult<object>(null, false, userResponse.Message));
+
+        if (userResponse.Data?.User.State == "Deactivated")
+        {
+            return BadRequest(new ApiResult<object>(null, false, "User had deactivated account."));
+        }
 
         var result = await _userManager.CheckPasswordAsync(user, model.Password);
         if (!result)
@@ -178,14 +192,11 @@ public class AuthController : Controller
 
         var notificationUrl = ServiceEndpoints.NotificationService.SendPasswordResetEmail;
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        Console.WriteLine($"Generated password reset token: {token}");
         
-        // TODO: GET LINK FOR FRONTEND
-        var resetUrl = $"https://frontend:port/reset-password?token={token}";
         var body = new
         {
             Id = user.UserId,
-            Url = resetUrl
+            Url = token
         };
         
         var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
@@ -330,5 +341,26 @@ public class AuthController : Controller
             return StatusCode(500, new { message = "An error occurred.", exception = ex.Message });
         }
     }
+    
+    // This endpoint is for user service only
+    [HttpDelete("delete/{userId}")]
+    public async Task<IActionResult> DeleteUser(int userId)
+    {
+        // Check if admin tries to do it
+        
+        var user = await _dbContext.Users
+            .FirstOrDefaultAsync(u => u.UserId == userId);
+
+        if (user is null)
+        {
+            return BadRequest(new ApiResult<string>("User not found.", false, "User not found."));
+        }
+        
+        var result = await _userManager.DeleteAsync(user);
+
+        return Ok(new ApiResult<bool>(true, true, "User deleted successfully."));
+    }
+    
+    
 
 }

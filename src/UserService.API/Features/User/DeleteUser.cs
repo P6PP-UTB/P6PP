@@ -1,4 +1,6 @@
 using FluentValidation;
+using ReservationSystem.Shared;
+using ReservationSystem.Shared.Clients;
 using ReservationSystem.Shared.Results;
 
 namespace UserService.API.Features;
@@ -16,10 +18,12 @@ public class DeleteUserValidator : AbstractValidator<DeleteUserRequest>
 public class DeleteUserHandler
 {
     private readonly Services.UserService _userService;
+    private readonly NetworkHttpClient _httpClient;
 
-    public DeleteUserHandler(Services.UserService userService)
+    public DeleteUserHandler(Services.UserService userService, NetworkHttpClient httpClient)
     {
         _userService = userService;
+        _httpClient = httpClient;
     }
 
     public async Task<ApiResult<bool>> HandleAsync(DeleteUserRequest request, CancellationToken cancellationToken)
@@ -27,7 +31,15 @@ public class DeleteUserHandler
         cancellationToken.ThrowIfCancellationRequested();
 
         var success = await _userService.DeleteUserAsync(request.Id, cancellationToken);
-        // TODO: Call to auth/delete ??
+        
+        var authUrl = ServiceEndpoints.AuthService.DeleteUser(request.Id);
+        var response = await _httpClient.DeleteAsync<object>(authUrl);
+        
+        if (!response.Success)
+        {
+            return new ApiResult<bool>(false, false, "Failed to delete user from AuthService");
+        }
+        
         return success 
             ? new ApiResult<bool>(success) 
             : new ApiResult<bool>(success, false, "User not found");
