@@ -38,7 +38,7 @@ builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
     client.BaseAddress = new Uri("http://user-service:5189");
 });
 
-
+builder.Services.AddHostedService<BackupSchedulerService>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<DapperContext>();

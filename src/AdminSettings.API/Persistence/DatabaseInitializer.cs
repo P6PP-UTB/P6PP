@@ -48,7 +48,7 @@ public class DatabaseInitializer
 
             await CreateAuditLogsTableAsync(conn);
             await CreateTimezoneTableAsync(conn);
-            await CreateCurrencyTableAsync(conn);
+            await CreateDatabaseBackupSettingTableAsync(conn);
             await CreateSystemSettingsTableAsync(conn);
         }
         catch (Exception ex)
@@ -85,17 +85,17 @@ public class DatabaseInitializer
         _logger.LogInformation("Table 'Timezone' ensured.");
     }
 
-    private async Task CreateCurrencyTableAsync(MySqlConnection conn)
+    private async Task CreateDatabaseBackupSettingTableAsync(MySqlConnection conn)
     {
         const string tableSql = @"
-        CREATE TABLE IF NOT EXISTS Currencies (
+        CREATE TABLE IF NOT EXISTS DatabaseBackupSettings (
             Id INT AUTO_INCREMENT PRIMARY KEY,
-            Name VARCHAR(255) NOT NULL,
-            Symbol VARCHAR(255) NOT NULL
+            BackupEnabled BOOLEAN NOT NULL DEFAULT TRUE,
+            BackupTime TIME NOT NULL DEFAULT '00:00:00',
+            BackupFrequency VARCHAR(255) NOT NULL DEFAULT 'monthly'
         );";
-
         await conn.ExecuteAsync(tableSql);
-        _logger.LogInformation("Table 'Currency' ensured.");
+        _logger.LogInformation("Table 'DatabaseBackupSettings' ensured.");
     }
 
     private async Task CreateSystemSettingsTableAsync(MySqlConnection conn)
@@ -104,9 +104,12 @@ public class DatabaseInitializer
         CREATE TABLE IF NOT EXISTS SystemSettings (
             Id INT AUTO_INCREMENT PRIMARY KEY,
             TimezoneId INT NOT NULL,
-            CurrencyId INT NOT NULL,
+            DatabaseBackupSettingId INT NOT NULL,
+            AuditLogEnabled BOOLEAN NOT NULL DEFAULT TRUE,
+            NotificationEnabled BOOLEAN NOT NULL DEFAULT TRUE,
             FOREIGN KEY (TimezoneId) REFERENCES Timezones(Id),
-            FOREIGN KEY (CurrencyId) REFERENCES Currencies(Id)
+            FOREIGN KEY (DatabaseBackupSettingId) REFERENCES DatabaseBackupSettings(Id),
+            SystemLanguage VARCHAR(10) NOT NULL DEFAULT 'en-US'
         );";
 
         await conn.ExecuteAsync(tableSql);

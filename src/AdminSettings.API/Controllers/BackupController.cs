@@ -17,7 +17,15 @@ public class BackupController : ControllerBase
     [HttpPost("run")]
     public async Task<IActionResult> RunBackup()
     {
-        await _backupService.BackupAllAsync();
-        return Ok("Zálohování dokončeno.");
+        var success = await _backupService.BackupAllAsync();
+
+        if (success)
+        {
+            return Ok("✅ Zálohování dokončeno.");
+        }
+        else
+        {
+            return BadRequest("❌ Zálohování nebylo provedeno.");
+        }
     }
 }
