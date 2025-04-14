@@ -16,29 +16,16 @@ public class BackupController : ControllerBase
 
     [HttpPost("run")]
     public async Task<IActionResult> RunBackup()
-
     {
-        var systemSettings = await _backupService.GetSystemSettingsAsync();
-        if (systemSettings?.DatabaseBackupSetting == null)
-        {
-            return StatusCode(500, "❌ System settings not found. Backup cannot be performed.");
-        }
-
-        // check if Manual backup is enabled
-        if (!systemSettings.DatabaseBackupSetting.ManualBackupEnabled)
-        {
-            return BadRequest("❌ Manual backup is disabled. Please enable it to perform a backup.");
-        }
-
         var success = await _backupService.BackupAllAsync();
 
         if (success)
         {
-            return Ok("✅ Backup completed.");
+            return Ok("✅ Zálohování dokončeno.");
         }
         else
         {
-            return StatusCode(500, "❌ Backup not performed due to a server error.");
+            return BadRequest("❌ Zálohování nebylo provedeno.");
         }
     }
 }

@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using AdminSettings.Services;
 using AdminSettings.Persistence.Entities;
-using AdminSettings.Persistence.Enums;
 
 namespace AdminSettings.Services
 {
@@ -35,13 +34,13 @@ namespace AdminSettings.Services
 
                         var systemSettings = await systemSettingsService.GetSystemSettingsAsync();
 
-                        if (systemSettings?.DatabaseBackupSetting != null && systemSettings.DatabaseBackupSetting.AutomaticBackupEnabled)
+                        if (systemSettings?.DatabaseBackupSetting != null && systemSettings.DatabaseBackupSetting.BackupEnabled)
                         {
                             var backupSetting = systemSettings.DatabaseBackupSetting;
 
                             if (ShouldRunBackup(backupSetting))
                             {
-                                _logger.LogInformation("Running a scheduled database backup.");
+                                _logger.LogInformation("Spouštím naplánovanou zálohu databáze.");
                                 await backupService.BackupAllAsync();
                                 await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
                             }
@@ -52,7 +51,7 @@ namespace AdminSettings.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "An error occurred while scheduling backups.");
+                    _logger.LogError(ex, "Došlo k chybě při plánování záloh.");
                     await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
                 }
             }
@@ -68,11 +67,11 @@ namespace AdminSettings.Services
             if (!isTimeToBackup)
                 return false;
 
-            return settings.BackupFrequency switch
+            return settings.BackupFrequency.ToLower() switch
             {
-                BackupFrequency.Daily => true,
-                BackupFrequency.Weekly => now.DayOfWeek == DayOfWeek.Sunday,
-                BackupFrequency.Monthly => now.Day == 1,
+                "daily" => true,
+                "weekly" => now.DayOfWeek == DayOfWeek.Sunday,
+                "monthly" => now.Day == 1,
                 _ => false
             };
         }

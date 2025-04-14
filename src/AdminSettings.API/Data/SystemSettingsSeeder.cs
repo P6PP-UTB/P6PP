@@ -1,6 +1,5 @@
 ﻿using AdminSettings.Data;
 using AdminSettings.Persistence.Entities;
-using AdminSettings.Persistence.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace AdminSettings.Data;
@@ -20,13 +19,23 @@ public class SystemSettingsSeeder
     {
         _logger.LogInformation("Seeding default data for system settings...");
 
+        // Seed Timezone
+        if (!await _context.Timezones.AnyAsync())
+        {
+            _context.Timezones.AddRange(
+                new Timezone { Name = "UTC", UtcOffset = "+00:00" },
+                new Timezone { Name = "CET", UtcOffset = "+01:00" },
+                new Timezone { Name = "CEST", UtcOffset = "+02:00" }
+            );
+        }
+
         // Seed DatabaseBackupSetting
         if (!await _context.DatabaseBackupSettings.AnyAsync())
         {
             _context.DatabaseBackupSettings.Add(new DatabaseBackupSetting
             {
-                ManualBackupEnabled = true,
-                BackupFrequency = BackupFrequency.Monthly,
+                BackupEnabled = true,
+                BackupFrequency = "monthly",
                 BackupTime = new TimeOnly(0, 0)
             });
 
@@ -38,12 +47,13 @@ public class SystemSettingsSeeder
         // Seed SystemSettings
         if (!await _context.SystemSettings.AnyAsync())
         {
+            var timezone = await _context.Timezones.FirstAsync();
             var databaseBackupSetting = await _context.DatabaseBackupSettings.FirstAsync();
 
             _context.SystemSettings.Add(new SystemSetting
             {
-                DatabaseBackupSettingId = databaseBackupSetting.Id,
-                DatabaseBackupSetting = databaseBackupSetting
+                TimezoneId = timezone.Id,
+                DatabaseBackupSettingId = databaseBackupSetting.Id
             });
 
             await _context.SaveChangesAsync();
