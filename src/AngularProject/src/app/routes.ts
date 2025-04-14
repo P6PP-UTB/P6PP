@@ -5,9 +5,10 @@ import { NavigationComponent } from './components/navigation/navigation.componen
 import { LoginPage } from './pages/login/login.page';
 import { SignupPage } from './pages/signup/signup.page';
 import { ProfilePage } from './pages/profile/profile.page';
-import {MainPageComponent} from './pages/main-page/main-page.component'
+import { MainPageComponent } from './pages/main-page/main-page.component'
+import { PaymentComponent } from './pages/payment/payment.component';
 import { AuthGuard } from './services/auth.guard';
-import { PaymentComponent } from './payment/payment.component';
+
 
 const routeConfig: Routes = [
     {
