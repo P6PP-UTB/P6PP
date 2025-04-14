@@ -298,31 +298,64 @@ public class AuthControllerTests
     public async Task Login_ValidUser_ReturnsOkWithToken()
     {
         // Arrange
-        var userManagerMock = _mockUserManager;
-
         var user = new ApplicationUser
         {
             UserId = 1,
             UserName = "testuser",
-            Email = "test@example.com"
+            Email = "test@example.com",
+            EmailConfirmed = true
         };
 
+        // Mock UserManager
+        var userManagerMock = _mockUserManager;
         userManagerMock.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
-        userManagerMock.Setup(x => x.CheckPasswordAsync(user, It.IsAny<string>())).ReturnsAsync(true);
+        userManagerMock.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(user);
+        userManagerMock.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).ReturnsAsync(true);
 
-        // Mock JWT configuration
+        // Mock HTTP client pro UserService
+        var httpMessageHandlerMock = new Mock<HttpMessageHandler>();
+        httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(@"{
+                ""data"": {
+                    ""user"": {
+                        ""state"": ""Active""
+                    }
+                },
+                ""success"": true,
+                ""message"": null
+            }", Encoding.UTF8, "application/json")
+            });
+
+        var httpClient = new HttpClient(httpMessageHandlerMock.Object);
+        var networkHttpClient = new NetworkHttpClient(httpClient, Mock.Of<ILogger<NetworkHttpClient>>());
+
+        // Mock JWT konfigurace
         var configMock = new Mock<IConfiguration>();
         configMock.Setup(c => c["JWT_SECRET_KEY"]).Returns("test-secret-key-12345678901234567890123456789012");
         configMock.Setup(c => c["JWT_ISSUER"]).Returns("test-issuer");
         configMock.Setup(c => c["JWT_AUDIENCE"]).Returns("test-audience");
 
-        var authController = new AuthController(userManagerMock.Object, _mockHttpClient.Object, configMock.Object, _dbContext);
+        // Vytvoření controlleru
+        var authController = new AuthController(
+            userManagerMock.Object,
+            networkHttpClient,
+            configMock.Object,
+            _dbContext
+        );
 
-        // Test login data
+        // Testovací data
         var model = new LoginModel
         {
             UsernameOrEmail = "test@example.com",
-            Password = "Test123!" // Valid password
+            Password = "Test123!"
         };
 
         // Act
@@ -331,6 +364,7 @@ public class AuthControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         var apiResult = Assert.IsType<ApiResult<string>>(okResult.Value);
+
         Assert.True(apiResult.Success);
         Assert.NotNull(apiResult.Data);
         Assert.IsType<string>(apiResult.Data);
@@ -379,19 +413,51 @@ public class AuthControllerTests
         {
             UserId = 1,
             UserName = "testuser",
-            Email = "test@example.com"
+            Email = "test@example.com",
+            EmailConfirmed = true
         };
 
         var userManagerMock = _mockUserManager;
+        var httpClientMock = new Mock<HttpMessageHandler>();
 
+        // Nastavení UserManager mocků
         userManagerMock.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
         userManagerMock.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(user);
         userManagerMock.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).ReturnsAsync(false);
 
-        // Create the AuthController with the mocked dependencies
-        var authController = new AuthController(userManagerMock.Object, _mockHttpClient.Object, _configuration, _dbContext);
+        // Nastavení odpovědi z UserService
+        var userServiceResponse = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(@"{
+            ""data"": {
+                ""user"": {
+                    ""state"": ""Active""
+                }
+            },
+            ""success"": true,
+            ""message"": null
+        }", Encoding.UTF8, "application/json")
+        };
 
-        // Test login data with correct email/username but incorrect password
+        httpClientMock.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(userServiceResponse);
+
+        var httpClient = new HttpClient(httpClientMock.Object);
+        var networkHttpClient = new NetworkHttpClient(httpClient, Mock.Of<ILogger<NetworkHttpClient>>());
+
+        var authController = new AuthController(
+            userManagerMock.Object,
+            networkHttpClient,
+            _configuration,
+            _dbContext
+        );
+
+        // Testovací data
         var model = new LoginModel
         {
             UsernameOrEmail = "test@example.com",
@@ -507,7 +573,7 @@ public class AuthControllerTests
         var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
         var apiResult = Assert.IsType<ApiResult<object>>(unauthorizedResult.Value);
         Assert.False(apiResult.Success);
-        Assert.Equal("Token does not contain user ID.", apiResult.Message);
+        Assert.Equal("Token does not contain valid user ID.", apiResult.Message);
     }
 
     /// <summary>
