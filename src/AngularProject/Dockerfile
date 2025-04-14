@@ -6,7 +6,8 @@ RUN npm install
 # Kopírování zbytku kódu
 COPY . .
 # Sestavení Angular aplikace
-RUN CI=false npm run build || echo "Build errors were ignored"
+# RUN CI=false npm run build || echo "Build errors were ignored"
+RUN npm run build
 # Vypsat obsah dist adresáře pro kontrolu
 RUN ls -la dist/
 

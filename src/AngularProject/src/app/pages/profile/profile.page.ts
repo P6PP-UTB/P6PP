@@ -91,7 +91,7 @@ export class ProfilePage implements OnInit {
   }
 
   onDeleteAccount() {
-    const confirmDelete = window.confirm('Are you sure you want to delete your account? This action is irreversible.');
+    const confirmDelete = window.confirm('Are you sure you want to send a request to delete your account? This action is irreversible.'); // Are you sure you want to delete your account? This action is irreversible.
     if (confirmDelete) {
       this.userService.deleteUser(this.user.id).subscribe(() => {
         localStorage.removeItem('token');
