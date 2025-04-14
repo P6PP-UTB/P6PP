@@ -7,7 +7,10 @@ import { SignupPage } from './pages/signup/signup.page';
 import { ProfilePage } from './pages/profile/profile.page';
 import { MainPageComponent } from './pages/main-page/main-page.component'
 import { PaymentComponent } from './pages/payment/payment.component';
+import { ForgetPassComponent } from './pages/forget-pass/forget-pass.component';
+
 import { AuthGuard } from './services/auth.guard';
+import { ResetPassComponent } from './pages/reset-pass/reset-pass.component';
 
 
 const routeConfig: Routes = [
@@ -41,7 +44,19 @@ const routeConfig: Routes = [
         component: PaymentComponent,
         title: 'Get Robux',
         canActivate: [AuthGuard] 
-    }
+    },
+    {
+        // to write a email for reset link
+        path: 'password_forget',
+        component: ForgetPassComponent,
+        title: 'Forgot a password?'
+    },
+    {
+        // reset link
+        path: 'password_reset',
+        component: ResetPassComponent,
+        title: 'Reset a password'
+    },
 ];
 
 export default routeConfig;

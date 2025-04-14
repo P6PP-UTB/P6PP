@@ -1,0 +1,23 @@
+<a id="logo" routerLink="">REZERVACE+</a>
+
+<div id="restore-block">
+    <div id="restore">Forgot a password?</div>
+    <div class="form-container">
+        <form [formGroup]="resetForm" (ngSubmit)="onSubmit()">
+            <label for="email">Enter your account's email<span class="required"></span></label>
+            <div class="container">
+            <input id="email" type="text" formControlName="email" placeholder="example@mail.com" required>
+            </div>
+
+            <div class="container">
+                <button id="submit" type="submit" class="sign-up-btn">Send a link</button>
+            </div>
+
+            <!-- <div class="container justify-content-center" *ngIf="loginError">
+                <p class="text-danger">
+                    {{ loginError }}
+                </p>
+            </div> -->
+        </form>
+    </div>
+</div>
