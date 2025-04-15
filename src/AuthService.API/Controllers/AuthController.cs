@@ -1,19 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
-using AuthService.API.Data;
-using AuthService.API.DTO;
-using AuthService.API.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using ReservationSystem.Shared;
-using ReservationSystem.Shared.Clients;
 using ReservationSystem.Shared.Results;
+using AuthService.API.DTO;
+using AuthService.API.Interfaces;
 
 namespace AuthService.API.Controllers;
 
@@ -21,92 +10,18 @@ namespace AuthService.API.Controllers;
 [ApiController]
 public class AuthController : Controller
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly NetworkHttpClient _httpClient;
-    private readonly IConfiguration _configuration;
-    private readonly AuthDbContext _dbContext;
+    private readonly IUserAuthService _authService;
 
-    public AuthController(UserManager<ApplicationUser> userManager, NetworkHttpClient httpClient,
-        IConfiguration configuration, AuthDbContext dbContext)
+    public AuthController(IUserAuthService authService)
     {
-        _userManager = userManager;
-        _httpClient = httpClient;
-        _configuration = configuration;
-        _dbContext = dbContext;
+        _authService = authService;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var existingEmail = await _userManager.FindByEmailAsync(model.Email);
-        if (existingEmail != null)
-            return BadRequest(new ApiResult<object>(null, false, "User with this email already exists."));
-
-        var existingUsername = await _userManager.FindByNameAsync(model.UserName);
-        if (existingUsername != null)
-            return BadRequest(new ApiResult<object>(null, false, "User with this username already exists."));
-
-        var url = ServiceEndpoints.UserService.CreateUser;
-        var newUser = new
-        {
-            Username = model.UserName,
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            Email = model.Email.ToLower(),
-        };
-
-        var response = await _httpClient.PostAsync<object, object>(url, newUser, CancellationToken.None);
-
-        if (!response.Success)
-            return BadRequest(new ApiResult<object>(null, false, response.Message));
-
-        var user = new ApplicationUser
-        {
-            Email = model.Email,
-            UserName = model.UserName,
-            UserId = int.Parse(response.Data.ToString())
-        };
-
-        var result = await _userManager.CreateAsync(user, model.Password);
-
-        if (!result.Succeeded)
-            return BadRequest(new ApiResult<object>(result.Errors, false, result.Errors.ToString()));
-
-        var verifyToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(verifyToken));
-        Console.WriteLine("Encoded token for email verification: " + encodedToken);
-
-        var verificationUrl = ServiceEndpoints.NotificationService.SendVerificationEmail;
-        var body = new
-        {
-            Id = user.UserId,
-            Url = encodedToken,
-        };
-
-        var verificationResult =
-            await _httpClient.PostAsync<object, object>(verificationUrl, body, CancellationToken.None);
-
-        if (!verificationResult.Success)
-        {
-            Console.WriteLine("Failed to send verification email.");
-        }
-
-
-        Console.WriteLine("Preparing to send registration email...");
-        var registrationUrl = ServiceEndpoints.NotificationService.SendRegistrationEmail(user.UserId);
-        var message = await _httpClient.GetAsync<object>(registrationUrl);
-
-        if (!message.Success)
-        {
-            Console.WriteLine("Failed to send registration email.");
-        }
-        else
-        {
-            Console.WriteLine("Registration email sent successfully.");
-        }
-
-
-        return Ok(new ApiResult<object>(new { Id = user.UserId }));
+        var result = await _authService.RegisterAsync(model);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("login")]
@@ -115,229 +30,63 @@ public class AuthController : Controller
         if (!ModelState.IsValid)
             return BadRequest(new ApiResult<object>(null, false, "Invalid data."));
 
-        ApplicationUser user = null;
-
-
-        if (!string.IsNullOrEmpty(model.UsernameOrEmail))
-        {
-            user = await _userManager.FindByEmailAsync(model.UsernameOrEmail)
-                   ?? await _userManager.FindByNameAsync(model.UsernameOrEmail);
-        }
-
-        if (user == null)
-            return BadRequest(new ApiResult<object>(null, false, "Invalid username/email or password."));
-
-        if (user.EmailConfirmed == false)
-            return BadRequest(new ApiResult<object>(null, false, "Email not verified."));
-
-
-        var userUrl = ServiceEndpoints.UserService.GetUserById(user.UserId);
-        var userResponse = await _httpClient.GetAsync<UserResponse>(userUrl);
-
-        if (!userResponse.Success)
-            return BadRequest(new ApiResult<object>(null, false, userResponse.Message));
-
-        if (userResponse.Data?.User.State == "Deactivated")
-        {
-            return BadRequest(new ApiResult<object>(null, false, "User had deactivated account."));
-        }
-
-        var result = await _userManager.CheckPasswordAsync(user, model.Password);
-        if (!result)
-            return BadRequest(new ApiResult<object>(null, false, "Invalid username/email or password."));
-
-        var token = GenerateJwtToken(user);
-        return Ok(new ApiResult<string>(token));
+        var result = await _authService.LoginAsync(model);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    private string GenerateJwtToken(ApplicationUser user)
-    {
-        var secretKey = _configuration["JWT_SECRET_KEY"];
-        var issuer = _configuration["JWT_ISSUER"];
-        var audience = _configuration["JWT_AUDIENCE"];
-
-        var claims = new List<Claim>
-        {
-            new Claim("userid", user.UserId.ToString()), //Změněno na UserId a ToString()
-            new Claim("username", user.UserName!)
-        };
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(5),
-            signingCredentials: creds
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-  // This endpoint is for authenticated users to request a password change.
+    // This endpoint is for authenticated users to request a password change.
     [Authorize]
-    [HttpGet("require-password-change")]
-    public async Task<IActionResult> RequirePasswordChange()
+    [HttpGet("change-password")]
+    public async Task<IActionResult> RequestPasswordChange()
     {
-        var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
-
-        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-            return Unauthorized(new ApiResult<object>(null, false, "Token does not contain valid user ID."));
-
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-
-        if (user == null)
-            return BadRequest(new ApiResult<object>(null, false, "User not found."));
-
-        var notificationUrl = ServiceEndpoints.NotificationService.SendPasswordResetEmail;
-        var rawToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(rawToken));
-        var resetUrl = $"://mojeapp.cz/reset-password?userId={user.UserId}&token={encodedToken}";
-
-        var body = new
-        {
-            Id = user.UserId,
-            Email = user.Email,
-            Url = encodedToken
-        };
-
-        var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
-
-        if (!response.Success)
-            return BadRequest(new ApiResult<object>(null, false, response.Message));
-
-        return Ok(new ApiResult<object>(null));
+        var result = await _authService.RequestPasswordChangeAsync(HttpContext);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _authService.ChangePasswordAsync(HttpContext, model);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    // This endpoint is for anonymous users to request a password reset.
+    [AllowAnonymous]
+    [HttpGet("reset-password")]
+    public async Task<IActionResult> RequestPasswordReset([FromQuery] string email)
+    {
+        var result = await _authService.RequestPasswordResetAsync(email);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    [AllowAnonymous]
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
-
-        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-            return Unauthorized(new ApiResult<object>(null, false, "Token does not contain valid user ID."));
-
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-
-        if (user == null)
-            return BadRequest(new ApiResult<object>(null, false, "User not found."));
-        
-        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
-        var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
-
-        if (!result.Succeeded)
-            return BadRequest(new ApiResult<object>(result.Errors, false, "Password reset failed."));
-
-        return Ok(new ApiResult<object>(
-            new { UserId = user.UserId, Email = user.Email },
-            true,
-            "Password reset successfully."));
+        var result = await _authService.ResetPasswordAsync(model);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // This endpoint is for anonymous users to request a password reset email.
-    [AllowAnonymous]
-    [HttpGet("require-password-change-anonymous")]
-    public async Task<IActionResult> RequirePasswordReset([FromQuery] string email)
-    {
-        if (string.IsNullOrEmpty(email))
-        {
-            return BadRequest(new ApiResult<object>(null, false, "Email is required."));
-        }
-
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
-        if (user == null)
-            return BadRequest(new ApiResult<object>(null, false, "User with this email does not exist."));
-
-        var notificationUrl = ServiceEndpoints.NotificationService.SendPasswordResetEmail;
-        
-        var rawToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(rawToken));
-        var resetUrl = $"://mojeapp.cz/reset-password?userId={user.UserId}&token={encodedToken}";
-        var body = new
-        {
-            Id = user.UserId,
-            Email = user.Email,
-            Url = resetUrl,
-            UrlToken = encodedToken
-        };
-
-        var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
-
-        if (!response.Success)
-            return BadRequest(new ApiResult<object>(null, false, response.Message));
-        Console.WriteLine($"token: {encodedToken}");
-        return Ok(new ApiResult<object>(null));
-    }
-
-    [HttpPost("reset-password-anonymous")]
-    public async Task<IActionResult> ResetPasswordAnonymous([FromBody] ResetPasswordModelAnonymous model)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == model.userId);
-        if (user == null)
-            return BadRequest(new ApiResult<object>(null, false, "User not found."));
-
-        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
-        var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
-        if (!result.Succeeded)
-            return BadRequest(new ApiResult<object>(result.Errors, false, "Password reset failed."));
-
-        return Ok(new ApiResult<object>(
-            new { UserId = user.UserId },
-            true,
-            "Password reset successfully."));
-    }
-
-
-    [HttpGet("isVerified/{userId}")]
+    [HttpGet("is-verified/{userId}")]
     public async Task<IActionResult> IsVerified(int userId)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-        if (user == null)
-            return BadRequest(new ApiResult<object>(null, false, "User not found."));
-
-        var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
-        if (!isEmailConfirmed)
-            return Ok(new ApiResult<object>(new { verified = false }, false, "Email not verified."));
-
-        return Ok(new ApiResult<object>(new { verified = true }, true, "User is verified."));
+        var result = await _authService.IsVerifiedAsync(userId);
+        return result.Success && result.Data != null ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("verify-email/{userId}/{token}")]
     public async Task<IActionResult> VerifyEmail(int userId, string token)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-        if (user == null)
-            return NotFound(new ApiResult<object>(null, false, "User not found."));
-
-        try
-        {
-            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
-
-            var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
-            if (result.Succeeded)
-                return Ok(new ApiResult<object>(null, true, "Email verified successfully."));
-
-            return BadRequest(new ApiResult<object>(null, false, "Invalid or expired token."));
-        }
-        catch (FormatException)
-        {
-            return BadRequest(new ApiResult<object>(null, false, "Token format is invalid."));
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new ApiResult<object>(null, false, "An unexpected error occurred."));
-        }
+        var result = await _authService.VerifyEmailAsync(userId, token);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
-
 
     [Authorize]
     [HttpPost("logout")]
@@ -347,77 +96,22 @@ public class AuthController : Controller
         {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
 
-            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
-            var usernameClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username");
-
-            if (userIdClaim == null || usernameClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-            {
-                return Unauthorized(new
-                {
-                    message = "Token is invalid or claims are missing",
-                    claims = HttpContext.User.Claims.Select(c => new { c.Type, c.Value })
-                });
-            }
-
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-
-            if (user == null)
-            {
-                return Unauthorized(new { message = "User not found in database." });
-            }
-
-            var expClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "exp");
-
-            if (expClaim == null || !long.TryParse(expClaim.Value, out var expUnix))
-            {
-                return Unauthorized(new { message = "Missing or invalid exp claim" });
-            }
-
-            var expirationDateUtc = DateTimeOffset.FromUnixTimeSeconds(expUnix).UtcDateTime;
-
-            var tokenBlackList = new TokenBlackList
-            {
-                UserId = user.Id, // string (Identity GUID)
-                UserNumericId = user.UserId, //int (Vlastní ID)
-                Token = token,
-                ExpirationDate = expirationDateUtc
-            };
-
-            _dbContext.TokenBlackLists.Add(tokenBlackList);
-            await _dbContext.SaveChangesAsync();
-
-            return Ok(new
-            {
-                message = "User logged out successfully.",
-                userid = user.UserId,
-                identityId = user.Id,
-                username = user.UserName,
-                claims = HttpContext.User.Claims.Select(c => new { c.Type, c.Value })
-            });
+            var result = await _authService.LogoutAsync(HttpContext, token);
+            return result.Success ? Ok(result.Data) : Unauthorized(result.Data);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Exception in Logout: {ex.Message}");
             return StatusCode(500, new { message = "An error occurred.", exception = ex.Message });
         }
     }
 
-    // This endpoint is for user service only
+     // This endpoint is for user service only¨
+     //
+     // TODO: Only Admin should be allowed to delete users
     [HttpDelete("delete/{userId}")]
     public async Task<IActionResult> DeleteUser(int userId)
     {
-        // Check if admin tries to do it
-
-        var user = await _dbContext.Users
-            .FirstOrDefaultAsync(u => u.UserId == userId);
-
-        if (user is null)
-        {
-            return BadRequest(new ApiResult<string>("User not found.", false, "User not found."));
-        }
-
-        var result = await _userManager.DeleteAsync(user);
-
-        return Ok(new ApiResult<bool>(true, true, "User deleted successfully."));
+        var result = await _authService.DeleteUserAsync(userId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 }
