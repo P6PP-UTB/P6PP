@@ -4,6 +4,7 @@ using NotificationService.API.Persistence;
 using NotificationService.API.Persistence.Entities.DB;
 using NotificationService.API.Persistence.Entities;
 using NotificationService.API.Persistence.Entities.DB.Models;
+using NotificationService.API.Logging; // <-- Přidáno pro FileLogger
 
 namespace NotificationService.API.Services
 {
@@ -24,7 +25,6 @@ namespace NotificationService.API.Services
             _userAppService = userAppService;
             _templateAppService = templateAppService;
             _mailAppService = mailAppService;
-
         }
 
         public async Task<BookingResponse?> GetBookingByIdAsync(int id)
@@ -39,7 +39,8 @@ namespace NotificationService.API.Services
             }
             catch (Exception e)
             {
-              //TODO: ADD LOGGING
+                // Logování chyby
+                await FileLogger.LogException(e, $"Error while fetching booking with ID {id}");
             }
             return response;
         }
@@ -55,9 +56,10 @@ namespace NotificationService.API.Services
             }
             catch (Exception e)
             {
-                //TODO: ADD LOGGING
+                // Logování chyby
+                await FileLogger.LogException(e, $"Error while fetching service with ID {serviceId}");
             }
-                
+
             return response;
         }
 
@@ -79,14 +81,16 @@ namespace NotificationService.API.Services
 
             if (booking == null)
             {
-                //TODO: ADD LOGGING
+                // Logování chyby
+                FileLogger.LogError($"Booking with ID {bookingId} not found.");
                 return;
             }
 
             var service = await GetServiceByIdAsync(booking.serviceId);
             if (service == null)
             {
-                //TODO: ADD LOGGING
+                // Logování chyby
+                await FileLogger.LogError($"Service with ID {booking.serviceId} not found for booking {bookingId}.");
                 return;
             }
 
@@ -102,7 +106,7 @@ namespace NotificationService.API.Services
             {
                 return;
             }
-            if(bookingTimer.Start < DateTime.UtcNow.AddHours(30))
+            if (bookingTimer.Start < DateTime.UtcNow.AddHours(30))
             {
                 bookingTimer.Notice24H = true;
             }
@@ -127,24 +131,24 @@ namespace NotificationService.API.Services
                 .ToListAsync();
             foreach (var booking in bookings)
             {
-                var succes = await SendReminderEmail(booking);
-                if (succes)
+                var success = await SendReminderEmail(booking);
+                if (success)
                 {
                     booking.Notice24H = true;
                     _notificationDbContext.Bookings.Update(booking);
                     await _notificationDbContext.SaveChangesAsync();
                 }
             }
-           
         }
 
         public async Task<bool> SendReminderEmail(Booking bookingLocal)
         {
             var booking = await GetBookingByIdAsync(bookingLocal.BookingId);
-            
+
             if (booking == null)
             {
-                //TODO: ADD LOGGING
+                // Logování chyby
+                await FileLogger.LogError($"Booking with ID {bookingLocal.BookingId} not found.");
                 return false;
             }
 
@@ -152,27 +156,28 @@ namespace NotificationService.API.Services
             {
                 return true;
             }
-            
+
             var service = await GetServiceByIdAsync(booking.serviceId);
-      
+
             if (service == null)
             {
-                //TODO: ADD LOGGING
+                // Logování chyby
+                await FileLogger.LogError($"Service with ID {booking.serviceId} not found for booking {bookingLocal.BookingId}.");
                 return false;
             }
-            
+
             var user = await _userAppService.GetUserByIdAsync(bookingLocal.UserId);
-            
+
             if (user == null)
             {
-                //TODO: ADD LOGGING
+                // Logování chyby
+                await FileLogger.LogError($"User with ID {bookingLocal.UserId} not found.");
                 return false;
             }
-            
-            //TODO: CHANGE TEMPLATE NAME. WAITING FOR CREATION
+
+            // Změna jména šablony. Čekání na vytvoření.
             var template = await _templateAppService.GetTemplateAsync("BookingConfirmation");
-            
-            
+
             template.Text = template.Text.Replace("{name}", user.FirstName + " " + user.LastName);
             template.Text = template.Text.Replace("{eventname}", service.serviceName);
             template.Text = template.Text.Replace("{datetime}", service.start.ToString());
@@ -190,12 +195,12 @@ namespace NotificationService.API.Services
             }
             catch (Exception e)
             {
-                //TODO: ADD LOGGING
+                // Logování chyby
+                await FileLogger.LogException(e, "Failed to send reminder email.");
                 return false;
             }
-            
-            return true;
 
+            return true;
         }
     }
 }
