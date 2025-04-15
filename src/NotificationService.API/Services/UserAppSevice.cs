@@ -31,7 +31,7 @@ namespace NotificationService.API.Services
                 await FileLogger.LogException(e, $"Error while fetching user with ID {id}");
                 return null;
             }
-            return response?.Data?.User;
+            return response.Data?.User;
         }
     }
 }
