@@ -5,10 +5,11 @@ using NotificationService.API.Persistence.Entities;
 using ReservationSystem.Shared.Results;
 using src.NotificationService.API.Persistence.Entities.DB.Models;
 using src.NotificationService.API.Services;
+using NotificationService.API.Logging; // <-- Přidáno
+
 namespace NotificationService.API.Features;
 
 public record SendBookingCancellationEmailRequest(int UserId, int BookingId);
-//TODO: Userid can be read from booking, if booking team add userId to API respond
 public record SendBookingCancellationEmailResponse(int? Id = null);
 
 public class SendBookingCancellationEmailValidator : AbstractValidator<SendBookingCancellationEmailRequest>
@@ -32,8 +33,7 @@ public class SendBookingCancellationEmailHandler
                                                TemplateAppService templateAppService,
                                                UserAppService userAppService,
                                                NotificationLogService notificationLogService,
-                                               BookingAppService bookingAppService
-    )
+                                               BookingAppService bookingAppService)
     {
         _mailAppService = mailAppService;
         _templateAppService = templateAppService;
@@ -45,36 +45,43 @@ public class SendBookingCancellationEmailHandler
     public async Task<ApiResult<SendBookingCancellationEmailResponse>> Handle(SendBookingCancellationEmailRequest request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
         var user = await _userAppService.GetUserByIdAsync(request.UserId);
 
         if (user == null)
         {
+            FileLogger.LogError($"User with ID {request.UserId} not found.");
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "User not found");
         }
+
         if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName))
         {
+            FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "User email or name not found");
         }
-        
+
         ServiceResponse? service = null;
         try
         {
             service = await _bookingAppService.GetServiceByBookingIdAsync(request.UserId);
-            
         }
         catch (Exception ex)
         {
+            FileLogger.LogError($"Error fetching service for booking ID {request.BookingId}", ex);
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "Event failed to load");
         }
-      
+
         if (service == null)
         {
+            FileLogger.LogError($"Service not found for booking ID {request.BookingId}");
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "Event not found");
         }
+
         await _bookingAppService.DeleteTimer(request.BookingId);
+
         var template = await _templateAppService.GetTemplateAsync("BookingCancellation");
 
-        template.Text = template.Text.Replace("{name}", user.FirstName + " " + user.LastName);
+        template.Text = template.Text.Replace("{name}", $"{user.FirstName} {user.LastName}");
         template.Text = template.Text.Replace("{eventname}", service.serviceName);
         template.Text = template.Text.Replace("{datetime}", service.start.ToString());
 
@@ -91,36 +98,13 @@ public class SendBookingCancellationEmailHandler
             await _notificationLogService.LogNotification(user.Id,
                                                           NotificationType.ReservationCanceled,
                                                           template.Subject,
-                                                          template.Text
-            );
+                                                          template.Text);
             return new ApiResult<SendBookingCancellationEmailResponse>(new SendBookingCancellationEmailResponse());
         }
-        catch
+        catch (Exception ex)
         {
+            FileLogger.LogError($"Failed to send cancellation email to: {user.Email}", ex);
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "Email was not sent");
         }
-    }
-}
-public static class SendBookingCancellationEmailEndpoint
-{
-    public static void SendBookingCancellationEmail(IEndpointRouteBuilder app)
-    {
-        app.MapPost("/api/notification/booking/sendbookingcancellationemail",
-            async (SendBookingCancellationEmailRequest request, SendBookingCancellationEmailHandler handler, SendBookingCancellationEmailValidator validator, CancellationToken cancellationToken) =>
-            {
-                var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-                if (!validationResult.IsValid)
-                {
-                    var errorMessages = validationResult.Errors.Select(x => x.ErrorMessage);
-                    return Results.BadRequest(new ApiResult<IEnumerable<string>>(errorMessages, false, "Validation failed"));
-                }
-
-                var result = await handler.Handle(request, cancellationToken);
-
-                return result.Success
-                    ? Results.Ok(result)
-                    : Results.BadRequest(result);
-            });
     }
 }
