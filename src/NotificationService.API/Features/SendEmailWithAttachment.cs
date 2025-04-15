@@ -1,4 +1,4 @@
-﻿using NotificationService.API.Services;
+using NotificationService.API.Services;
 using FluentValidation;
 using ReservationSystem.Shared;
 using ReservationSystem.Shared.Results;
@@ -10,13 +10,14 @@ using System.Threading.Tasks;
 using System.Threading;
 using NotificationService.API.Persistence;
 using NotificationService.API.Persistence.Entities.DB;
+using NotificationService.API.Logging; // <-- Přidáno pro FileLogger
 
 namespace NotificationService.API.Features;
 
 public record SendEmailWithAttachmentRequest(
-    IList<string> Address, 
-    string Subject, 
-    string Body, 
+    IList<string> Address,
+    string Subject,
+    string Body,
     IList<Base64Attachment> Attachments); // Použití Base64 pro přílohy
 
 public record Base64Attachment(string FileName, string ContentBase64); // Nový model pro Base64 přílohy
@@ -44,6 +45,7 @@ public class SendEmailWithAttachmentHandler
 {
     private readonly MailAppService _mailAppService;
     private readonly NetworkHttpClient _httpClient;
+
     public SendEmailWithAttachmentHandler(MailAppService mailAppService,
         NetworkHttpClient httpClient)
     {
@@ -73,10 +75,17 @@ public class SendEmailWithAttachmentHandler
         try
         {
             await _mailAppService.SendEmailAsync(emailArgs, attachments);
+
+            // Logování úspěchu
+            await FileLogger.LogInfo($"Email with attachments sent successfully to: {string.Join(", ", request.Address)} | Subject: {request.Subject}");
+
             return new ApiResult<SendEmailWithAttachmentResponse>(new SendEmailWithAttachmentResponse());
         }
-        catch
+        catch (Exception ex)
         {
+            // Logování chyby
+            await FileLogger.LogException(ex, $"Failed to send email with attachments to: {string.Join(", ", request.Address)} | Subject: {request.Subject}");
+
             return new ApiResult<SendEmailWithAttachmentResponse>(null, false, "Email with attachment was not sent");
         }
     }
@@ -93,8 +102,8 @@ public static class SendEmailWithAttachmentEndpoint
 
                 if (!validationResult.IsValid)
                 {
-                    Console.WriteLine(validationResult.Errors);
                     var errorMessages = validationResult.Errors.Select(x => x.ErrorMessage);
+                    FileLogger.LogError($"Validation failed for SendEmailWithAttachmentRequest: {string.Join("; ", errorMessages)}"); // <-- Přidáno
                     return Results.BadRequest(new ApiResult<IEnumerable<string>>(errorMessages, false, "Validation failed"));
                 }
 
@@ -106,8 +115,3 @@ public static class SendEmailWithAttachmentEndpoint
             });
     }
 }
-
-
-
-
-
