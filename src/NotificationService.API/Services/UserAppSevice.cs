@@ -1,8 +1,9 @@
-﻿using System.Net.Mail;
+using System.Net.Mail;
 using NotificationService.API.Persistence.Entities;
 using ReservationSystem.Shared.Clients;
 using ReservationSystem.Shared;
 using ReservationSystem.Shared.Results;
+using NotificationService.API.Logging;
 
 namespace NotificationService.API.Services
 {
@@ -16,6 +17,7 @@ namespace NotificationService.API.Services
         {
             _httpClient = httpClient;
         }
+
         public async Task<User?> GetUserByIdAsync(int id)
         {
             ApiResult<GetUserRespond>? response = null;
@@ -25,10 +27,11 @@ namespace NotificationService.API.Services
             }
             catch (Exception e)
             {
-                //TODO: ADD LOGGING
+                // Logování chyby při získávání uživatele
+                await FileLogger.LogException(e, $"Error while fetching user with ID {id}");
                 return null;
             }
-            return response.Data?.User;
+            return response?.Data?.User;
         }
     }
 }
