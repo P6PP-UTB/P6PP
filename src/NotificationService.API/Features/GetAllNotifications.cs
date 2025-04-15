@@ -4,6 +4,7 @@ using NotificationService.API.Services;
 using ReservationSystem.Shared.Results;
 using src.NotificationService.API.Persistence.Entities.DB.Models;
 using src.NotificationService.API.Services;
+using NotificationService.API.Logging; // <-- Přidáno
 
 namespace NotificationService.API.Features;
 
@@ -30,20 +31,43 @@ public class GetAllNotificationsHandler
     public async Task<ApiResult<GetAllNotifictionsResponse>> Handle(GetAllNotificationsRequest request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var notifications = await _notificationLogService.GetNotificationsFor(request.UserId);
 
-        string message = "";
-        if (notifications == null) {
-            message = $"Error while getting notification logs for {request.UserId}";
-        } else if (notifications.Count == 0) {
-            message = $"No notifications for user id: {request.UserId}";
+        try
+        {
+            var notifications = await _notificationLogService.GetNotificationsFor(request.UserId);
+
+            string message = "";
+            if (notifications == null)
+            {
+                message = $"Error while getting notification logs for user {request.UserId}";
+                await FileLogger.LogError(message);
+            }
+            else if (notifications.Count == 0)
+            {
+                message = $"No notifications found for user {request.UserId}";
+                await FileLogger.LogInfo(message);
+            }
+            else
+            {
+                message = $"Found {notifications.Count} notifications for user {request.UserId}";
+                await FileLogger.LogInfo(message);
+            }
+
+            return new ApiResult<GetAllNotifictionsResponse>(
+                new GetAllNotifictionsResponse(notifications),
+                notifications != null,
+                message
+            );
         }
-
-        return new ApiResult<GetAllNotifictionsResponse>(
-            new GetAllNotifictionsResponse(notifications),
-            notifications != null,
-            message
-        );
+        catch (Exception ex)
+        {
+            await FileLogger.LogException(ex, $"Exception while getting notifications for user {request.UserId}");
+            return new ApiResult<GetAllNotifictionsResponse>(
+                null,
+                false,
+                "An error occurred while retrieving notifications"
+            );
+        }
     }
 }
 
@@ -60,8 +84,9 @@ public static class GetAllNotificationsEndpoint
 
                 if (!validationResult.IsValid)
                 {
-                    Console.WriteLine(validationResult.Errors);
                     var errorMessages = validationResult.Errors.Select(x => x.ErrorMessage);
+                    await FileLogger.LogInfo($"Validation failed for GetAllNotificationsRequest: {string.Join(", ", errorMessages)}");
+
                     return Results.BadRequest(
                         new ApiResult<IEnumerable<string>>(
                             errorMessages,
@@ -73,7 +98,9 @@ public static class GetAllNotificationsEndpoint
 
                 var result = await handler.Handle(request, cancellationToken);
 
-                return result.Success ? Results.Ok(result) : Results.NotFound(result);
+                return result.Success
+                    ? Results.Ok(result)
+                    : Results.NotFound(result);
             }
         );
     }
