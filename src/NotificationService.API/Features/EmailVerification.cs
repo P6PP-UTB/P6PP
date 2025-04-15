@@ -4,10 +4,12 @@ using FluentValidation;
 using ReservationSystem.Shared.Results;
 using src.NotificationService.API.Services;
 using src.NotificationService.API.Persistence.Entities.DB.Models;
+using NotificationService.API.Logging; // <-- Přidáno
+
 namespace NotificationService.API.Features;
 
 public record SendVerificationEmail(int Id, string token);
-public record SendVerificationEmailResponse(int? Id=null);
+public record SendVerificationEmailResponse(int? Id = null);
 
 public class SendVerificationEmailValidator : AbstractValidator<SendVerificationEmail>
 {
@@ -28,8 +30,7 @@ public class SendVerificationEmailHandler
     public SendVerificationEmailHandler(MailAppService mailAppService,
                                         TemplateAppService templateAppService,
                                         UserAppService userAppService,
-                                        NotificationLogService notificationLogService
-    )
+                                        NotificationLogService notificationLogService)
     {
         _mailAppService = mailAppService;
         _templateAppService = templateAppService;
@@ -40,20 +41,24 @@ public class SendVerificationEmailHandler
     public async Task<ApiResult<SendVerificationEmailResponse>> Handle(SendVerificationEmail request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
         var user = await _userAppService.GetUserByIdAsync(request.Id);
 
         if (user == null)
         {
+            await FileLogger.LogError($"User with ID {request.Id} not found.");
             return new ApiResult<SendVerificationEmailResponse>(null, false, "User not found");
         }
-        if (string.IsNullOrEmpty(user.Email) || (string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName))) 
+
+        if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName))
         {
+            await FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
             return new ApiResult<SendVerificationEmailResponse>(null, false, "User email or name not found");
         }
 
         var template = await _templateAppService.GetTemplateAsync("Verification");
 
-        template.Text = template.Text.Replace("{name}", user.FirstName + " " +  user.LastName);
+        template.Text = template.Text.Replace("{name}", $"{user.FirstName} {user.LastName}");
         template.Text = template.Text.Replace("{link}", request.token);
 
         var emailArgs = new EmailArgs
@@ -66,15 +71,19 @@ public class SendVerificationEmailHandler
         try
         {
             await _mailAppService.SendEmailAsync(emailArgs);
+
             await _notificationLogService.LogNotification(user.Id,
                                                           NotificationType.EmailVerification,
                                                           template.Subject,
-                                                          template.Text
-            );
+                                                          template.Text);
+
+            await FileLogger.LogInfo($"Verification email successfully sent to user {user.Email}");
+
             return new ApiResult<SendVerificationEmailResponse>(new SendVerificationEmailResponse());
         }
-        catch
+        catch (Exception ex)
         {
+            await FileLogger.LogException(ex, $"Failed to send verification email to: {user.Email}");
             return new ApiResult<SendVerificationEmailResponse>(null, false, "Email was not sent");
         }
     }
@@ -92,6 +101,7 @@ public static class SendVerificationEmailEndpoint
                 if (!validationResult.IsValid)
                 {
                     var errorMessages = validationResult.Errors.Select(x => x.ErrorMessage);
+                    await FileLogger.LogInfo($"Validation failed for verification email request. ID: {request.Id}");
                     return Results.BadRequest(new ApiResult<IEnumerable<string>>(errorMessages, false, "Validation failed"));
                 }
 
