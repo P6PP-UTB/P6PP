@@ -2,6 +2,7 @@ using NotificationService.API.Services;
 using ReservationSystem.Shared.Results;
 using FluentValidation;
 using NotificationService.API.Persistence.Entities.DB.Models;
+using NotificationService.API.Logging; // ✅ Přidáno pro FileLogger
 
 namespace NotificationService.API.Features;
 
@@ -30,12 +31,23 @@ public class EditTemplateHandler
     public async Task<ApiResult<EditTemplateResponse>> Handle(EditTemplateRequest request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var editSucces = await _templateAppService.EditTemplateAsync(request.template);
+        var editSuccess = await _templateAppService.EditTemplateAsync(request.template);
+
+        if (editSuccess)
+        {
+            await FileLogger.LogInfo($"Template '{request.template.Name}' ({request.template.Language}) updated successfully.");
+        }
+        else
+        {
+            await FileLogger.LogInfo($"Template '{request.template.Name}' ({request.template.Language}) not found. Update failed.");
+        }
 
         return new ApiResult<EditTemplateResponse>(
             new EditTemplateResponse(),
-            editSucces,
-            editSucces ? "Template edit saved." : "No template named '{request.template.Name}' in language '{request.template.Language}'!");
+            editSuccess,
+            editSuccess
+                ? "Template edit saved."
+                : $"No template named '{request.template.Name}' in language '{request.template.Language}'!");
     }
 }
 
