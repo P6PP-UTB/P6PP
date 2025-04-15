@@ -50,30 +50,30 @@ public class SendBookingCancellationEmailHandler
 
         if (user == null)
         {
-            FileLogger.LogError($"User with ID {request.UserId} not found.");
+            await FileLogger.LogError($"User with ID {request.UserId} not found.");
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "User not found");
         }
 
         if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName))
         {
-            FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
+            await FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "User email or name not found");
         }
 
         ServiceResponse? service = null;
         try
         {
-            service = await _bookingAppService.GetServiceByBookingIdAsync(request.UserId);
+            service = await _bookingAppService.GetServiceByBookingIdAsync(request.BookingId);
         }
         catch (Exception ex)
         {
-            FileLogger.LogError($"Error fetching service for booking ID {request.BookingId}", ex);
+            await FileLogger.LogException(ex, $"Error fetching service for booking ID {request.BookingId}");
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "Event failed to load");
         }
 
         if (service == null)
         {
-            FileLogger.LogError($"Service not found for booking ID {request.BookingId}");
+            await FileLogger.LogError($"Service not found for booking ID {request.BookingId}");
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "Event not found");
         }
 
@@ -99,12 +99,40 @@ public class SendBookingCancellationEmailHandler
                                                           NotificationType.ReservationCanceled,
                                                           template.Subject,
                                                           template.Text);
-            return new ApiResult<SendBookingCancellationEmailResponse>(new SendBookingCancellationEmailResponse());
+            await FileLogger.LogInfo($"Cancellation email sent to user {user.Email} for booking ID {request.BookingId}");
+
+            return new ApiResult<SendBookingCancellationEmailResponse>(
+                new SendBookingCancellationEmailResponse(), true, "Cancellation email sent.");
         }
         catch (Exception ex)
         {
-            FileLogger.LogError($"Failed to send cancellation email to: {user.Email}", ex);
+            await FileLogger.LogException(ex, $"Failed to send cancellation email to: {user.Email}");
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "Email was not sent");
+        }
+    }
+
+    public static class SendBookingCancellationEmailEndpoint
+    {
+        public static void SendBookingCancellationEmail(IEndpointRouteBuilder app)
+        {
+            app.MapPost("/api/notification/booking/sendbookingcancellationemail",
+                async (SendBookingCancellationEmailRequest request, SendBookingCancellationEmailHandler handler, SendBookingCancellationEmailValidator validator, CancellationToken cancellationToken) =>
+                {
+                    var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+                    if (!validationResult.IsValid)
+                    {
+                        var errorMessages = validationResult.Errors.Select(x => x.ErrorMessage);
+                        await FileLogger.LogInfo("Validation failed for cancellation email request.");
+                        return Results.BadRequest(new ApiResult<IEnumerable<string>>(errorMessages, false, "Validation failed"));
+                    }
+
+                    var result = await handler.Handle(request, cancellationToken);
+
+                    return result.Success
+                        ? Results.Ok(result)
+                        : Results.BadRequest(result);
+                });
         }
     }
 }
