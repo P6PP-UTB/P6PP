@@ -1,15 +1,32 @@
 <app-navigation></app-navigation>
 <div class="wrapper">
-    <div class="container">
-        <div class="account-rep">
-            <h3 style="font-weight: bolder;">Accoun replenishment</h3>
+  <div class="container">
+    <div class="account-rep">
+      <h3 style="font-weight: bolder;">Account replenishment</h3>
 
-            <div class="func">
-                <h5 style="font-weight: bold;">Buy Robux</h5>
-                <p>Enter Amount</p>
-                <input type="text" placeholder="0,0 CZK" (input)="onInput($event)" />
-                <button id="pay-btn">Pay {{paymentAmount}}</button>
-            </div>
+      <div class="func">
+        <h5 style="font-weight: bold;">Buy Robux</h5>
+
+        <div class="quick-buttons">
+          <button (click)="setFixedAmount(100)">100 CZK</button>
+          <button (click)="setFixedAmount(200)">200 CZK</button>
+          <button (click)="setFixedAmount(500)">500 CZK</button>
         </div>
+
+        <div class="separator">or</div>
+
+        <div class="custom-input">
+          <label for="amountInput">Add your own amount</label>
+          <input
+            id="amountInput"
+            type="text"
+            placeholder="0,0 CZK"
+            (input)="onInput($event)"
+          />
+        </div>
+
+        <button id="pay-btn">Pay {{ paymentAmount }}</button>
+      </div>
     </div>
+  </div>
 </div>
