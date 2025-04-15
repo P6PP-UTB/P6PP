@@ -57,4 +57,64 @@ input[type="text"] {
     border-radius: 5px;
     font-weight: bold;
     cursor: pointer;
+    &:hover {
+        background-color: #b71c1c;
+    }
 }
+
+.quick-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  
+    button {
+      border-radius: 5px;
+      padding: 20px 20px;
+      background-color: #EA2839;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+  
+      &:hover {
+        background-color: #b71c1c;
+      }
+    }
+  }
+  
+  .separator {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #888;
+    margin: 10px 0;
+  }
+  
+  .custom-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  
+    label {
+      font-weight: 500;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      color: #444;
+    }
+  
+    input {
+      padding: 8px 12px;
+      font-size: 1rem;
+      width: 100%;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+  
+      &:focus {
+        outline: none;
+        border-color: #EA2839;
+      }
+    }
+  }
+  
