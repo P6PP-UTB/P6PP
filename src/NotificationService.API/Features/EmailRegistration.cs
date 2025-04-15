@@ -45,13 +45,13 @@ public class SendRegistrationEmailHandler
 
         if (user == null)
         {
-            await FileLogger.LogError($"User with ID {request.Id} not found.");
+            FileLogger.LogError($"User with ID {request.Id} not found.");
             return new ApiResult<SendRegistrationEmailResponse>(null, false, "User not found");
         }
 
         if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName))
         {
-            await FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
+             FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
             return new ApiResult<SendRegistrationEmailResponse>(null, false, "User email or name not found");
         }
 
