@@ -49,13 +49,13 @@ public class SendBookingConfirmationEmailHandler
         var user = await _userAppService.GetUserByIdAsync(request.UserId);
         if (user == null)
         {
-            FileLogger.LogError($"User with ID {request.UserId} not found.");
+            await FileLogger.LogError($"User with ID {request.UserId} not found.");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "User not found");
         }
 
         if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName))
         {
-            FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
+            await FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "User email or name not found");
         }
 
@@ -66,13 +66,13 @@ public class SendBookingConfirmationEmailHandler
         }
         catch (Exception ex)
         {
-            FileLogger.LogError($"Error fetching service for booking ID {request.BookingId}", ex);
+            await FileLogger.LogException(ex, $"Error fetching service for booking ID {request.BookingId}");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Event failed to load");
         }
 
         if (service == null)
         {
-            FileLogger.LogError($"Service not found for booking ID {request.BookingId}");
+            await FileLogger.LogError($"Service not found for booking ID {request.BookingId}");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Service not found in booking");
         }
 
@@ -98,12 +98,40 @@ public class SendBookingConfirmationEmailHandler
                                                           NotificationType.ReservationConfirmed,
                                                           template.Subject,
                                                           template.Text);
-            return new ApiResult<SendBookingConfirmationEmailResponse>(new SendBookingConfirmationEmailResponse());
+            await FileLogger.LogInfo($"Confirmation email sent to user {user.Email} for booking ID {request.BookingId}");
+
+            return new ApiResult<SendBookingConfirmationEmailResponse>(
+                new SendBookingConfirmationEmailResponse(), true, "Confirmation email sent.");
         }
         catch (Exception ex)
         {
-            FileLogger.LogError($"Failed to send confirmation email to: {user.Email}", ex);
+            await FileLogger.LogException(ex, $"Failed to send confirmation email to: {user.Email}");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Email was not sent");
+        }
+    }
+
+    public static class SendBookingConfirmationEmailEndpoint
+    {
+        public static void SendBookingConfirmationEmail(IEndpointRouteBuilder app)
+        {
+            app.MapPost("/api/notification/booking/sendbookingconfirmationemail",
+                async (SendBookingConfirmationEmailRequest request, SendBookingConfirmationEmailHandler handler, SendBookingConfirmationEmailValidator validator, CancellationToken cancellationToken) =>
+                {
+                    var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+                    if (!validationResult.IsValid)
+                    {
+                        var errorMessages = validationResult.Errors.Select(x => x.ErrorMessage);
+                        await FileLogger.LogInfo("Validation failed for confirmation email request.");
+                        return Results.BadRequest(new ApiResult<IEnumerable<string>>(errorMessages, false, "Validation failed"));
+                    }
+
+                    var result = await handler.Handle(request, cancellationToken);
+
+                    return result.Success
+                        ? Results.Ok(result)
+                        : Results.BadRequest(result);
+                });
         }
     }
 }
