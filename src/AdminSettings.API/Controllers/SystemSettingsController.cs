@@ -72,5 +72,33 @@ namespace AdminSettings.Controllers
             var notificationEnabled = await _systemSettingsService.GetNotificationEnabledAsync();
             return Ok(notificationEnabled);
         }
+
+        [HttpPut("system-settings/backup/manual/{enabled}")]
+        public async Task<IActionResult> SetManualBackupEnabled(bool enabled)
+        {
+            var settings = await _systemSettingsService.GetSystemSettingsAsync();
+            if (settings == null)
+                return NotFound(new { Message = "System settings not found." });
+
+            settings.DatabaseBackupSetting.ManualBackupEnabled = enabled;
+            var result = await _systemSettingsService.UpdateSystemSettingsAsync(settings);
+            return result
+                ? Ok(new { Message = $"Manual backup has been {(enabled ? "enabled" : "disabled")}." })
+                : StatusCode(500, new { Message = "Failed to update manual backup setting." });
+        }
+
+        [HttpPut("system-settings/backup/automatic/{enabled}")]
+        public async Task<IActionResult> SetAutomaticBackupEnabled(bool enabled)
+        {
+            var settings = await _systemSettingsService.GetSystemSettingsAsync();
+            if (settings == null)
+                return NotFound(new { Message = "System settings not found." });
+
+            settings.DatabaseBackupSetting.AutomaticBackupEnabled = enabled;
+            var result = await _systemSettingsService.UpdateSystemSettingsAsync(settings);
+            return result
+                ? Ok(new { Message = $"Automatic backup has been {(enabled ? "enabled" : "disabled")}." })
+                : StatusCode(500, new { Message = "Failed to update automatic backup setting." });
+        }
     }
 }

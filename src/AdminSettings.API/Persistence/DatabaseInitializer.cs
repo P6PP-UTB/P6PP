@@ -90,9 +90,10 @@ public class DatabaseInitializer
         const string tableSql = @"
         CREATE TABLE IF NOT EXISTS DatabaseBackupSettings (
             Id INT AUTO_INCREMENT PRIMARY KEY,
-            BackupEnabled BOOLEAN NOT NULL DEFAULT TRUE,
+            ManualBackupEnabled BOOLEAN NOT NULL DEFAULT TRUE,
+            AutomaticBackupEnabled BOOLEAN NOT NULL DEFAULT TRUE,
             BackupTime TIME NOT NULL DEFAULT '00:00:00',
-            BackupFrequency VARCHAR(255) NOT NULL DEFAULT 'monthly'
+            BackupFrequency INT NOT NULL DEFAULT 1
         );";
         await conn.ExecuteAsync(tableSql);
         _logger.LogInformation("Table 'DatabaseBackupSettings' ensured.");

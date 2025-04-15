@@ -1,4 +1,5 @@
-﻿using AdminSettings.Services;
+﻿using AdminSettings.Persistence.Entities;
+using AdminSettings.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
@@ -39,18 +40,18 @@ public class DatabaseBackupService
             {
                 // 💾 Zapsání výstupu do souboru
                 await File.WriteAllTextAsync(backupFilePath, output);
-                Console.WriteLine($"✅ Záloha {dbName} uložena do {backupFilePath}");
+                Console.WriteLine($"✅ Backup {dbName} saved to {backupFilePath}");
                 return true;
             }
             else
             {
-                Console.WriteLine($"❌ Chyba při záloze {dbName}: {error}");
+                Console.WriteLine($"❌ Error while backing up {dbName}: {error}");
                 return false;
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Výjimka při záloze {dbName}: {ex.Message}");
+            Console.WriteLine($"❌ Exception for backup {dbName}: {ex.Message}");
             return false;
         }
     }
@@ -61,13 +62,13 @@ public class DatabaseBackupService
 
         if (systemSettings?.DatabaseBackupSetting == null)
         {
-            Console.WriteLine("❌ Nastavení zálohování nenalezeno.");
+            Console.WriteLine("❌ Backup settings not found.");
             return false;
         }
 
-        if (!systemSettings.DatabaseBackupSetting.BackupEnabled)
+        if (!systemSettings.DatabaseBackupSetting.ManualBackupEnabled)
         {
-            Console.WriteLine("❌ Zálohování není povoleno.");
+            Console.WriteLine("❌ Backup not allowed.");
             return false;
         }
 
@@ -75,7 +76,9 @@ public class DatabaseBackupService
         {
             ("admin_db", "root", "password123"),
             ("auth_db", "root", "password123"),
-            ("userdb", "root", "password123")
+            ("userdb", "root", "password123"),
+            ("booking_db", "root", "password123"),
+            ("notification_db", "root", "password123")
         };
 
         foreach (var db in databases)
@@ -84,5 +87,10 @@ public class DatabaseBackupService
         }
 
         return true;
+    }
+
+    public async Task<SystemSetting?> GetSystemSettingsAsync()
+    {
+        return await _systemSettingsService.GetSystemSettingsAsync();
     }
 }
