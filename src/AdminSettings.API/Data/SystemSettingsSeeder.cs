@@ -1,5 +1,6 @@
 ﻿using AdminSettings.Data;
 using AdminSettings.Persistence.Entities;
+using AdminSettings.Persistence.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace AdminSettings.Data;
@@ -34,8 +35,8 @@ public class SystemSettingsSeeder
         {
             _context.DatabaseBackupSettings.Add(new DatabaseBackupSetting
             {
-                BackupEnabled = true,
-                BackupFrequency = "monthly",
+                ManualBackupEnabled = true,
+                BackupFrequency = BackupFrequency.Monthly,
                 BackupTime = new TimeOnly(0, 0)
             });
 
@@ -53,7 +54,9 @@ public class SystemSettingsSeeder
             _context.SystemSettings.Add(new SystemSetting
             {
                 TimezoneId = timezone.Id,
-                DatabaseBackupSettingId = databaseBackupSetting.Id
+                DatabaseBackupSettingId = databaseBackupSetting.Id,
+                Timezone = timezone,
+                DatabaseBackupSetting = databaseBackupSetting
             });
 
             await _context.SaveChangesAsync();
