@@ -40,7 +40,7 @@ public class GetAllNotificationsHandler
             if (notifications == null)
             {
                 message = $"Error while getting notification logs for user {request.UserId}";
-                await FileLogger.LogError(message);
+                FileLogger.LogError(message);
             }
             else if (notifications.Count == 0)
             {
