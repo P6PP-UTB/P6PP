@@ -3,6 +3,6 @@
 public class Timezone
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string UtcOffset { get; set; }
+    public required string Name { get; set; }
+    public required string UtcOffset { get; set; }
 }

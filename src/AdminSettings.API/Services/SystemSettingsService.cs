@@ -82,7 +82,8 @@ namespace AdminSettings.Services
             if (existingBackupSetting == null)
                 return false;
 
-            existingBackupSetting.BackupEnabled = backupSetting.BackupEnabled;
+            existingBackupSetting.ManualBackupEnabled = backupSetting.ManualBackupEnabled;
+            existingBackupSetting.AutomaticBackupEnabled = backupSetting.AutomaticBackupEnabled;
             existingBackupSetting.BackupFrequency = backupSetting.BackupFrequency;
             existingBackupSetting.BackupTime = backupSetting.BackupTime;
 
