@@ -50,13 +50,13 @@ public class SendBookingConfirmationEmailHandler
         var user = await _userAppService.GetUserByIdAsync(request.UserId);
         if (user == null)
         {
-            await FileLogger.LogError($"User with ID {request.UserId} not found.");
+            FileLogger.LogError($"User with ID {request.UserId} not found.");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "User not found");
         }
 
         if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName))
         {
-            await FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
+            FileLogger.LogError($"User data incomplete (Email or Name) for ID {user.Id}");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "User email or name not found");
         }
 
@@ -73,7 +73,7 @@ public class SendBookingConfirmationEmailHandler
 
         if (service == null)
         {
-            await FileLogger.LogError($"Service not found for booking ID {request.BookingId}");
+            FileLogger.LogError($"Service not found for booking ID {request.BookingId}");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Service not found in booking");
         }
 
