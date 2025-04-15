@@ -5,17 +5,17 @@
     <button class="nav-btn" routerLink="">Home</button>
     <button class="nav-btn">Courses</button>
     <button class="nav-btn">Coaches</button>
-    <button class="nav-btn" routerLink="profile">Profile</button>
+    <button class="nav-btn" routerLink="/profile">Profile</button>
   </nav>
   
   <div id="log-btns" *ngIf="!isLoggedIn">
-    <button id="login-btn" class="nav-btn" routerLink="login">Log in</button>
+    <button id="login-btn" class="nav-btn" routerLink="/login">Log in</button>
     <button id="signup-btn" class="nav-btn" routerLink="signup">Sign up</button>
   </div>
   
 
   <div *ngIf="isLoggedIn" class="navigation-logged-in">
-    <button class="nav-btn" id="balance" routerLink="payment">
+    <button class="nav-btn" id="balance" routerLink="/payment">
       {{MoneyBalance}},-
       <img src="assets/icons/robucks.svg" alt="money" class="icon" />
     </button>
