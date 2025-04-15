@@ -1,6 +1,7 @@
 using NotificationService.API.Services;
 using ReservationSystem.Shared.Results;
 using NotificationService.API.Persistence.Entities.DB.Models;
+using NotificationService.API.Logging; // <-- Přidáno
 
 namespace NotificationService.API.Features;
 
@@ -18,13 +19,26 @@ public class GetAllTemplatesHandler
     public async Task<ApiResult<GetAllTemplatesResponse>> Handle(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var templates = await _templateAppService.GetAllTemplatesAsync();
 
-        if (templates == null || templates.Count == 0)
+        try
         {
-            return new ApiResult<GetAllTemplatesResponse>(null, false, "No templates in database");
+            var templates = await _templateAppService.GetAllTemplatesAsync();
+
+            if (templates == null || templates.Count == 0)
+            {
+                var msg = "No templates found in database";
+                await FileLogger.LogInfo(msg);
+                return new ApiResult<GetAllTemplatesResponse>(null, false, msg);
+            }
+
+            await FileLogger.LogInfo($"Retrieved {templates.Count} templates from database");
+            return new ApiResult<GetAllTemplatesResponse>(new GetAllTemplatesResponse(templates));
         }
-        return new ApiResult<GetAllTemplatesResponse>(new GetAllTemplatesResponse(templates));
+        catch (Exception ex)
+        {
+            await FileLogger.LogException(ex, "Exception while retrieving templates");
+            return new ApiResult<GetAllTemplatesResponse>(null, false, "An error occurred while retrieving templates");
+        }
     }
 }
 
