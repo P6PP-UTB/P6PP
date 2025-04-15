@@ -74,7 +74,7 @@ public class UserAuthService : IUserAuthService
         var body = new
         {
             Id = user.UserId,
-            Token = encodedToken,
+            Url = encodedToken, // ??
         };
         
         var verificationResult = await _httpClient.PostAsync<object, object>(verificationUrl, body, CancellationToken.None);
@@ -182,8 +182,8 @@ public class UserAuthService : IUserAuthService
         {
             Id = user.UserId,
             Email = user.Email,
-            Url = resetUrl,
-            Token = encodedToken
+            ResetUrl = resetUrl,
+            Url = encodedToken // ?
         };
 
         var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
@@ -236,7 +236,7 @@ public class UserAuthService : IUserAuthService
             Id = user.UserId,
             Email = user.Email,
             Url = resetUrl,
-            Token = encodedToken
+            UrlToken = encodedToken
         };
 
         var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
