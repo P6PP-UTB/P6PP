@@ -49,6 +49,8 @@ app.UseEndpoints(endpoints =>
     UpdateUserEndpoint.Register(endpoints);
     CreateUserEndpoint.Register(endpoints);
     AssignUserRoleEndpoint.Register(endpoints);
+    DeactivateUserEndpoint.Register(endpoints);
+    ActivateUserEndpoint.Register(endpoints);
     
     
     // ROLE ENDPOINTS
