@@ -2,19 +2,17 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AuthService.API.Data;
-using AuthService.API.DTO;
 using AuthService.API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using ReservationSystem.Shared.Clients;
-using Swashbuckle.AspNetCore.Filters;
+using Microsoft.OpenApi.Models;
+using AuthService.API.Interfaces;
+using AuthService.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(8005);
-});
+builder.WebHost.ConfigureKestrel(options => { options.ListenAnyIP(8005); });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 Console.WriteLine($"🔍 Connection string used: {connectionString}");
@@ -47,10 +45,34 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(c =>
 {
     c.EnableAnnotations();
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Enter your JWT token in the following format: Bearer {your token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
 
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "bearer",
+                Name = "Authorization",
+                In = ParameterLocation.Header
+            },
+            new List<string>()
+        }
+    });
 });
-
-
 
 
 builder.Services.AddAuthentication(options =>
@@ -82,11 +104,16 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = issuer,  // Načítání hodnoty Issuer
-            ValidAudience = audience,  // Načítání hodnoty Audience
-            IssuerSigningKey = new SymmetricSecurityKey(key)  // Načítání hodnoty Secret Key
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
+
+builder.Services.AddHostedService<ExpiredTokenCleanupService>();
+
+builder.Services.AddScoped<IUserAuthService, UserAuthService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -121,6 +148,7 @@ app.UseCors("AllowAngularDevClient");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<AuthService.API.Middleware.TokenBlacklistMiddleware>();
 
 app.MapControllers();
 
