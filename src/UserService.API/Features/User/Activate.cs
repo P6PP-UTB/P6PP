@@ -1,5 +1,6 @@
 using FluentValidation;
 using ReservationSystem.Shared.Results;
+using UserService.API.Abstraction;
 
 namespace UserService.API.Features;
 
@@ -15,9 +16,9 @@ public class ActivateUserValidator : AbstractValidator<ActivateUserRequest>
 
 public class ActivateUserHandler
 {
-    private readonly Services.UserService _userService;
+    private readonly IUserService _userService;
 
-    public ActivateUserHandler(Services.UserService userService)
+    public ActivateUserHandler(IUserService userService)
     {
         _userService = userService;
     }

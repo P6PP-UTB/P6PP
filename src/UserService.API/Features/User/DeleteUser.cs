@@ -2,6 +2,7 @@ using FluentValidation;
 using ReservationSystem.Shared;
 using ReservationSystem.Shared.Clients;
 using ReservationSystem.Shared.Results;
+using UserService.API.Abstraction;
 
 namespace UserService.API.Features;
 
@@ -17,10 +18,10 @@ public class DeleteUserValidator : AbstractValidator<DeleteUserRequest>
 
 public class DeleteUserHandler
 {
-    private readonly Services.UserService _userService;
+    private readonly IUserService _userService;
     private readonly NetworkHttpClient _httpClient;
 
-    public DeleteUserHandler(Services.UserService userService, NetworkHttpClient httpClient)
+    public DeleteUserHandler(IUserService userService, NetworkHttpClient httpClient)
     {
         _userService = userService;
         _httpClient = httpClient;

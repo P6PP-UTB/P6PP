@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using ReservationSystem.Shared.Results;
+using UserService.API.Abstraction;
 
 namespace UserService.API.Features;
 
@@ -16,9 +17,9 @@ public class DeactivateUserValidator : AbstractValidator<DeactivateUserRequest>
 
     public class DeactivateUserHandler
 {
-    private readonly Services.UserService _userService;
+    private readonly IUserService _userService;
 
-    public DeactivateUserHandler(Services.UserService userService)
+    public DeactivateUserHandler(IUserService userService)
     {
         _userService = userService;
     }
