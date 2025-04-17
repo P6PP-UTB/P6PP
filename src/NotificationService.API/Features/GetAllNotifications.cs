@@ -1,6 +1,4 @@
 using FluentValidation;
-using NotificationService.API.Persistence.Entities.DB.Models;
-using NotificationService.API.Services;
 using ReservationSystem.Shared.Results;
 using src.NotificationService.API.Persistence.Entities.DB.Models;
 using src.NotificationService.API.Services;
@@ -8,7 +6,7 @@ using NotificationService.API.Logging; // <-- Přidáno
 
 namespace NotificationService.API.Features;
 
-public record GetAllNotificationsRequest(int UserId, bool unreadOnly=true);
+public record GetAllNotificationsRequest(int UserId, bool unreadOnly=true, int perPage=20, int page=0);
 public record GetAllNotifictionsResponse(List<NotificationLog>? NotificationLogs);
 
 public class GetAllNotificationsValidator : AbstractValidator<GetAllNotificationsRequest>
@@ -16,6 +14,7 @@ public class GetAllNotificationsValidator : AbstractValidator<GetAllNotification
     public GetAllNotificationsValidator()
     {
         RuleFor(u => u.UserId).GreaterThan(0);
+        RuleFor(u => u.page).GreaterThanOrEqualTo(0);
     }
 }
 
@@ -34,7 +33,8 @@ public class GetAllNotificationsHandler
 
         try
         {
-            var notifications = await _notificationLogService.GetNotificationsFor(request.UserId, request.unreadOnly);
+            var notifications = await _notificationLogService
+                .GetNotificationsFor(request.UserId, request.unreadOnly, request.perPage, request.page);
 
             string message = "";
             if (notifications == null)
@@ -49,7 +49,7 @@ public class GetAllNotificationsHandler
             }
             else
             {
-                message = $"Found {notifications.Count} notifications for user {request.UserId}";
+                message = $"Returning {notifications.Count} notifications for user {request.UserId}";
                 await FileLogger.LogInfo(message);
             }
 
@@ -77,10 +77,10 @@ public static class GetAllNotificationsEndpoint
     {
         app.MapGet(
             "/api/notification/logs/getallnotifications/{UserId:int}",
-            async (int UserId, bool? unreadOnly,
+            async (int UserId, bool? unreadOnly, int? perPage, int? page,
                    GetAllNotificationsHandler handler, GetAllNotificationsValidator validator, CancellationToken cancellationToken) =>
             {
-                var request = new GetAllNotificationsRequest(UserId, unreadOnly ?? true);
+                var request = new GetAllNotificationsRequest(UserId, unreadOnly ?? true, perPage ?? 20, page ?? 0);
                 var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
                 if (!validationResult.IsValid)

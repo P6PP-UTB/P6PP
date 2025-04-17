@@ -34,16 +34,27 @@ public class NotificationLogService
     }
 
     /// <summary>
-    /// Get all notifications for <param>userId</userId>
-    /// If <param>unreadOnly</param> is true, only unread notifications are returned
-    /// Only unread notifications are sent by default
+    /// Get all notifications for userId.
+    /// Notifications are ordered by Newest first
     /// </summary>
-    public async Task<List<NotificationLog>> GetNotificationsFor(int userId, bool unreadOnly = true)
+    /// <param name="userId">Return notifications for this UserID</param>
+    /// <param name="unreadOnly">If is true (default), only unread notifications are returned</param>
+    /// <param name="perPage">How many notifications to send on one page.
+    /// When 0, returns all notifications starting from <paramref name="page"/>. Is 20 by default</param>
+    /// <param name="page">Which page do you want returned. They are counted from 0</param>
+    public async Task<List<NotificationLog>> GetNotificationsFor(int userId, bool unreadOnly = true, int perPage = 20, int page = 0)
     {
         var logs =  _notificationDbContext.NotificationLogs
             .Where(n => (n.UserId == userId));
         if (unreadOnly) {
             logs = logs.Where(n => n.HasBeeenRead == false);
+        }
+
+        logs = logs.OrderByDescending(n => n.SentDate)
+                   .Skip(page * perPage);
+
+        if (perPage > 0) {
+            logs = logs.Take(perPage);
         }
         return await logs.ToListAsync();
     }
