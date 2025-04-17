@@ -30,6 +30,7 @@ public static class ServiceExtensions
         services.AddSingleton<GetAllNotificationsValidator>();
         services.AddScoped<NotificationLogService>();
         services.AddScoped<GetAllNotificationsHandler>();
+        services.AddScoped<SetNotificationsHandler>();
 
         // Register RegisterEmail Services
         services.AddSingleton<SendRegistrationEmailValidator>();

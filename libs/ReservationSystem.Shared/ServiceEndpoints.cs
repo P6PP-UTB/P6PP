@@ -41,6 +41,8 @@ public static class ServiceEndpoints
         public static string SendBookingConfirmationEmail => $"{BaseUrl}/api/notification/user/sendbookingconfirmationemail";
         public static string SendBookingCancellationEmail => $"{BaseUrl}/api/notification/user/sendbookingcancellationemail";
         public static string GetAllNotifications(int UserId, bool unreadOnly=true) => $"{BaseUrl}/api/notification/logs/getallnotifications/{UserId}";
+        public static string SetAllNotificationsAsRead(int UserId) => $"{BaseUrl}/api/notification/logs/setallnotificationsasread/{UserId}";
+        public static string SetSomeNotificationsAsRead => $"{BaseUrl}/api/notification/logs/setsomenotificationsasread";
     }
     
 }

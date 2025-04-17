@@ -47,4 +47,26 @@ public class NotificationLogService
         }
         return await logs.ToListAsync();
     }
+
+    public async Task<int> SetAllNotificationsAsRead(int userId)
+    {
+        var notificationsChanged = await _notificationDbContext
+            .NotificationLogs
+            .Where(n => n.UserId == userId)
+            .ExecuteUpdateAsync(n => n.SetProperty(x => x.HasBeeenRead, true));
+
+        await _notificationDbContext.SaveChangesAsync();
+        return notificationsChanged;
+    }
+
+    public async Task<int> SetSomeNotificationsAsRead(List<int> notificationIds)
+    {
+        var notificationsChanged = await _notificationDbContext
+            .NotificationLogs
+            .Where(n => notificationIds.Contains(n.Id))
+            .ExecuteUpdateAsync(n => n.SetProperty(x => x.HasBeeenRead, true));
+
+        await _notificationDbContext.SaveChangesAsync();
+        return notificationsChanged;
+    }
 }
