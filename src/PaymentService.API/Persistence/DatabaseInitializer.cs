@@ -70,10 +70,10 @@ public class DatabaseInitializer
                 );";
 
             await connection.ExecuteAsync(createUserCreditTableQuery);
-            _logger.LogInformation("'Roles' table checked/created successfully.");
+            _logger.LogInformation("'UserCredit' table checked/created successfully.");
 
             await connection.ExecuteAsync(createPaymentTableQuery);
-            _logger.LogInformation("'Users' table checked/created successfully.");
+            _logger.LogInformation("'Payment' table checked/created successfully.");
         }
         catch (Exception ex)
         {
