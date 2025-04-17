@@ -22,4 +22,5 @@ public class NotificationLog : Entity
     public required string Text { get; set; }
     [Required]
     public required DateTime SentDate { get; set; }
+    public bool HasBeeenRead { get; set; } = false;
 }
