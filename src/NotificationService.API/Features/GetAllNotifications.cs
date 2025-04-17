@@ -8,7 +8,7 @@ using NotificationService.API.Logging; // <-- Přidáno
 
 namespace NotificationService.API.Features;
 
-public record GetAllNotificationsRequest(int UserId);
+public record GetAllNotificationsRequest(int UserId, bool unreadOnly=true);
 public record GetAllNotifictionsResponse(List<NotificationLog>? NotificationLogs);
 
 public class GetAllNotificationsValidator : AbstractValidator<GetAllNotificationsRequest>
@@ -34,7 +34,7 @@ public class GetAllNotificationsHandler
 
         try
         {
-            var notifications = await _notificationLogService.GetNotificationsFor(request.UserId);
+            var notifications = await _notificationLogService.GetNotificationsFor(request.UserId, request.unreadOnly);
 
             string message = "";
             if (notifications == null)
@@ -77,9 +77,10 @@ public static class GetAllNotificationsEndpoint
     {
         app.MapGet(
             "/api/notification/logs/getallnotifications/{UserId:int}",
-            async (int UserId, GetAllNotificationsHandler handler, GetAllNotificationsValidator validator, CancellationToken cancellationToken) =>
+            async (int UserId, bool? unreadOnly,
+                   GetAllNotificationsHandler handler, GetAllNotificationsValidator validator, CancellationToken cancellationToken) =>
             {
-                var request = new GetAllNotificationsRequest(UserId);
+                var request = new GetAllNotificationsRequest(UserId, unreadOnly ?? true);
                 var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
                 if (!validationResult.IsValid)

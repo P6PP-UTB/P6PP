@@ -26,7 +26,8 @@ public class NotificationLogService
                 NotificationType = type,
                 Subject = subject,
                 Text = text,
-                SentDate = DateTime.Now
+                SentDate = DateTime.Now,
+                HasBeeenRead = false,
             }
         );
         await _notificationDbContext.SaveChangesAsync();
@@ -34,14 +35,16 @@ public class NotificationLogService
 
     /// <summary>
     /// Get all notifications for <param>userId</userId>
+    /// If <param>unreadOnly</param> is true, only unread notifications are returned
+    /// Only unread notifications are sent by default
     /// </summary>
-    public async Task<List<NotificationLog>> GetNotificationsFor(int userId)
+    public async Task<List<NotificationLog>> GetNotificationsFor(int userId, bool unreadOnly = true)
     {
-        // TODO: Some sort of paging or result limiting should be probably implemented
-        var logs = await _notificationDbContext.NotificationLogs
-            .Where(n => n.UserId == userId)
-            .ToListAsync();
-
-        return logs;
+        var logs =  _notificationDbContext.NotificationLogs
+            .Where(n => (n.UserId == userId));
+        if (unreadOnly) {
+            logs = logs.Where(n => n.HasBeeenRead == false);
+        }
+        return await logs.ToListAsync();
     }
 }
