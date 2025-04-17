@@ -90,7 +90,7 @@ namespace NotificationService.API.Services
             if (service == null)
             {
                 // Logování chyby
-                await FileLogger.LogError($"Service with ID {booking.serviceId} not found for booking {bookingId}.");
+                FileLogger.LogError($"Service with ID {booking.serviceId} not found for booking {bookingId}.");
                 return;
             }
 
@@ -148,7 +148,7 @@ namespace NotificationService.API.Services
             if (booking == null)
             {
                 // Logování chyby
-                await FileLogger.LogError($"Booking with ID {bookingLocal.BookingId} not found.");
+                FileLogger.LogError($"Booking with ID {bookingLocal.BookingId} not found.");
                 return false;
             }
 
@@ -162,7 +162,7 @@ namespace NotificationService.API.Services
             if (service == null)
             {
                 // Logování chyby
-                await FileLogger.LogError($"Service with ID {booking.serviceId} not found for booking {bookingLocal.BookingId}.");
+                FileLogger.LogError($"Service with ID {booking.serviceId} not found for booking {bookingLocal.BookingId}.");
                 return false;
             }
 
@@ -171,7 +171,7 @@ namespace NotificationService.API.Services
             if (user == null)
             {
                 // Logování chyby
-                await FileLogger.LogError($"User with ID {bookingLocal.UserId} not found.");
+                FileLogger.LogError($"User with ID {bookingLocal.UserId} not found.");
                 return false;
             }
 
