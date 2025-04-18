@@ -8,8 +8,31 @@ on:
   workflow_dispatch:
 
 jobs:
+  prepare:
+    name: 'Prepare'
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.environment.outputs.env }}
+    steps:
+      - name: Determine Environment
+        id: environment
+        run: |
+          if [[ "${{ github.ref }}" =~ refs/tags/^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "env=Production" >> $GITHUB_OUTPUT
+            exit 0
+          elif [[ "${{ github.ref }}" == refs/heads/main ]]; then
+            echo "env=Development" >> $GITHUB_OUTPUT
+            exit 0
+          elif [[ "${{ github.ref }}" =~ refs/tags/^[0-9]+\.[0-9]+\.[0-9]+-(alpha|beta|rc\.[0-9]+)$ ]]; then
+            echo "env=Staging" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          exit 1
   push_image:
-    environment: 'Development'
+    name: 'Build and Push ${{ matrix.image }} to ACR'
+    runs-on: ubuntu-latest
+    needs: prepare
+    environment: ${{ needs.prepare.outputs.env }}
     strategy:
       matrix:
         include:
@@ -21,8 +44,6 @@ jobs:
             dockerfile: src/NotificationService.API/Dockerfile
           - image: userservice
             dockerfile: src/UserService.API/Dockerfile
-    name: 'Build and Push ${{ matrix.image }} to ACR'
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
