@@ -1,0 +1,32 @@
+.card{
+    background: #f2f2f2;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-title{
+    font-size: 20pt;
+}
+
+.image-wrapper {
+    height: 100px;
+    overflow: hidden;
+  }
+  
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Crops to fill */
+    object-position: center; /* Centered crop */
+}
+
+.buy{
+    background-color: #EA2839;
+    color: white;
+    font-size: 14pt;
+}
+
+.info{
+    background-color: rgba(70, 80, 90, 1);
+    color: white;
+    font-size: 14pt;
+}

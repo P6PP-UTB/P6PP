@@ -89,13 +89,17 @@ body {
   justify-content: center;
 }
 
-
 .container-back {
   width: 1000px;
   background-color: white;
   min-height: 100vh;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+app-cource{
+  // flex: 0 0 50%;
+  // margin: 20px;
 }
 
 footer{

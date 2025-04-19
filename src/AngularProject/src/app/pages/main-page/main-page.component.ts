@@ -4,9 +4,10 @@ import { NavigationComponent } from "../../components/navigation/navigation.comp
 import {CommonModule} from '@angular/common'
 import { CalendarComponent } from "../../components/calendar/calendar.component";
 import { FooterComponent } from '../../components/footer/footer.component';
+import { CourceComponent } from '../../components/cource/cource.component';
 @Component({
   selector: 'app-main-page',
-  imports: [FooterComponent,NavigationComponent, CommonModule, CalendarComponent],
+  imports: [FooterComponent,NavigationComponent, CommonModule, CalendarComponent, CourceComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss'
 })
