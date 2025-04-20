@@ -1,11 +1,12 @@
 using Microsoft.Extensions.Caching.Memory;
+using UserService.API.Abstraction;
 using UserService.API.Exceptions;
 using UserService.API.Persistence.Entities;
 using UserService.API.Persistence.Repositories;
 
 namespace UserService.API.Services;
 
-public class UserService
+public class UserService : IUserService
 {
     private readonly UserRepository _userRepository;
     private readonly RoleRepository _roleRepository;
