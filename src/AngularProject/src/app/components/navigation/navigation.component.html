@@ -1,16 +1,16 @@
 <div id="head-div">
-  <button id="logo" routerLink="">REZERVACE+</button>
+  <a id="logo" class="btn" routerLink="">REZERVACE+</a>
 
   <nav id="navigation-bar">
-    <button class="nav-btn" routerLink="">Home</button>
-    <button class="nav-btn">Courses</button>
-    <button class="nav-btn">Coaches</button>
-    <button class="nav-btn" routerLink="/profile">Profile</button>
+    <a class="nav-btn btn" routerLink="">Home</a>
+    <a class="nav-btn btn">Courses</a>
+    <a class="nav-btn btn">Coaches</a>
+    <a class="nav-btn btn" routerLink="/profile">Profile</a>
   </nav>
   
   <div id="log-btns" *ngIf="!isLoggedIn">
-    <button id="login-btn" class="nav-btn" routerLink="/login">Log in</button>
-    <button id="signup-btn" class="nav-btn" routerLink="signup">Sign up</button>
+    <a id="login-btn" class="nav-btn btn" routerLink="/login">Log in</a>
+    <a id="signup-btn" class="nav-btn btn" routerLink="/signup">Sign up</a>
   </div>
   
 

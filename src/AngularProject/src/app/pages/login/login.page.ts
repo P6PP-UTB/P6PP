@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
+import { NavigationComponent } from '../../components/navigation/navigation.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterModule, NavigationComponent],
   templateUrl: './login.page.html',
   styleUrl: './login.page.scss'
 })
