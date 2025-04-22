@@ -28,73 +28,74 @@ export class MainPageComponent {
 
   }
   
-  // courses: Course[] = [];
+  courses: Course[] = [];
 
   // TESTING DATA !!!COMMENT 31:0!!!
-  courses: Course[] = [
-    {
-      id: 1,
-      start: new Date(),
-      end: new Date(),
-      price: 100,
-      serviceName: "Swimming",
-      currentCapacity: 35,
-      totalCapacity: 40,
-      roomName: "Swimming Pool 1",
-      isCancelled: false
-    },
-    {
-      id: 2,
-      start: new Date(),
-      end: new Date(),
-      price: 200,
-      serviceName: "Yoga",
-      currentCapacity: 35,
-      totalCapacity: 40,
-      roomName: "Room 1",
-      isCancelled: false
-    },
-    {
-      id: 3,
-      start: new Date(),
-      end: new Date(),
-      price: 250,
-      serviceName: "Boxing",
-      currentCapacity: 35,
-      totalCapacity: 40,
-      roomName: "Room 3",
-      isCancelled: false
-    },
-    {
-      id: 4,
-      start: new Date(),
-      end: new Date(),
-      price: 50,
-      serviceName: "Group training with Ronnie Coleman",
-      currentCapacity: 35,
-      totalCapacity: 40,
-      roomName: "Room 6",
-      isCancelled: false
-    },
-    {
-      id: 5,
-      start: new Date(),
-      end: new Date(),
-      price: 150,
-      serviceName: "Powerlifting",
-      currentCapacity: 35,
-      totalCapacity: 40,
-      roomName: "Room 2",
-      isCancelled: false
-    },
-  ];
+  // courses: Course[] = [
+  //   {
+  //     id: 1,
+  //     start: new Date(),
+  //     end: new Date(),
+  //     price: 100,
+  //     serviceName: "Swimming",
+  //     currentCapacity: 35,
+  //     totalCapacity: 40,
+  //     roomName: "Swimming Pool 1",
+  //     isCancelled: false
+  //   },
+  //   {
+  //     id: 2,
+  //     start: new Date(),
+  //     end: new Date(),
+  //     price: 200,
+  //     serviceName: "Yoga",
+  //     currentCapacity: 35,
+  //     totalCapacity: 40,
+  //     roomName: "Room 1",
+  //     isCancelled: false
+  //   },
+  //   {
+  //     id: 3,
+  //     start: new Date(),
+  //     end: new Date(),
+  //     price: 250,
+  //     serviceName: "Boxing",
+  //     currentCapacity: 35,
+  //     totalCapacity: 40,
+  //     roomName: "Room 3",
+  //     isCancelled: false
+  //   },
+  //   {
+  //     id: 4,
+  //     start: new Date(),
+  //     end: new Date(),
+  //     price: 50,
+  //     serviceName: "Group training with Ronnie Coleman",
+  //     currentCapacity: 35,
+  //     totalCapacity: 40,
+  //     roomName: "Room 6",
+  //     isCancelled: false
+  //   },
+  //   {
+  //     id: 5,
+  //     start: new Date(),
+  //     end: new Date(),
+  //     price: 150,
+  //     serviceName: "Powerlifting",
+  //     currentCapacity: 35,
+  //     totalCapacity: 40,
+  //     roomName: "Room 2",
+  //     isCancelled: false
+  //   },
+  // ];
 
-  // ngOnInit(){
-  //   this.courseService.getAllCourses().subscribe(courses => {
-  //     console.log(courses)
-  //     this.courses = courses;
-  //   });
-  // }
+  ngOnInit(){
+    this.courseService.getAllCourses().subscribe(courses => {
+      this.courses = courses;
+    });
+
+    //this.courseService.getAllCources().then((coursesList: Course[] = this.courses) => this.courses = coursesList)
+  }
 
   scrollDown() {
     const cont = document.querySelector('.scroll-container');

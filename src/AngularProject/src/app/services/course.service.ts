@@ -12,6 +12,11 @@ export class CourseService {
   getAllCourses(): Observable<Course[]> {
     return this.http.get<Course[]>(this.requestURL);
   }
+
+  // async getAllCources(): Promise<Course[]>{
+  //   const data = await fetch(this.requestURL);
+  //   return await data.json() ?? [];
+  // }
   
   
 
