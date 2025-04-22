@@ -1,3 +1,32 @@
 <app-navigation />
 
-<p>course-page works!</p>
+<div class="section-content">    
+    <div class="container-back">
+        <div class="header-main">
+            {{ cource.serviceName }}
+        </div>
+        <div class="main-info">
+            <div>
+                Trainer: Ronnie Coleman
+            </div>
+            <div>
+                Start at {{ cource.start.toDateString() }}
+            </div>
+            <div>
+                End at {{ cource.end.toDateString() }}
+            </div>
+            <div>
+                {{ cource.roomName }}
+            </div>
+            <div>
+                Price: {{ cource.price }}
+            </div>
+            <div>
+                Spots available {{ cource.currentCapacity }}/{{ cource.totalCapacity }}
+            </div>
+        </div>
+        <button class="btn">Enroll</button>
+    </div>
+</div>
+
+<app-footer />

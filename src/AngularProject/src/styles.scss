@@ -26,6 +26,13 @@ html, body {
     background: transparent;
     
   }
+
+.container-back {
+    width: 1000px;
+    background-color: white;
+    min-height: 100vh;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
   
 .header-main{
   font-family: 'Source Sans 3';
