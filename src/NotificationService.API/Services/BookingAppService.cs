@@ -5,18 +5,20 @@ using NotificationService.API.Persistence.Entities.DB;
 using NotificationService.API.Persistence.Entities;
 using NotificationService.API.Persistence.Entities.DB.Models;
 using NotificationService.API.Logging; // <-- Přidáno pro FileLogger
+using ReservationSystem.Shared.Clients;
+using ReservationSystem.Shared.Results;
 
 namespace NotificationService.API.Services
 {
     public class BookingAppService
     {
-        private readonly HttpClient _httpClient;
+        private readonly NetworkHttpClient _httpClient;
         private readonly NotificationDbContext _notificationDbContext;
         private readonly UserAppService _userAppService;
         private readonly TemplateAppService _templateAppService;
         private readonly MailAppService _mailAppService;
 
-        public BookingAppService(HttpClient httpClient, NotificationDbContext notificationDbContext,
+        public BookingAppService(NetworkHttpClient httpClient, NotificationDbContext notificationDbContext,
             UserAppService userAppService,
             TemplateAppService templateAppService, MailAppService mailAppService)
         {
@@ -29,30 +31,29 @@ namespace NotificationService.API.Services
 
         public async Task<BookingResponse?> GetBookingByIdAsync(int id)
         {
-            BookingResponse? response = null;
+            ApiResult<BookingResponse>? response = null;
             try
             {
-                var httpResponse = await _httpClient.GetAsync("http://host.docker.internal:8080/api/Bookings/" + id);
-                httpResponse.EnsureSuccessStatusCode();
-                var content = await httpResponse.Content.ReadAsStringAsync();
-                response = JsonSerializer.Deserialize<BookingResponse>(content);
+               
+                response = await _httpClient.GetAsync<BookingResponse>("http://host.docker.internal:8080/api/Bookings/" + id);
+                Console.WriteLine(response.Data);
             }
             catch (Exception e)
             {
                 // Logování chyby
                 await FileLogger.LogException(e, $"Error while fetching booking with ID {id}");
             }
-            return response;
+            return response?.Data;
         }
 
         public async Task<ServiceResponse?> GetServiceByIdAsync(int serviceId)
         {
-            ServiceResponse? response = null;
+            ApiResult<ServiceResponse>? response = null;
             try
             {
-                var httpResponse = await _httpClient.GetAsync("http://host.docker.internal:8080/api/Services/" + serviceId);
-                var content = await httpResponse.Content.ReadAsStringAsync();
-                response = JsonSerializer.Deserialize<ServiceResponse>(content);
+                response = await _httpClient.GetAsync<ServiceResponse>("http://host.docker.internal:8080/api/Services/" + serviceId);
+                Console.WriteLine(response.Data);
+
             }
             catch (Exception e)
             {
@@ -60,7 +61,7 @@ namespace NotificationService.API.Services
                 await FileLogger.LogException(e, $"Error while fetching service with ID {serviceId}");
             }
 
-            return response;
+            return response?.Data;
         }
 
         public async Task<ServiceResponse?> GetServiceByBookingIdAsync(int bookingId)

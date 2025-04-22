@@ -9,15 +9,13 @@ using NotificationService.API.Logging; // <-- Přidáno
 
 namespace NotificationService.API.Features;
 
-public record SendBookingConfirmationEmailRequest(int UserId, int BookingId);
-//TODO: Userid can be read from booking, if booking team add userId to API respond
+public record SendBookingConfirmationEmailRequest(int BookingId);
 public record SendBookingConfirmationEmailResponse(int? Id = null);
 
 public class SendBookingConfirmationEmailValidator : AbstractValidator<SendBookingConfirmationEmailRequest>
 {
     public SendBookingConfirmationEmailValidator()
     {
-        RuleFor(x => x.UserId).GreaterThan(0);
         RuleFor(x => x.BookingId).GreaterThan(0);
     }
 }
@@ -46,11 +44,21 @@ public class SendBookingConfirmationEmailHandler
     public async Task<ApiResult<SendBookingConfirmationEmailResponse>> Handle(SendBookingConfirmationEmailRequest request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        BookingResponse? booking = null;
+        try
+        {
+            booking = await _bookingAppService.GetBookingByIdAsync(request.BookingId);
+        }
+        catch (Exception e)
+        {
+            FileLogger.LogError($"Booking with ID {request.BookingId} throw exception: {e.Message}");
+            return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Event failed to load");
+        }
 
-        var user = await _userAppService.GetUserByIdAsync(request.UserId);
+        var user = await _userAppService.GetUserByIdAsync(booking.userId);
         if (user == null)
         {
-            FileLogger.LogError($"User with ID {request.UserId} not found.");
+            FileLogger.LogError($"User with ID {booking.userId} not found.");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "User not found");
         }
 
@@ -63,17 +71,17 @@ public class SendBookingConfirmationEmailHandler
         ServiceResponse? service = null;
         try
         {
-            service = await _bookingAppService.GetServiceByBookingIdAsync(request.BookingId);
+            service = await _bookingAppService.GetServiceByIdAsync(booking.serviceId);
         }
         catch (Exception ex)
         {
-            await FileLogger.LogException(ex, $"Error fetching service for booking ID {request.BookingId}");
+            await FileLogger.LogException(ex, $"Error fetching service for booking ID {booking.serviceId}");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Event failed to load");
         }
 
         if (service == null)
         {
-            FileLogger.LogError($"Service not found for booking ID {request.BookingId}");
+            FileLogger.LogError($"Service not found for booking ID {booking.id}");
             return new ApiResult<SendBookingConfirmationEmailResponse>(null, false, "Service not found in booking");
         }
 

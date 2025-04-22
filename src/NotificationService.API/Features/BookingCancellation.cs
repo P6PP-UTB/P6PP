@@ -9,14 +9,13 @@ using NotificationService.API.Logging; // <-- Přidáno
 
 namespace NotificationService.API.Features;
 
-public record SendBookingCancellationEmailRequest(int UserId, int BookingId);
+public record SendBookingCancellationEmailRequest(int BookingId);
 public record SendBookingCancellationEmailResponse(int? Id = null);
 
 public class SendBookingCancellationEmailValidator : AbstractValidator<SendBookingCancellationEmailRequest>
 {
     public SendBookingCancellationEmailValidator()
     {
-        RuleFor(x => x.UserId).GreaterThan(0);
         RuleFor(x => x.BookingId).GreaterThan(0);
     }
 }
@@ -45,12 +44,23 @@ public class SendBookingCancellationEmailHandler
     public async Task<ApiResult<SendBookingCancellationEmailResponse>> Handle(SendBookingCancellationEmailRequest request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        BookingResponse? booking = null;
+        try
+        {
+            booking = await _bookingAppService.GetBookingByIdAsync(request.BookingId);
 
-        var user = await _userAppService.GetUserByIdAsync(request.UserId);
+        }
+        catch (Exception e)
+        {
+            FileLogger.LogError($"Booking with ID {request.BookingId} throw exception: {e.Message}");
+
+        }
+
+        var user = await _userAppService.GetUserByIdAsync(booking.userId);
 
         if (user == null)
         {
-            FileLogger.LogError($"User with ID {request.UserId} not found.");
+            FileLogger.LogError($"User with ID {booking.userId} not found.");
             return new ApiResult<SendBookingCancellationEmailResponse>(null, false, "User not found");
         }
 
@@ -63,7 +73,7 @@ public class SendBookingCancellationEmailHandler
         ServiceResponse? service = null;
         try
         {
-            service = await _bookingAppService.GetServiceByBookingIdAsync(request.BookingId);
+            service = await _bookingAppService.GetServiceByIdAsync(booking.serviceId);
         }
         catch (Exception ex)
         {

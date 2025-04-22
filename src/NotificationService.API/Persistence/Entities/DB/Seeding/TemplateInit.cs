@@ -558,7 +558,7 @@ public class TemplateInit
                                     </p>
 
                                     <div class=""button-container"">
-                                      <a href=""{token}"" target=""_blank"" rel=""noopener noreferrer""
+                                      <a href=""http://localhost:4201/password_reset/{token}"" target=""http://localhost:4201/password_reset/{token}"" rel=""noopener noreferrer""
                                         >Reset Password</a
                                       >
                                     </div>
