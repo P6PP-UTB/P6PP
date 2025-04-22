@@ -19,9 +19,10 @@
             <div class="col">
                 <div class="top">QUICK LINKS</div>
                 <hr>
-                <p><button class="ps-0 pe-0" routerLink="">Home</button></p>
-                <p><button class="ps-0 pe-0" routerLink="">Cources</button><p>
-                <p><button class="ps-0 pe-0" routerLink="">Coaches</button></p>
+                <p><a class="ps-0 pe-0" href="#top" routerLink="">Home</a></p>
+                <p><a class="ps-0 pe-0" href="#calendar" routerLink="">My calendar</a><p></p>
+                <p><a class="ps-0 pe-0" href="#courses" routerLink="">Cources</a><p>
+                <p><a class="ps-0 pe-0" href="#" routerLink="">Coaches</a></p>
             </div>
             
             <div class="col">
@@ -52,23 +53,7 @@
     <div class="pt-2 pb-4 px-4 flex-fill">
         <div class="col" id="footerBot">
             <p class="pt-2">
-                <button class="scroll-top ps-0 pe-0" onclick="scrollToTop()">Back to Top</button>
-
-                <!--WILL BE MOVED TO .TS LATER-->
-                <script>
-                    window.addEventListener("scroll", function() {
-                        let btn = document.querySelector(".scroll-top");
-                        if (window.scrollY > 200) {
-                            btn.classList.add("show");
-                        } else {
-                            btn.classList.remove("show");
-                        }
-                    });
-
-                    function scrollToTop() {
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                    }
-                </script>
+                <a class="scroll-top ps-0 pe-0" href="#top" routerLink="">Back to Top</a>
             </p>
             <div>
                 <a href="https://termify.io/">
