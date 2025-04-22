@@ -99,7 +99,6 @@ namespace NotificationService.API.Services
             {
                 BookingId = booking.id,
                 Start = service.start,
-                UserId = userId,
             };
 
             if (await _notificationDbContext.Bookings
@@ -167,17 +166,17 @@ namespace NotificationService.API.Services
                 return false;
             }
 
-            var user = await _userAppService.GetUserByIdAsync(bookingLocal.UserId);
+            var user = await _userAppService.GetUserByIdAsync(booking.userId);
 
             if (user == null)
             {
                 // Logování chyby
-                FileLogger.LogError($"User with ID {bookingLocal.UserId} not found.");
+                FileLogger.LogError($"User with ID {booking.userId} not found.");
                 return false;
             }
 
             // Změna jména šablony. Čekání na vytvoření.
-            var template = await _templateAppService.GetTemplateAsync("BookingConfirmation");
+            var template = await _templateAppService.GetTemplateAsync("BookingReminder");
 
             template.Text = template.Text.Replace("{name}", user.FirstName + " " + user.LastName);
             template.Text = template.Text.Replace("{eventname}", service.serviceName);

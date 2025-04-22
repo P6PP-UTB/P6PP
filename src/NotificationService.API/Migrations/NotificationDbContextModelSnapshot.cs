@@ -39,9 +39,6 @@ namespace NotificationService.API.Migrations
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Bookings");
@@ -72,8 +69,8 @@ namespace NotificationService.API.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasMaxLength(1500)
-                        .HasColumnType("varchar(1500)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
 
                     b.HasKey("Id");
 
