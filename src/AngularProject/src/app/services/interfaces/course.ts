@@ -1,5 +1,6 @@
 export interface Course {
     id: number;
+    trainerId: number;
     start: Date;
     end: Date;
     price: number;

@@ -34,6 +34,7 @@ export class MainPageComponent {
   courses: Course[] = [
     {
       id: 1,
+      trainerId: 1,
       start: new Date(),
       end: new Date(),
       price: 100,
@@ -45,6 +46,7 @@ export class MainPageComponent {
     },
     {
       id: 2,
+      trainerId: 1,
       start: new Date(),
       end: new Date(),
       price: 200,
@@ -56,6 +58,7 @@ export class MainPageComponent {
     },
     {
       id: 3,
+      trainerId: 1,
       start: new Date(),
       end: new Date(),
       price: 250,
@@ -67,6 +70,7 @@ export class MainPageComponent {
     },
     {
       id: 4,
+      trainerId: 2,
       start: new Date(),
       end: new Date(),
       price: 50,
@@ -78,6 +82,7 @@ export class MainPageComponent {
     },
     {
       id: 5,
+      trainerId: 2,
       start: new Date(),
       end: new Date(),
       price: 150,

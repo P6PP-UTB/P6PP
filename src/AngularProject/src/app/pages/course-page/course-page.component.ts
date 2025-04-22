@@ -21,6 +21,7 @@ export class CoursePageComponent {
 
   cource: Course = {
       id: 1,
+      trainerId: 1,
       start: new Date(),
       end: new Date(),
       price: 100,
