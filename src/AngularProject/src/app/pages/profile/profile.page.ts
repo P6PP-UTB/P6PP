@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NavigationComponent } from '../../components/navigation/navigation.component';
+import { FooterComponent } from '../../components/footer/footer.component';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-profile.page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NavigationComponent],
+  imports: [CommonModule, ReactiveFormsModule, NavigationComponent, FooterComponent],
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.scss'
 })
