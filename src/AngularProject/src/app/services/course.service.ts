@@ -10,11 +10,11 @@ export class CourseService {
 
   constructor(private http: HttpClient) {}
 
-  getAllCourses(): Observable<Course[]> {
+  getAllCourses(): Observable<any[]> {
     return this.http.get<Course[]>(this.requestAllURL);
   }
 
-  getOneCourse(id: any): Observable<Course>{
+  getOneCourse(id: any): Observable<any>{
     const reqUrl = this.requestSingleURL + id.toString();
     return this.http.get<Course>(reqUrl);
   }

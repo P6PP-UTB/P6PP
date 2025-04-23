@@ -1,19 +1,19 @@
 <app-navigation />
 
 <div class="section-content">    
-    <div class="container-back">
+    <div *ngIf="course" class="container-back">
         <div class="header-main">
             {{ course.serviceName }}
         </div>
         <div class="main-info">
-            <div>
-                {{ course.trainerId }}
+            <div *ngIf="trainer">
+                Trainer: {{ trainer }}
             </div>
             <div>
-                Start at {{ course.start.toDateString() }}
+                Start at {{ course.start | date:'HH:mm, dd.MM.yyyy' }}
             </div>
             <div>
-                End at {{ course.end.toDateString() }}
+                End at {{ course.end | date:'HH:mm, dd.MM.yyyy' }}
             </div>
             <div>
                 {{ course.roomName }}
