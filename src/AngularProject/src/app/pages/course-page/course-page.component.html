@@ -9,11 +9,17 @@
             <div *ngIf="trainer">
                 Trainer: {{ trainer }}
             </div>
-            <div>
+            <!-- <div>
                 Start at {{ course.start | date:'HH:mm, dd.MM.yyyy' }}
             </div>
             <div>
                 End at {{ course.end | date:'HH:mm, dd.MM.yyyy' }}
+            </div> -->
+            <div>
+                {{ course.start | date:'dd.MM.yyyy' }}
+            </div>
+            <div>
+                {{ course.start | date:'HH:mm' }} - {{ course.end | date:'HH:mm' }}
             </div>
             <div>
                 {{ course.roomName }}
