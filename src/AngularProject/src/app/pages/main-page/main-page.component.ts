@@ -95,8 +95,9 @@ export class MainPageComponent {
   ];
 
   ngOnInit(){
-    this.courseService.getAllCourses().subscribe(courses => {
-      this.courses = courses;
+    this.courseService.getAllCourses().subscribe(courcesResponse => {
+      this.courses = courcesResponse.data;
+      console.log("course arr: ", this.courses);
     });
 
     //this.courseService.getAllCources().then((coursesList: Course[] = this.courses) => this.courses = coursesList)
