@@ -21,6 +21,17 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -50,7 +61,7 @@ app.UseHttpsRedirection();
 
 
 app.UseCors("AllowAngularDevClient");
-
+app.UseCors("AllowAngularNgClient");
 
 app.UseRouting();
 

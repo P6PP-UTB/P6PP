@@ -23,9 +23,10 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Ng serve Angular
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularDevClient", policy =>
+    options.AddPolicy("AllowAngularNgClient", policy =>
     {
         policy.WithOrigins("http://localhost:4200")
               .AllowAnyHeader()
@@ -46,6 +47,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors("AllowAngularDevClient");
+app.UseCors("AllowAngularNgClient");
 
 app.MapControllers();
 
