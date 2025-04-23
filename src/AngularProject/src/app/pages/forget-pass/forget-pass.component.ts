@@ -32,8 +32,8 @@ export class ForgetPassComponent {
   
       console.log('Sending request to:', 'http://localhost:8005/api/auth/reset-password');
       console.log('With body:', { email });
-      console.log('http://localhost:8005/api/auth/reset-password?email=', email)
-      this.http.post('http://localhost:8005/api/auth/reset-password?email=', {email})
+
+      this.http.get('http://localhost:8005/api/auth/reset-password?email=' + email)
         .subscribe({
           next: (response) => {
             console.log('Response from backend:', response); 

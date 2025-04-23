@@ -36,6 +36,17 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularNgClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddHttpClient<NetworkHttpClient>();
 
 builder.Services.AddControllers();
@@ -145,6 +156,7 @@ if (!app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors("AllowAngularDevClient");
+app.UseCors("AllowAngularNgClient");
 
 app.UseAuthentication();
 app.UseAuthorization();
