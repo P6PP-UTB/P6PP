@@ -19,7 +19,7 @@ export class CoursePageComponent {
 
   }
 
-  cource: Course = {
+  course: Course = {
       id: 1,
       trainerId: 1,
       start: new Date(),
@@ -39,7 +39,7 @@ export class CoursePageComponent {
     // this.courseService.getOneCourse(id).subscribe(course => {
     //   console.log('Fetched course:', course);
     // });
-    console.log('Fetched course:', this.cource);
+    console.log('Fetched course:', this.course);
   }
 
   private getLastSegment(url: string): string {

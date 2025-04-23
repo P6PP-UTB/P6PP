@@ -3,26 +3,26 @@
 <div class="section-content">    
     <div class="container-back">
         <div class="header-main">
-            {{ cource.serviceName }}
+            {{ course.serviceName }}
         </div>
         <div class="main-info">
             <div>
-                Trainer: Ronnie Coleman
+                {{ course.trainerId }}
             </div>
             <div>
-                Start at {{ cource.start.toDateString() }}
+                Start at {{ course.start.toDateString() }}
             </div>
             <div>
-                End at {{ cource.end.toDateString() }}
+                End at {{ course.end.toDateString() }}
             </div>
             <div>
-                {{ cource.roomName }}
+                {{ course.roomName }}
             </div>
             <div>
-                Price: {{ cource.price }}
+                Price: {{ course.price }}
             </div>
             <div>
-                Spots available {{ cource.currentCapacity }}/{{ cource.totalCapacity }}
+                Spots available {{ course.currentCapacity }}/{{ course.totalCapacity }}
             </div>
         </div>
         <button class="btn">Enroll</button>
