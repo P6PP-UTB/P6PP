@@ -59,6 +59,7 @@ public class SendVerificationEmailHandler
         var template = await _templateAppService.GetTemplateAsync("Verification");
 
         template.Text = template.Text.Replace("{name}", $"{user.FirstName} {user.LastName}");
+        template.Text = template.Text.Replace("{userId}", user.Id.ToString());
         template.Text = template.Text.Replace("{token}", request.token);
 
         var emailArgs = new EmailArgs

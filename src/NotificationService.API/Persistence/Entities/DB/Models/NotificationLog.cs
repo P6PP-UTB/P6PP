@@ -18,9 +18,10 @@ public class NotificationLog : Entity
     public required NotificationType NotificationType { get; set; }
     [StringLength(75)]
     public required string Subject { get; set; }
-    [StringLength(3000)]
+    [StringLength(10000)]
     public required string Text { get; set; }
     [Required]
     public required DateTime SentDate { get; set; }
-    public bool HasBeeenRead { get; set; } = false;
+    [Required]
+    public required bool HasBeeenRead { get; set; } = false;
 }
