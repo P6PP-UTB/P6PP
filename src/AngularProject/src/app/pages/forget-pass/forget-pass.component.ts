@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-forget-pass',
   standalone: true,
-  imports: [ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './forget-pass.component.html',
   styleUrl: './forget-pass.component.scss'
 })
@@ -13,6 +14,7 @@ export class ForgetPassComponent {
   resetForm: FormGroup;
   resetError: string | null = null;
   successMessage: string | null = null;
+  showVerifyMessage: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -38,6 +40,7 @@ export class ForgetPassComponent {
           next: (response) => {
             console.log('Response from backend:', response); 
             this.successMessage = 'A reset link has been sent to your email.';
+            this.showVerifyMessage = true;
             this.resetForm.reset();
           },
           error: (err) => {

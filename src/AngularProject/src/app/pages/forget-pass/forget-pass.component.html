@@ -2,6 +2,11 @@
 
 <div id="restore-block">
     <div id="restore">Forgot a password?</div>
+
+    <div id="confirm" *ngIf="showVerifyMessage" class="alert alert-info">
+        Please, check your email to set a new password.
+    </div>
+
     <div class="form-container">
         <form [formGroup]="resetForm" (ngSubmit)="onSubmit()">
             <label for="email">Enter your account's email<span class="required"></span></label>
