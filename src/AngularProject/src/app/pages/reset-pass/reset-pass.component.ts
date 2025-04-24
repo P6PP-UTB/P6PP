@@ -36,16 +36,18 @@ export class ResetPassComponent {
     if (this.resetForm.valid) {
       const form = this.resetForm.value;
 
+
       this.route.queryParams.subscribe(params => {
         const userId = params['userId'];
         const token = params['token'];
-  
+        console.log(params);
+
         const payload = {
           newPassword: form.newPassword,
           token: token,
           userId: userId
         };
-        console.log(payload)
+        console.log("reset password payload", payload)
 
         this.http.post('http://localhost:8005/api/auth/reset-password', payload)
         .subscribe({
