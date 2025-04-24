@@ -4,18 +4,18 @@
     <div id="restore">Set a new password</div>
     <div class="form-container">
         <form [formGroup]="resetForm" (ngSubmit)="onSubmit()">
-            <label for="password">Password 
+            <label for="newPassword">Password 
                 <span class="required">*</span>
-                <p class="error-message" *ngIf="resetForm.controls['password'].invalid && resetForm.controls['password'].touched && resetForm.get('password')?.value ">
+                <p class="error-message" *ngIf="resetForm.controls['newPassword'].invalid && resetForm.controls['newPassword'].touched && resetForm.get('newPassword')?.value ">
                     Password must be at least 8 characters long and contian at least number, uppercase and lowercase letters, at least one special character
                 </p>
             </label>
 
             <div class="container">
-                <input id="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Password" required
-                    [ngClass]="{'error-input': resetForm.controls['password'].invalid && 
-                        resetForm.controls['password'].touched && 
-                        resetForm.get('password')?.value}">
+                <input id="newPassword" [type]="hidePassword ? 'password' : 'text'" formControlName="newPassword" placeholder="Set a new password" required
+                    [ngClass]="{'error-input': resetForm.controls['newPassword'].invalid && 
+                        resetForm.controls['newPassword'].touched && 
+                        resetForm.get('newPassword')?.value}">
                 <button type="button" class="toggle-password" (click)="hidePassword = !hidePassword">👁</button>
             </div>
 
@@ -24,16 +24,16 @@
                 <span class="required">*</span>
                 <p class="error-message"
                 *ngIf="resetForm.get('repeatPassword')?.value 
-                    && resetForm.get('password')?.value !== resetForm.get('repeatPassword')?.value
+                    && resetForm.get('newPassword')?.value !== resetForm.get('repeatPassword')?.value
                     && resetForm.get('repeatPassword')?.touched">
-                    Passwords do not match
+                    Passwords do not matching
                 </p>
             </label>
             
             <div class="container">
-                <input id="repeatPassword" [type]="hideRepeatPassword ? 'password' : 'text'" formControlName="repeatPassword" placeholder="Password" required
+                <input id="repeatPassword" [type]="hideRepeatPassword ? 'password' : 'text'" formControlName="repeatPassword" placeholder="Repeat a new password" required
                     [ngClass]="{'error-input': resetForm.get('repeatPassword')?.value 
-                        && resetForm.get('password')?.value !== resetForm.get('repeatPassword')?.value
+                        && resetForm.get('newPassword')?.value !== resetForm.get('repeatPassword')?.value
                         && resetForm.get('repeatPassword')?.touched}">
                 <button type="button" class="toggle-password" (click)="hideRepeatPassword = !hideRepeatPassword">👁</button>
             </div>
