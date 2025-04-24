@@ -1,5 +1,152 @@
 .section-content {
-    display: flex;
-    scroll-snap-align: start;
-    justify-content: center;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 15vw;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 0;
+}
+
+.container-back {
+  position: relative;
+  width: 100%;
+  max-width: 960px; /* Matches the image width */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  font-family: 'Source Sans 3', sans-serif;
+}
+
+.image-slider {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9; /* automatically gives it a height */
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.slider-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+
+.slider-button.left {
+  left: 10px;
+}
+
+.slider-button.right {
+  right: 10px;
+}
+
+.slider-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.308);
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s;
+  border-radius: 12.5%;
+}
+
+.content-container {
+  width: 100%;
+  max-width: 960px; /* Matches the image width */
+  margin: 0 auto;
+}
+
+.info-row {
+  margin: 10pt 0pt;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap; /* Ensures responsiveness for smaller screens */
+  width: 100%; /* Matches the image width */
+}
+
+.left-info {
+  padding: 0 20pt;
+  flex: 1 1 60%; /* Takes 60% of the width */
+  text-align: left;
+}
+
+.right-info {
+  padding: 0 20pt;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.course-description {
+  margin-top: 20px;
+  font-size: 1rem;
+  color: #333;
+  width: 100%; /* Matches the image width */
+  text-align: left;
+}
+
+.coach-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.coach-name {
+  font-weight: bold;
+  font-size: 1.3rem;
+  margin-bottom: 5px;
+}
+
+.coach-tag {
+  font-weight: 500;
+  font-size: 1.3rem;
+  margin-bottom: 5px;
+}
+
+.coach-desc {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.info {
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: bold;
+  font-size: 24pt;
+}
+
+// .enroll {
+//   margin-top: 20px;
+//   padding: 10px 20px;
+//   font-size: 18px;
+//   background-color: #dc3545;
+//   color: white;
+//   border: none;
+//   border-radius: 5px;
+//   cursor: pointer;
+//   z-index: 1;
+// }
+
+.enroll{
+  margin-top: 20px;
+  background-color: #EA2839;
+  color: white;
+  font-size: 14pt;
+  cursor: pointer;
+}
+
+.enroll:hover{
+  background-color: #b71c1c;
+}
