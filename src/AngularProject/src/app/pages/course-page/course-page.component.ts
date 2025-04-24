@@ -32,7 +32,6 @@ export class CoursePageComponent {
   // Массив изображений
   imageUrls: string[] = [
     'https://goo.su/kSY4URo?',
-    'https://goo.su/NHmvY',
     'https://goo.su/YyOz7YE',
     'https://tse3.mm.bing.net/th?id=OIG2.5bowY.5mQdQKTIv5qY1g&pid=ImgGn'
   ];
