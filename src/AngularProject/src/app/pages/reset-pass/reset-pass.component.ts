@@ -14,7 +14,8 @@ export class ResetPassComponent {
   resetForm: FormGroup;
   hidePassword = true;
   hideRepeatPassword = true;
-  
+  tryToLogin: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -48,7 +49,9 @@ export class ResetPassComponent {
 
         this.http.post('http://localhost:8005/api/auth/reset-password', payload)
         .subscribe({
-          next: () => alert('Your password has been changed'),
+          next: () => {alert('Your password has been changed'),
+            this.tryToLogin = true;
+          },
           error: (err) => {
             console.error(err);
             alert('Error: ' + (err.error?.message || 'unexpected error'));

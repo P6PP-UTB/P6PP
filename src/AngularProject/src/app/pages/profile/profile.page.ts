@@ -29,6 +29,7 @@ export class ProfilePage implements OnInit {
   ngOnInit() {
     this.userService.getCurrentUser().subscribe((res) => {
       this.user = res?.data?.user;
+      console.log(res);
       this.initForms();
     });
   }
