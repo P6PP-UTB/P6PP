@@ -54,7 +54,7 @@ const routeConfig: Routes = [
     },
     {
         // reset link
-        path: 'reset_password',
+        path: 'reset-password',
         component: ResetPassComponent,
         title: 'Reset a password'
     },
