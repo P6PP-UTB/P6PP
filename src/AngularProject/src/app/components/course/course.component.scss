@@ -31,8 +31,18 @@
     font-size: 14pt;
 }
 
+.buy:hover{
+    background-color: #b71c1c;
+}
+
 .info{
     background-color: rgba(70, 80, 90, 1);
+    color: white;
+    font-size: 14pt;
+}
+
+.info:hover{
+    background-color: rgb(40, 50, 60, 1);
     color: white;
     font-size: 14pt;
 }
