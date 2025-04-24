@@ -46,7 +46,7 @@ export class ResetPassComponent {
         };
         console.log(payload)
 
-        this.http.post('http://localhost:8005/api/auth/change-password', payload)
+        this.http.post('http://localhost:8005/api/auth/reset-password', payload)
         .subscribe({
           next: () => alert('Your password has been changed'),
           error: (err) => {
