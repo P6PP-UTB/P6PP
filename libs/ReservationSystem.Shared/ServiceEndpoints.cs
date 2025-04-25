@@ -28,6 +28,7 @@ public static class ServiceEndpoints
         public static string ResetPassword => $"{BaseUrl}/api/auth/reset-password";
 
         public static string DeleteUser(int id) => $"{BaseUrl}/api/auth/delete/{id}";
+        public static string ValidateToken => $"{BaseUrl}/api/auth/validate";
 
     }
 
