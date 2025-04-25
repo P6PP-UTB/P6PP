@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { jwtDecode } from 'jwt-decode';
-
-interface JwtPayload {
-  nameid: string;
-  name: string;
-}
+import { map, catchError } from 'rxjs/operators';
 
 interface UpdateUserRequest {
   username?: string;
@@ -17,6 +12,7 @@ interface UpdateUserRequest {
   weight?: number;
   height?: number;
   sex?: string;
+  dateOfBirth?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,31 +22,28 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  getUserIdFromToken(): number | null {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.warn('🚫 Токен не найден');
-      return null;
-    }
-
-    try {
-      const decoded: any = jwtDecode(token);
-      const userId = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-      return parseInt(userId);
-    } catch (err) {
-      console.error('Decoding error: ', err);
-      return null;
-    }
+  getStoredUserId(): number | null {
+    const rawId = localStorage.getItem('userId');
+    return rawId ? parseInt(rawId, 10) : null;
   }
 
   getCurrentUser(): Observable<any> {
-    const id = this.getUserIdFromToken();
-    if (!id) return of(null);
+    const id = this.getStoredUserId();
+    if (!id) {
+      console.warn('❌ no userId localStorage');
+      return of(null);
+    }
     return this.getUserById(id);
   }
 
   getUserById(id: number): Observable<any> {
-    return this.http.get(`${this.userBaseUrl}/${id}`);
+    return this.http.get<any>(`${this.userBaseUrl}/${id}`).pipe(
+      map(response => response?.data?.user || null),
+      catchError(err => {
+        console.error('🧨 Error was occured:', err);
+        return of(null);
+      })
+    );
   }
 
   updateUser(id: number, payload: UpdateUserRequest): Observable<any> {

@@ -27,9 +27,8 @@ export class ProfilePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.userService.getCurrentUser().subscribe((res) => {
-      this.user = res?.data?.user;
-      console.log(res);
+    this.userService.getCurrentUser().subscribe((user) => {
+      this.user = user;
       this.initForms();
     });
   }
@@ -43,7 +42,8 @@ export class ProfilePage implements OnInit {
       phoneNumber: [this.user?.phoneNumber || ''],
       weight: [this.user?.weight || ''],
       height: [this.user?.height || ''],
-      sex: [this.user?.sex || '']
+      sex: [this.user?.sex || ''],
+      dateOfBirth: [this.user?.dateOfBirth ? this.user.dateOfBirth.split('T')[0] : '']
     });
 
     this.settingsForm = this.fb.group({
@@ -90,6 +90,13 @@ export class ProfilePage implements OnInit {
         this.toastr.success('Password reset successfully!');
       });
     }
+  } 
+
+  getAge(birthDate: string): number {
+    const dob = new Date(birthDate);
+    const diff = Date.now() - dob.getTime();
+    const ageDate = new Date(diff); 
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
   }
 
   // onDeleteAccount() {
