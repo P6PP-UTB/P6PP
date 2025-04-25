@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NavigationComponent } from '../../components/navigation/navigation.component';
 
@@ -22,19 +22,19 @@ export class SignupPage {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
+    private authService: AuthService
   ) {
     this.signupForm = this.fb.group({
       name: ['', [
         Validators.required,
         Validators.minLength(2),
-        Validators.pattern('^[a-zA-Z]{2,}$')]],
+        Validators.pattern(/^[\p{L}\p{M}]{2,}$/u)
+      ]],     
 
       surname: ['', [
         Validators.required,
         Validators.minLength(2),
-        Validators.pattern('^[a-zA-Z ]{2,}$')]],
+        Validators.pattern(/^[\p{L}\p{M}]{2,}$/u)]],
 
       username: ['', [
         Validators.required, 
@@ -56,6 +56,7 @@ export class SignupPage {
   }
 
   onSubmit() {
+    console.log("Signing up...")
     this.registrationError = null;
   
     if (this.signupForm.valid) {
@@ -68,24 +69,29 @@ export class SignupPage {
         firstName: form.name,
         lastName: form.surname
       };
+
+      console.log("Payload: ", payload);
   
       this.authService.registerUser(payload).subscribe({
         next: () => {
+          console.log("Success. Wait couple of minutes and check email")
           this.showVerifyMessage = true;
-          //this.signupForm.reset();
-          //this.router.navigate(['/login']); // или куда надо
         },
         error: (err) => {
+          console.log("Error occured")
           if (err.status === 400 && err.error?.message) {
+            console.log("ERROR: ", err.error.message);
             this.registrationError = err.error.message;
           } else {
+            console.log("UNEXPECTED ERROR: ", err.error.message);
             this.registrationError = 'Something went wrong, try again later.';
           }
         }
       });
   
     } else {
-      console.warn('Invalid:', this.signupForm.value);
+      console.warn('Invalid form:', this.signupForm.value);
+      this.registrationError = "Check all fields for errors"
     }
   }
 }
