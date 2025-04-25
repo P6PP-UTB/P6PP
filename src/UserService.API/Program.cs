@@ -18,18 +18,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDevClient", policy =>
     {
-        policy.WithOrigins("http://localhost:4201")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngularDevClient", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins("http://localhost:4200", "http://localhost:4201")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -94,7 +83,6 @@ app.UseEndpoints(endpoints =>
     UpdateUserEndpoint.Register(endpoints);
     CreateUserEndpoint.Register(endpoints);
     AssignUserRoleEndpoint.Register(endpoints);
-
 
     // ROLE ENDPOINTS
     GetRoleByIdEndpoint.Register(endpoints);

@@ -15,6 +15,7 @@
       <p *ngIf="user?.sex">⚧ Gender: {{ user.sex }}</p>
       <p *ngIf="user?.height">📏 Height: {{ user.height }} cm</p>
       <p *ngIf="user?.weight">⚖️ Weight: {{ user.weight }} kg</p>
+      <p *ngIf="user?.dateOfBirth">🎂 Age: {{ getAge(user.dateOfBirth) }} y.o.</p>
     </div>
     <button class="settings-btn" (click)="toggleSettingsForm()">Settings</button>
   </section>
@@ -32,6 +33,7 @@
       <input type="text" formControlName="phoneNumber" placeholder="Phone Number" class="form-input" />
       <input type="number" formControlName="weight" placeholder="Weight (kg)" class="form-input" />
       <input type="number" formControlName="height" placeholder="Height (cm)" class="form-input" />
+      <input type="date" formControlName="dateOfBirth" placeholder="Date of birth" class="form-input"/>
       <select formControlName="sex" class="form-input">
         <option value="" disabled selected hidden>Select Gender</option>
         <option value="Male">Male</option>

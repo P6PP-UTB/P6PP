@@ -19,14 +19,36 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/login`, payload);
   }
 
-  logout() {
-    localStorage.removeItem('token');
-    this._isLoggedIn$.next(false); // ⚡ Оповещаем всех
+  logout(): void {
+    this.http.post(`${this.baseUrl}/logout`, {}).subscribe({
+      next: () => {
+        this.clearSession();
+      },
+      error: () => {
+        this.clearSession();
+      }
+    });
   }
 
-  setToken(token: string) {
+  setSession(token: string, userId: number): void {
     localStorage.setItem('token', token);
-    this._isLoggedIn$.next(true); // ⚡ Оповещаем всех
+    localStorage.setItem('userId', userId.toString());
+    this._isLoggedIn$.next(true);
+  }
+
+  clearSession(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    this._isLoggedIn$.next(false);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  getUserId(): number | null {
+    const id = localStorage.getItem('userId');
+    return id ? parseInt(id, 10) : null;
   }
 
   get isLoggedIn$() {
@@ -36,6 +58,4 @@ export class AuthService {
   private hasToken(): boolean {
     return !!localStorage.getItem('token');
   }
-
-
 }
