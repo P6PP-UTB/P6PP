@@ -102,7 +102,7 @@ public class UserAuthService : IUserAuthService
         return new ApiResult<object>(new { Id = user.UserId });
     }
 
-    public async Task<ApiResult<string>> LoginAsync(LoginModel model)
+    public async Task<ApiResult<LoginResponse>> LoginAsync(LoginModel model)
     {
         ApplicationUser user = null;
 
@@ -113,28 +113,32 @@ public class UserAuthService : IUserAuthService
         }
 
         if (user is null)
-            return new ApiResult<string>(null, false, "Invalid username/email or password.");
+            return new ApiResult<LoginResponse>(null, false, "Invalid username/email or password.");
 
         if (!user.EmailConfirmed)
-            return new ApiResult<string>(null, false, "Email not verified.");
+            return new ApiResult<LoginResponse>(null, false, "Email not verified.");
 
         var userUrl = ServiceEndpoints.UserService.GetUserById(user.UserId);
         var userResponse = await _httpClient.GetAsync<UserResponse>(userUrl);
 
         if (!userResponse.Success)
-            return new ApiResult<string>(null, false, userResponse.Message);
+            return new ApiResult<LoginResponse>(null, false, userResponse.Message);
 
         if (userResponse.Data?.User.State == "Deactivated")
         {
-            return new ApiResult<string>(null, false, "User had deactivated account.");
+            return new ApiResult<LoginResponse>(null, false, "User had deactivated account.");
         }
 
         var result = await _userManager.CheckPasswordAsync(user, model.Password);
         if (!result)
-            return new ApiResult<string>(null, false, "Invalid username/email or password.");
+            return new ApiResult<LoginResponse>(null, false, "Invalid username/email or password.");
 
         var token = GenerateJwtToken(user);
-        return new ApiResult<string>(token);
+        return new ApiResult<LoginResponse>(new LoginResponse()
+        {
+            Token = token,
+            UserId = user.UserId,
+        });
     }
 
     private string GenerateJwtToken(ApplicationUser user)

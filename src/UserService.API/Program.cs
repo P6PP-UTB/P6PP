@@ -1,3 +1,4 @@
+using ReservationSystem.Shared.Middlewares;
 using UserService.API.Abstraction;
 using UserService.API.Extensions;
 using UserService.API.Features;
@@ -44,6 +45,16 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService.API.Services.UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 
+builder.Services.Configure<AuthMiddlewareOptions>(options =>
+{
+    options.ExcludedRoutes = new List<ExcludedRoute>
+    {
+        new() { Path = "/api/user", Method = "POST", MatchType = PathMatchType.Exact },
+        new() { Path = "/api/user", Method = "GET", MatchType = PathMatchType.StartsWith },
+        new() { Path = "/api/users", Method = "GET", MatchType = PathMatchType.Exact }
+    };
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -72,6 +83,8 @@ app.UseCors("AllowAngularNgClient");
 
 app.UseRouting();
 
+app.UseMiddleware<AuthMiddleware>();
+
 app.UseEndpoints(endpoints =>
 {
     // USER ENDPOINTS
@@ -81,8 +94,9 @@ app.UseEndpoints(endpoints =>
     UpdateUserEndpoint.Register(endpoints);
     CreateUserEndpoint.Register(endpoints);
     AssignUserRoleEndpoint.Register(endpoints);
-
-
+    DeactivateUserEndpoint.Register(endpoints);
+    ActivateUserEndpoint.Register(endpoints);
+    
     // ROLE ENDPOINTS
     GetRoleByIdEndpoint.Register(endpoints);
     GetRolesEndpoint.Register(endpoints);
