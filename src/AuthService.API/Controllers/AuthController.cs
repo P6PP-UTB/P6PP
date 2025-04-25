@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReservationSystem.Shared.Results;
@@ -105,7 +106,7 @@ public class AuthController : Controller
         }
     }
 
-     // This endpoint is for user service only¨
+     // This endpoint is for user service only
      //
      // TODO: Only Admin should be allowed to delete users
     [HttpDelete("delete/{userId}")]
@@ -113,5 +114,18 @@ public class AuthController : Controller
     {
         var result = await _authService.DeleteUserAsync(userId);
         return result.Success ? Ok(result) : BadRequest(result);
+    }
+    
+    [Authorize]
+    [HttpGet("validate")]
+    public IActionResult Validate()
+    {
+        var userId = User.FindFirst("userid")?.Value;
+        var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+        if (userId == null)
+            return Unauthorized(new ApiResult<bool>(false, false, "Invalid token."));
+
+        return Ok(new ApiResult<bool>(true, true, "Token is valid."));
     }
 }
