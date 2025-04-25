@@ -18,7 +18,6 @@ namespace AdminSettings.Services
         public async Task<SystemSetting?> GetSystemSettingsAsync()
         {
             return await _context.SystemSettings
-                .Include(s => s.Timezone)
                 .Include(s => s.DatabaseBackupSetting)
                 .FirstOrDefaultAsync();
         }
@@ -30,29 +29,9 @@ namespace AdminSettings.Services
             if (existingSettings == null)
                 return false;
 
-            existingSettings.TimezoneId = settings.TimezoneId;
             existingSettings.AuditLogEnabled = settings.AuditLogEnabled;
             existingSettings.NotificationEnabled = settings.NotificationEnabled;
             existingSettings.DatabaseBackupSettingId = settings.DatabaseBackupSettingId;
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<List<Timezone>> GetTimezonesAsync()
-        {
-            return await _context.Timezones.ToListAsync();
-        }
-
-        public async Task<bool> UpdateTimezoneAsync(Timezone timezone)
-        {
-            var existingTimezone = await _context.Timezones.FirstOrDefaultAsync(t => t.Id == timezone.Id);
-
-            if (existingTimezone == null)
-                return false;
-
-            existingTimezone.Name = timezone.Name;
-            existingTimezone.UtcOffset = timezone.UtcOffset;
 
             await _context.SaveChangesAsync();
             return true;
