@@ -53,11 +53,11 @@ public static class ServiceEndpoints
         // SystemSettings
         public static string GetSystemSettings => $"{BaseUrl}/api/system-settings";
         public static string UpdateSystemSettings => $"{BaseUrl}/api/system-settings";
-        public static string GetTimezones => $"{BaseUrl}/api/system-settings/timezones";
-        public static string UpdateTimezone => $"{BaseUrl}/api/system-settings/timezones";
         public static string GetDatabaseBackupSetting => $"{BaseUrl}/api/system-settings/BackupSetting";
         public static string UpdateDatabaseBackupSetting => $"{BaseUrl}/api/system-settings/BackupSetting";
         public static string GetNotificationEnabled => $"{BaseUrl}/api/system-settings/notification-enabled";
+        public static string GetEnableAuditLogs => $"{BaseUrl}/api/system-settings/audit-log-enabled";
+        public static string SetEnableAuditLogs(bool enabled) => $"{BaseUrl}/api/system-settings/audit-log-enabled/{enabled}";
 
         // Backup
         public static string RunBackup => $"{BaseUrl}/api/backup/run";
