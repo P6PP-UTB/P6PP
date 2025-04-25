@@ -12,6 +12,7 @@ import { ForgetPassComponent } from './pages/forget-pass/forget-pass.component';
 import { AuthGuard } from './services/auth.guard';
 import { ResetPassComponent } from './pages/reset-pass/reset-pass.component';
 import { CoursePageComponent } from './pages/course-page/course-page.component';
+import { VerificationComponent } from './pages/verification/verification.component';
 
 
 const routeConfig: Routes = [
@@ -57,6 +58,11 @@ const routeConfig: Routes = [
         path: 'password_reset',
         component: ResetPassComponent,
         title: 'Reset a password'
+    },
+    {
+        path: 'email_verification',
+        component: VerificationComponent,
+        title: 'Verify your account'
     },
     {
         path: 'course/:id',
