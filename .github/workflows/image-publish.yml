@@ -38,6 +38,10 @@ jobs:
         include:
           - image: authservice
             dockerfile: src/AuthService.API/Dockerfile
+          - image: angularproject
+            dockerfile: src/AngularProject/Dockerfile
+          - image: adminsettings
+            dockerfile: src/AdminSettings.API/Dockerfile
           - image: bookingservice
             dockerfile: src/BookingService.API/Dockerfile
           - image: notificationservice
