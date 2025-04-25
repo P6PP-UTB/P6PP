@@ -37,17 +37,17 @@ jobs:
       matrix:
         include:
           - image: authservice
-            dockerfile: src/AuthService.API/Dockerfile
+            path: src/AuthService.API/
           - image: angularproject
-            dockerfile: src/AngularProject/Dockerfile
+            path: src/AngularProject/
           - image: adminsettings
-            dockerfile: src/AdminSettings.API/Dockerfile
+            path: src/AdminSettings.API/
           - image: bookingservice
-            dockerfile: src/BookingService.API/Dockerfile
+            path: src/BookingService.API/
           - image: notificationservice
-            dockerfile: src/NotificationService.API/Dockerfile
+            path: src/NotificationService.API/
           - image: userservice
-            dockerfile: src/UserService.API/Dockerfile
+            path: src/UserService.API/
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,7 +60,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ${{ matrix.dockerfile }}
+          context: ${{ matrix.path }}
+          file: ${{ matrix.dockerfile || 'Dockerfile' }}
           push: true
           tags: ${{ secrets.ACR_URL }}/cicd/${{ matrix.image }}:${{ vars.IMAGE_TAG }}
