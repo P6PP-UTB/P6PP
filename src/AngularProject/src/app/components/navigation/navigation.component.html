@@ -1,0 +1,34 @@
+<div id="head-div">
+  <a id="logo" class="btn" routerLink="">REZERVACE+</a>
+
+  <nav id="navigation-bar">
+    <a class="nav-btn btn" href="#" routerLink="">Home</a>
+    <a class="nav-btn btn" href="#calendar">My calendar</a>
+    <a class="nav-btn btn" href="#courses">Courses</a>
+    <a class="nav-btn btn">Coaches</a>
+    <a class="nav-btn btn" routerLink="/profile">Profile</a>
+  </nav>
+  
+  <div id="log-btns" *ngIf="!isLoggedIn">
+    <a id="login-btn" class="nav-btn btn" routerLink="/login">Log in</a>
+    <a id="signup-btn" class="nav-btn btn" routerLink="/signup">Sign up</a>
+  </div>
+  
+
+  <div *ngIf="isLoggedIn" class="navigation-logged-in">
+    <button class="nav-btn" id="balance" routerLink="/payment">
+      {{MoneyBalance}},-
+      <img src="assets/icons/robucks.svg" alt="money" class="icon" />
+    </button>
+    <div id="logout-btn">
+      <button class="nav-btn" (click)="logout()">
+        Log out
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- <app-header></app-header> -->
+<!-- <app-sidebar-menu [isOpen]="isMenuOpen" (menuClosed)="onMenuClosed()"></app-sidebar-menu> -->
+<!-- <app-footer></app-footer> -->

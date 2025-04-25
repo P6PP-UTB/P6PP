@@ -62,7 +62,16 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4201")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 builder.Services.AddAuthentication(options =>
     {
@@ -136,7 +145,7 @@ if (!app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<AuthService.API.Middleware.TokenBlacklistMiddleware>();
-
+app.UseCors("AllowAngularDevClient");
 app.MapControllers();
 
 app.Run();

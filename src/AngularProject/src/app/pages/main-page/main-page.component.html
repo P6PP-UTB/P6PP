@@ -1,0 +1,58 @@
+<div class="scroll-container">      
+    <section class="scroll-section after-video">
+        <app-navigation style="position: absolute; z-index:20; width: 100%"></app-navigation>
+        <div class="video-wrapper" id="top">
+          <video
+            #bgVideo
+            class="video"
+            autoplay
+            muted
+            playsinline
+            (ended)="onVideoEnded()"
+            *ngIf="!isHidden"
+          >
+            <source src="assets/media/rezervace_comp.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video.
+          </video>
+        
+          
+          <img
+            *ngIf="isHidden"
+            src="assets/media/rezervace_still.png"
+            alt="Video placeholder"
+            class="video"
+          />
+        
+          <div class="controls">
+              <button class="control-btn" (click)="toggleMute()">
+                {{ isMuted ? 'Sound' : 'No Sound' }}
+              </button>
+          
+              <button class="control-btn" (click)="toggleVideo()">
+                {{ isHidden ? 'Show' : ' Hide' }}
+              </button>
+          </div>
+        
+          
+          <button class="scroll-btn" (click)="scrollDown()">down</button>
+      </div>
+    </section>
+    <section class="scroll-section-content">
+      <div class="container-back">
+        <div id="courses" class="header-main">
+          Courses
+        </div>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+          <app-cource *ngFor="let course of courses" [course]="course"></app-cource>
+        </div>
+      </div>
+    </section>
+    <section class="scroll-section-content">
+      <div class="container-back">
+        <app-calendar id="calendar"></app-calendar>
+        <footer>
+          <app-footer />
+        </footer>
+      </div>  
+    </section>
+</div>  

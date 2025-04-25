@@ -38,6 +38,13 @@ public static class ServiceEndpoints
         public static string SendVerificationEmail => $"{BaseUrl}/api/notification/user/sendverificationemail";
         public static string SendPasswordResetEmail => $"{BaseUrl}/api/notification/user/sendpasswordresetemail";
         public static string SendRegistrationEmail(int id) => $"{BaseUrl}/api/notification/user/sendregistrationemail/{id}";
+        public static string GetAllTemplates => $"{BaseUrl}/api/notification/templates/getalltemplates";
+        public static string EditTemplate => $"{BaseUrl}/api/notification/templates/edittemplate";
+        public static string SendBookingConfirmationEmail => $"{BaseUrl}/api/notification/user/sendbookingconfirmationemail";
+        public static string SendBookingCancellationEmail => $"{BaseUrl}/api/notification/user/sendbookingcancellationemail";
+        public static string GetAllNotifications(int UserId, bool unreadOnly=true) => $"{BaseUrl}/api/notification/logs/getallnotifications/{UserId}";
+        public static string SetAllNotificationsAsRead(int UserId) => $"{BaseUrl}/api/notification/logs/setallnotificationsasread/{UserId}";
+        public static string SetSomeNotificationsAsRead => $"{BaseUrl}/api/notification/logs/setsomenotificationsasread";
     }
     
 }
