@@ -1,0 +1,88 @@
+#logo{
+    font-family: 'Source Sans 3';
+    font-size: 16pt;
+    font-weight: bold;
+    background: none;
+    border: none;
+    width: 135pt;
+    text-align: left;
+}
+
+body{
+    margin: 0%;
+    padding: 0%;
+}
+
+.nav-btn{
+    font-family: 'Source Sans 3';
+    font-size: 12pt;
+    font-weight: bold;
+    background: none;
+    border: none;
+    margin-right: 10pt;
+    border-radius: 0px;
+}
+
+.nav-btn:hover{
+    color: #EA2839;
+}
+
+#navigation-bar{
+    display: block;
+}
+
+#head-div{
+    padding: 10pt;
+    display: flex;
+    background-color: white;
+    border-bottom-style:ridge;
+    border-width: 1px;
+    border-color: black;
+    box-shadow: 0px 1px 20px #cecece;
+    justify-content: space-between;
+}
+
+#log-btns{
+    width: 135pt;
+}
+
+#login-btn{
+    border-radius: 8px;
+    background-color: #EA2839;
+    color: #ffffff;
+    width: 60pt;
+}
+
+#signup-btn{
+    width: 60pt;
+    margin-right: 0pt;
+}
+
+.menu-btn{
+    background: none;
+    border: none;
+    color: black;
+    font-size: 20px;
+    cursor: pointer;
+    align-self: flex-end;
+}
+
+#balance{
+    background-color: #EA2839;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 5vw;
+    padding: 0%;
+}
+#balance .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+
+.navigation-logged-in {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}

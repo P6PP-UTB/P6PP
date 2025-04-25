@@ -1,0 +1,24 @@
+
+<div class="sidebar" [@menuAnimation]="isOpen ? 'open' : 'closed'" >
+    <button class="close-btn" (click)="closeMenu()"><mat-icon>close</mat-icon></button>
+    <ul>
+        <li><button class="menu-btn-cat">
+            My Reservations
+        </button></li>
+        <li><button class="menu-btn-cat">
+            Profile
+        </button></li>
+        <li> <button class="menu-btn-cat">
+            Settings
+        </button></li>
+        <li><button class="menu-btn-cat">
+            Privacy
+        </button></li>
+        <li>
+            <button class="menu-btn-cat" (click)="logout()">
+              Log Out
+            </button>
+        </li>
+    </ul>   
+    
+<div>
