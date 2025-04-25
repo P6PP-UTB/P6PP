@@ -7,10 +7,6 @@ public class SystemSetting
 {
     public int Id { get; set; }
 
-    [ForeignKey("Timezone")]
-    public int TimezoneId { get; set; }
-    public required Timezone Timezone { get; set; }
-
     public string SystemLanguage { get; } = "en-US";
 
     public bool AuditLogEnabled { get; set; } = true;

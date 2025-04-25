@@ -10,6 +10,5 @@ public class AdminSettingsDbContext : DbContext
 
     public DbSet<AuditLog> AuditLogs { get; set; }
     public DbSet<SystemSetting> SystemSettings { get; set; }
-    public DbSet<Timezone> Timezones { get; set; }
     public DbSet<DatabaseBackupSetting> DatabaseBackupSettings { get; set; }
 }
