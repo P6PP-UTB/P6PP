@@ -27,7 +27,6 @@ public static class ServiceMappingExtensions
     public static ServiceResponse Map(this Service input)
         => new(
                 input.Id,
-                input.TrainerId,
                 input.Start,
                 input.End, input.Price,
                 input.ServiceName!,
