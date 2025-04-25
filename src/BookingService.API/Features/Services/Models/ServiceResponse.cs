@@ -2,7 +2,6 @@
 
 public record ServiceResponse(
     int Id,
-    int TrainerId,
     DateTime Start,
     DateTime End,
     int Price,
