@@ -42,7 +42,11 @@ export class LoginPage {
           this.router.navigate(['']);
         },
         error: (err) => {
+          console.log('ERROR: ', err);
+
           if (err.status === 401 && err.error?.message) {
+            this.loginError = err.error.message;
+          } else if (err.status === 400 && err.error.message) {
             this.loginError = err.error.message;
           } else {
             this.loginError = 'Something went wrong, try again later.';
