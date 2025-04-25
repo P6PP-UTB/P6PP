@@ -47,7 +47,6 @@ public class DatabaseInitializer
             await conn.OpenAsync();
 
             await CreateAuditLogsTableAsync(conn);
-            await CreateTimezoneTableAsync(conn);
             await CreateDatabaseBackupSettingTableAsync(conn);
             await CreateSystemSettingsTableAsync(conn);
         }
@@ -72,19 +71,6 @@ public class DatabaseInitializer
         _logger.LogInformation("Table 'AuditLogs' ensured.");
     }
 
-    private async Task CreateTimezoneTableAsync(MySqlConnection conn)
-    {
-        const string tableSql = @"
-        CREATE TABLE IF NOT EXISTS Timezones (
-            Id INT AUTO_INCREMENT PRIMARY KEY,
-            Name VARCHAR(255) NOT NULL,
-            UtcOffset VARCHAR(255) NOT NULL
-        );";
-
-        await conn.ExecuteAsync(tableSql);
-        _logger.LogInformation("Table 'Timezone' ensured.");
-    }
-
     private async Task CreateDatabaseBackupSettingTableAsync(MySqlConnection conn)
     {
         const string tableSql = @"
@@ -104,11 +90,9 @@ public class DatabaseInitializer
         const string tableSql = @"
         CREATE TABLE IF NOT EXISTS SystemSettings (
             Id INT AUTO_INCREMENT PRIMARY KEY,
-            TimezoneId INT NOT NULL,
             DatabaseBackupSettingId INT NOT NULL,
             AuditLogEnabled BOOLEAN NOT NULL DEFAULT TRUE,
             NotificationEnabled BOOLEAN NOT NULL DEFAULT TRUE,
-            FOREIGN KEY (TimezoneId) REFERENCES Timezones(Id),
             FOREIGN KEY (DatabaseBackupSettingId) REFERENCES DatabaseBackupSettings(Id),
             SystemLanguage VARCHAR(10) NOT NULL DEFAULT 'en-US'
         );";
