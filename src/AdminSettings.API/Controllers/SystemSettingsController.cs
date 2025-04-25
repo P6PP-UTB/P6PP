@@ -33,23 +33,6 @@ namespace AdminSettings.Controllers
             return result ? NoContent() : NotFound("System settings not found.");
         }
 
-        [HttpGet("system-settings/timezones")]
-        public async Task<IActionResult> GetTimezones()
-        {
-            var timezones = await _systemSettingsService.GetTimezonesAsync();
-            return timezones.Count > 0 ? Ok(timezones) : NotFound("No timezones available.");
-        }
-
-        [HttpPut("system-settings/timezones")]
-        public async Task<IActionResult> UpdateTimezone([FromBody] Timezone timezone)
-        {
-            if (!ModelState.IsValid || timezone == null)
-                return BadRequest("Invalid timezone data.");
-
-            var result = await _systemSettingsService.UpdateTimezoneAsync(timezone);
-            return result ? NoContent() : NotFound("Timezone not found.");
-        }
-
         [HttpGet("system-settings/BackupSetting")]
         public async Task<IActionResult> GetDatabaseBackupSetting()
         {
@@ -64,6 +47,27 @@ namespace AdminSettings.Controllers
                 return BadRequest("Invalid backup setting data.");
             var result = await _systemSettingsService.UpdateDatabaseBackupSettingAsync(backupSetting);
             return result ? NoContent() : NotFound("Backup setting not found.");
+        }
+
+        [HttpGet("system-settings/audit-log-enabled")]
+        public async Task<IActionResult> GetAuditLogEnabled()
+        {
+            var auditLogEnabled = await _systemSettingsService.GetAuditLogEnabledAsync();
+            return Ok(auditLogEnabled);
+        }
+
+        [HttpPut("system-settings/audit-log-enabled/{enabled}")]
+        public async Task<IActionResult> SetAuditLogEnabled(bool enabled)
+        {
+            var settings = await _systemSettingsService.GetSystemSettingsAsync();
+            if (settings == null)
+                return NotFound(new { Message = "System settings not found." });
+
+            settings.AuditLogEnabled = enabled;
+            var result = await _systemSettingsService.UpdateSystemSettingsAsync(settings);
+            return result
+                ? Ok(new { Message = $"Audit log has been {(enabled ? "enabled" : "disabled")}." })
+                : StatusCode(500, new { Message = "Failed to update audit log setting." });
         }
 
         [HttpGet("system-settings/notification-enabled")]
