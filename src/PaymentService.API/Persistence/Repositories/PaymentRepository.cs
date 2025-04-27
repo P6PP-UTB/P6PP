@@ -18,13 +18,14 @@ namespace PaymentService.API.Persistence.Repositories
             cancellationToken.ThrowIfCancellationRequested();
             using var connection = await _context.CreateConnectionAsync();
             const string query = @"
-                INSERT INTO Payment (UserId, RoleId, Price, Status, CreatedAt, TransactionType)
-                VALUES (@UserId, @RoleId, @Price, @Status, @CreatedAt, 'reservation');
+                INSERT INTO Payment (UserId, RoleId, Price, CreditAmount, Status, CreatedAt, TransactionType)
+                VALUES (@UserId, @RoleId, @Price, 0, @Status, @CreatedAt, 'reservation');
                 SELECT LAST_INSERT_ID();";
 
             return await connection.ExecuteScalarAsync<int?>(query, new
             {
                 payment.UserId,
+                payment.RoleId,
                 payment.Price,
                 payment.Status,
                 CreatedAt = DateTime.UtcNow
@@ -36,13 +37,14 @@ namespace PaymentService.API.Persistence.Repositories
             cancellationToken.ThrowIfCancellationRequested();
             using var connection = await _context.CreateConnectionAsync();
             const string query = @"
-                INSERT INTO Payment (UserId, RoleId Price, Status, CreatedAt, TransactionType)
-                VALUES (@UserId, @RoleId, @CreditAmount, @Status, @CreatedAt, 'credit' );
+                INSERT INTO Payment (UserId, RoleId, Price, CreditAmount, Status, CreatedAt, TransactionType)
+                VALUES (@UserId, @RoleId, 0, @CreditAmount, @Status, @CreatedAt, 'credit' );
                 SELECT LAST_INSERT_ID();";
 
             return await connection.ExecuteScalarAsync<int?>(query, new
             {
                 payment.UserId,
+                payment.RoleId,
                 payment.CreditAmount,
                 payment.Status,
                 CreatedAt = DateTime.UtcNow
@@ -73,7 +75,7 @@ namespace PaymentService.API.Persistence.Repositories
             const string query = @"
         SELECT PaymentID, UserId,RoleId,Price,CreditAmount,Status,TransactionType
         FROM Payment
-        WHERE UserId = @Id;";
+        WHERE PaymentId = @Id;";
 
             return await connection.QueryFirstOrDefaultAsync<Payment>(query, new { Id = id });
         }
