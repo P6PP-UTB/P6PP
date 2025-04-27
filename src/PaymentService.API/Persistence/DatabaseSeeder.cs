@@ -21,10 +21,21 @@ public class DatabaseSeeder
         _logger.LogInformation("Seeding Payments...");
 
         const string insertPaymentsQuery = @"
-           INSERT INTO Payment (PaymentID, UserId, RoleId, CreditAmount, Price, Status, TransactionType, CreatedAt) VALUES
-           (1, 3, 1, 250, 0, 'completed', 'credit', NOW()),
-           (2, 2, 3, 0, 200, 'completed', 'reservation', NOW()),
-           (3, 3, 1, 0, 500, 'failed', 'reservation', NOW());
+                   INSERT INTO Payment (PaymentID, UserId, RoleId, CreditAmount, Price, Status, TransactionType, CreatedAt)
+            SELECT * FROM (SELECT 1 AS PaymentID, 3 AS UserId, 1 AS RoleId, 250 AS CreditAmount, 0 AS Price, 'completed' AS Status, 'credit' AS TransactionType, NOW() AS CreatedAt) AS tmp
+            WHERE NOT EXISTS (
+                SELECT 1 FROM Payment WHERE PaymentID = 1
+            )
+            UNION ALL
+            SELECT * FROM (SELECT 2 AS PaymentID, 2 AS UserId, 3 AS RoleId, 0 AS CreditAmount, 200 AS Price, 'completed' AS Status, 'reservation' AS TransactionType, NOW() AS CreatedAt) AS tmp
+            WHERE NOT EXISTS (
+                SELECT 1 FROM Payment WHERE PaymentID = 2
+            )
+            UNION ALL
+            SELECT * FROM (SELECT 3 AS PaymentID, 3 AS UserId, 1 AS RoleId, 0 AS CreditAmount, 500 AS Price, 'failed' AS Status, 'reservation' AS TransactionType, NOW() AS CreatedAt) AS tmp
+            WHERE NOT EXISTS (
+                SELECT 1 FROM Payment WHERE PaymentID = 3
+            );
         ";
 
         await connection.ExecuteAsync(insertPaymentsQuery);
@@ -34,10 +45,22 @@ public class DatabaseSeeder
         _logger.LogInformation("Seeding UserCredit...");
 
         const string insertUserCreditQuery = @"
-           INSERT INTO UserCredit (UserId, RoleId, CreditBalance) VALUES
-           (1, 1, 1000),
-           (2, 2, 500),
-           (3, 1, 250);";
+               INSERT INTO UserCredit (UserId, RoleId, CreditBalance)
+        SELECT * FROM (SELECT 1 AS UserId, 1 AS RoleId, 1000 AS CreditBalance) AS tmp
+        WHERE NOT EXISTS (
+            SELECT 1 FROM UserCredit WHERE UserId = 1 AND RoleId = 1
+        )
+        UNION ALL
+        SELECT * FROM (SELECT 2 AS UserId, 2 AS RoleId, 500 AS CreditBalance) AS tmp
+        WHERE NOT EXISTS (
+            SELECT 1 FROM UserCredit WHERE UserId = 2 AND RoleId = 2
+        )
+        UNION ALL
+        SELECT * FROM (SELECT 3 AS UserId, 1 AS RoleId, 250 AS CreditBalance) AS tmp
+        WHERE NOT EXISTS (
+            SELECT 1 FROM UserCredit WHERE UserId = 3 AND RoleId = 1
+        );
+        ";
         await connection.ExecuteAsync(insertUserCreditQuery);
         _logger.LogInformation("UserCredit seeded successfully.");
         _logger.LogInformation("Seeding completed.");
