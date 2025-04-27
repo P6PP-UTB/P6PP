@@ -18,8 +18,8 @@ namespace PaymentService.API.Persistence.Repositories
             cancellationToken.ThrowIfCancellationRequested();
             using var connection = await _context.CreateConnectionAsync();
             const string query = @"
-                INSERT INTO Payment (UserId, Price, Status, CreatedAt, TransactionType)
-                VALUES (@UserId, @Price, @Status, @CreatedAt, 'reservation');
+                INSERT INTO Payment (UserId, RoleId, Price, Status, CreatedAt, TransactionType)
+                VALUES (@UserId, @RoleId, @Price, @Status, @CreatedAt, 'reservation');
                 SELECT LAST_INSERT_ID();";
 
             return await connection.ExecuteScalarAsync<int?>(query, new
@@ -36,8 +36,8 @@ namespace PaymentService.API.Persistence.Repositories
             cancellationToken.ThrowIfCancellationRequested();
             using var connection = await _context.CreateConnectionAsync();
             const string query = @"
-                INSERT INTO Payment (UserId, Price, Status, CreatedAt, TransactionType)
-                VALUES (@UserId, @CreditAmount, @Status, @CreatedAt, 'credit' );
+                INSERT INTO Payment (UserId, RoleId Price, Status, CreatedAt, TransactionType)
+                VALUES (@UserId, @RoleId, @CreditAmount, @Status, @CreatedAt, 'credit' );
                 SELECT LAST_INSERT_ID();";
 
             return await connection.ExecuteScalarAsync<int?>(query, new

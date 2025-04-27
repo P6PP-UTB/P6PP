@@ -50,6 +50,7 @@ public class CreatePaymentHandler
             var payment = new Payment
             {
                 UserId = request.UserId,
+                RoleId = request.RoleId,
                 CreditAmount = request.Amount,
                 Status = "pending",
                 CreatedAt = DateTime.UtcNow
@@ -64,6 +65,7 @@ public class CreatePaymentHandler
             var payment = new Payment
             {
                 UserId = request.UserId,
+                RoleId = request.RoleId,
                 Price = request.Amount,
                 Status = "pending",
                 CreatedAt = DateTime.UtcNow
