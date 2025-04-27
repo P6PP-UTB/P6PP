@@ -49,7 +49,7 @@ public class PaymentService
 
     public async Task<int?> ChangeStatus(Payment payment, CancellationToken cancellationToken)
     {
-        string cacheKey = $"payment:{payment.Id}";
+        string cacheKey = $"payment:{payment.PaymentID}";
 
         var newRole = await _paymentRepository.ChangeStatus(payment, cancellationToken);
 

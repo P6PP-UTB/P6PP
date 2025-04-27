@@ -79,6 +79,7 @@ public class UpdatePaymentHandler
 
                 var payment = new Payment
                 {
+                    PaymentID = (ulong)request.Id,
                     Status = "completed",
                 };
 
@@ -93,6 +94,7 @@ public class UpdatePaymentHandler
             {
                 var payment = new Payment
                 {
+                    PaymentID = (ulong)request.Id,
                     Status = "failed",
                 };
                 var id = await _paymentService.ChangeStatus(payment, cancellationToken);
@@ -110,6 +112,7 @@ public class UpdatePaymentHandler
 
                 var payment = new Payment
                 {
+                    PaymentID = (ulong)request.Id,
                     Status = "completed",
                 };
 
@@ -124,6 +127,7 @@ public class UpdatePaymentHandler
             {
                 var payment = new Payment
                 {
+                    PaymentID = (ulong)request.Id,
                     Status = "failed",
                 };
                 var id = await _paymentService.ChangeStatus(payment, cancellationToken);
