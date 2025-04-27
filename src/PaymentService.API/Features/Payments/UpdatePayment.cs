@@ -40,6 +40,7 @@ public class UpdatePaymentHandler
         {
             var payment = new Payment
                 {
+                    PaymentID = (ulong)request.Id,
                     Status = "failed",
                 };
 
@@ -74,7 +75,7 @@ public class UpdatePaymentHandler
         {
             var credits = await _paymentService.UpdateCreditsReservation(type.UserId, type.Price, cancellationToken);
 
-            if (credits == "success")
+            if (credits == "Success")
             {
 
                 var payment = new Payment
@@ -107,7 +108,7 @@ public class UpdatePaymentHandler
         {
             var credits = await _paymentService.UpdateCredits(type.UserId, type.CreditAmount, cancellationToken);
 
-            if (credits == "success")
+            if (credits == "Success")
             {
 
                 var payment = new Payment

@@ -81,7 +81,7 @@ public class PaymentService
         if (!_cache.TryGetValue(cacheKey, out UserCredit? payment))
         {
             payment = await _paymentRepository.GetBalanceByIdAsync((int)userId, cancellationToken);
-            if (payment != null || payment.CreditBalance > Price)
+            if (payment != null && payment.CreditBalance >= Price)
             {
                 payment.CreditBalance -= Price;
 
@@ -91,7 +91,7 @@ public class PaymentService
 
             }
         }
-        else if (payment != null || payment.CreditBalance > Price)
+        else if (payment != null && payment.CreditBalance >= Price)
         {
             payment.CreditBalance -= Price;
 
