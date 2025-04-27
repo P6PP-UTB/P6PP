@@ -1,0 +1,58 @@
+#verify-block{
+    max-width: 800px;
+    margin: auto;
+    padding-bottom: 10vw;
+  }
+
+#block{
+  margin: 0pt 20pt;
+}
+
+.text{
+    font-family: "Source Sans 3";
+    font-size: 16pt;
+    font-weight: 700;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: black;
+    padding-bottom: 10pt;
+}
+
+#submit {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #EA2839;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+#submit:hover {
+  background-color: #b71c1c;
+}
+
+#login{
+  background-color: rgba(70, 80, 90, 1);
+  color: white;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+#login:hover{
+  background-color: rgb(40, 50, 60, 1);
+}
+
+#confirm{
+  background: #f2f2f2;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: #EA2839;
+  border-color: transparent;
+}

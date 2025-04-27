@@ -22,7 +22,8 @@ public class UserAuthService : IUserAuthService
     private readonly IConfiguration _configuration;
     private readonly AuthDbContext _dbContext;
 
-    public UserAuthService(UserManager<ApplicationUser> userManager, NetworkHttpClient httpClient, IConfiguration configuration, AuthDbContext dbContext)
+    public UserAuthService(UserManager<ApplicationUser> userManager, NetworkHttpClient httpClient,
+        IConfiguration configuration, AuthDbContext dbContext)
     {
         _userManager = userManager;
         _httpClient = httpClient;
@@ -69,21 +70,22 @@ public class UserAuthService : IUserAuthService
         var verifyToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(verifyToken));
         Console.WriteLine("Encoded token for email verification: " + encodedToken);
-        
+
         var verificationUrl = ServiceEndpoints.NotificationService.SendVerificationEmail;
         var body = new
         {
             Id = user.UserId,
-            Url = encodedToken, // ??
+            Token = encodedToken,
         };
-        
-        var verificationResult = await _httpClient.PostAsync<object, object>(verificationUrl, body, CancellationToken.None);
+
+        var verificationResult =
+            await _httpClient.PostAsync<object, object>(verificationUrl, body, CancellationToken.None);
 
         if (!verificationResult.Success)
         {
             Console.WriteLine("Failed to send verification email.");
         }
-            
+
         Console.WriteLine("Preparing to send registration email...");
         var registrationUrl = ServiceEndpoints.NotificationService.SendRegistrationEmail(user.UserId);
         var message = await _httpClient.GetAsync<object>(registrationUrl);
@@ -96,14 +98,14 @@ public class UserAuthService : IUserAuthService
         {
             Console.WriteLine("Registration email sent successfully.");
         }
-        
+
         return new ApiResult<object>(new { Id = user.UserId });
     }
 
     public async Task<ApiResult<string>> LoginAsync(LoginModel model)
     {
         ApplicationUser user = null;
-        
+
         if (!string.IsNullOrEmpty(model.UsernameOrEmail))
         {
             user = await _userManager.FindByEmailAsync(model.UsernameOrEmail)
@@ -112,13 +114,13 @@ public class UserAuthService : IUserAuthService
 
         if (user is null)
             return new ApiResult<string>(null, false, "Invalid username/email or password.");
-        
+
         if (!user.EmailConfirmed)
             return new ApiResult<string>(null, false, "Email not verified.");
-        
+
         var userUrl = ServiceEndpoints.UserService.GetUserById(user.UserId);
         var userResponse = await _httpClient.GetAsync<UserResponse>(userUrl);
-        
+
         if (!userResponse.Success)
             return new ApiResult<string>(null, false, userResponse.Message);
 
@@ -181,9 +183,7 @@ public class UserAuthService : IUserAuthService
         var body = new
         {
             Id = user.UserId,
-            Email = user.Email,
-            ResetUrl = resetUrl,
-            Url = encodedToken // ?
+            Token = encodedToken
         };
 
         var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
@@ -193,7 +193,7 @@ public class UserAuthService : IUserAuthService
 
         return new ApiResult<object>(null);
     }
-    
+
     public async Task<ApiResult<object>> ChangePasswordAsync(HttpContext httpContext, ChangePasswordModel model)
     {
         var userIdClaim = httpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
@@ -212,7 +212,8 @@ public class UserAuthService : IUserAuthService
         if (!result.Succeeded)
             return new ApiResult<object>(result.Errors, false, "Password changed failed.");
 
-        return new ApiResult<object>(new { UserId = user.UserId, Email = user.Email }, true, "Password changed successfully.");  
+        return new ApiResult<object>(new { UserId = user.UserId, Email = user.Email }, true,
+            "Password changed successfully.");
     }
 
     public async Task<ApiResult<object>> RequestPasswordResetAsync(string email)
@@ -227,16 +228,13 @@ public class UserAuthService : IUserAuthService
             return new ApiResult<object>(null, false, "User with this email does not exist.");
 
         var notificationUrl = ServiceEndpoints.NotificationService.SendPasswordResetEmail;
-        
+
         var rawToken = await _userManager.GeneratePasswordResetTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(rawToken));
-        var resetUrl = $"://mojeapp.cz/reset-password?userId={user.UserId}&token={encodedToken}";
         var body = new
         {
             Id = user.UserId,
-            Email = user.Email,
-            Url = resetUrl,
-            UrlToken = encodedToken
+            Token = encodedToken
         };
 
         var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
@@ -247,7 +245,7 @@ public class UserAuthService : IUserAuthService
         Console.WriteLine($"token: {encodedToken}");
         return new ApiResult<object>(null);
     }
-    
+
     public async Task<ApiResult<object>> ResetPasswordAsync(ResetPasswordModel model)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == model.userId);
@@ -298,7 +296,7 @@ public class UserAuthService : IUserAuthService
         }
         catch (Exception)
         {
-             return new ApiResult<object>(null, false, "An unexpected error occurred.");
+            return new ApiResult<object>(null, false, "An unexpected error occurred.");
         }
     }
 
@@ -361,10 +359,10 @@ public class UserAuthService : IUserAuthService
         {
             return new ApiResult<bool>(false, false, "User not found.");
         }
-        
+
         var result = await _userManager.DeleteAsync(user);
 
-        if(!result.Succeeded)
+        if (!result.Succeeded)
         {
             var errors = string.Join("; ", result.Errors.Select(e => e.Description));
             return new ApiResult<bool>(false, false, $"Failed to delete user: {errors}");

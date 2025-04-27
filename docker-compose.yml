@@ -73,7 +73,6 @@ services:
     container_name: notification-service
     ports:
       - "5181:5181"
-      - "56000:56000"  # Debug port
     environment:
       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=notification_db;User=root;Password=password123;
     depends_on:
@@ -97,6 +96,7 @@ services:
     networks:
       - backend
 
+
   mysql:
     image: mysql:latest
     container_name: mysql_local
@@ -115,6 +115,20 @@ services:
       interval: 10s
       retries: 5
       timeout: 5s
+
+  angular-frontend:
+    build: 
+      context: ./src/AngularProject
+      dockerfile: Dockerfile
+    container_name: angular-frontend
+    ports:
+      - "4201:8011"
+    networks:
+      - backend
+    depends_on:
+      - auth-service
+      - user-service
+      - notification-service
 
 volumes:
   mysql_data:

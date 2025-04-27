@@ -1,0 +1,56 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    background: white;
+    color: black;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow:  -10px 0px 60px rgb(182, 182, 182);
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    color: black;
+    font-size: 20px;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+
+  ul {
+    list-style: none; 
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+
+  }
+  
+  li {
+    width: 100%; 
+  }
+  
+  .menu-btn-cat {
+    width: 80%; 
+    padding: 15px 20px; 
+    font-size: 16px; 
+    border: none;
+    border-radius: 5px;
+    background-color: #ffffff;
+    color: black;
+    text-align: center;
+    cursor: pointer;
+   
+  }
+  
+  .menu-btn-cat:hover {
+   
+    box-shadow: inset 1px 1px 5px #a7a7a7,
+            inset 1px 1px 5px #ffffff;
+}
+  

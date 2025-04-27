@@ -1,0 +1,56 @@
+<a id="logo" routerLink="">REZERVACE+</a>
+
+<div id="restore-block">
+    <div id="restore">Set a new password</div>
+    <div class="form-container">
+        <form [formGroup]="resetForm" (ngSubmit)="onSubmit()">
+            <label for="newPassword">Password 
+                <span class="required">*</span>
+                <p class="error-message" *ngIf="resetForm.controls['newPassword'].invalid && resetForm.controls['newPassword'].touched && resetForm.get('newPassword')?.value ">
+                    Password must be at least 8 characters long and contian at least number, uppercase and lowercase letters, at least one special character
+                </p>
+            </label>
+
+            <div class="container">
+                <input id="newPassword" [type]="hidePassword ? 'password' : 'text'" formControlName="newPassword" placeholder="Set a new password" required
+                    [ngClass]="{'error-input': resetForm.controls['newPassword'].invalid && 
+                        resetForm.controls['newPassword'].touched && 
+                        resetForm.get('newPassword')?.value}">
+                <button type="button" class="toggle-password" (click)="hidePassword = !hidePassword">👁</button>
+            </div>
+
+
+            <label for="repeatPassword">Repeat password 
+                <span class="required">*</span>
+                <p class="error-message"
+                *ngIf="resetForm.get('repeatPassword')?.value 
+                    && resetForm.get('newPassword')?.value !== resetForm.get('repeatPassword')?.value
+                    && resetForm.get('repeatPassword')?.touched">
+                    Passwords do not matching
+                </p>
+            </label>
+            
+            <div class="container">
+                <input id="repeatPassword" [type]="hideRepeatPassword ? 'password' : 'text'" formControlName="repeatPassword" placeholder="Repeat a new password" required
+                    [ngClass]="{'error-input': resetForm.get('repeatPassword')?.value 
+                        && resetForm.get('newPassword')?.value !== resetForm.get('repeatPassword')?.value
+                        && resetForm.get('repeatPassword')?.touched}">
+                <button type="button" class="toggle-password" (click)="hideRepeatPassword = !hideRepeatPassword">👁</button>
+            </div>
+
+            <div class="container">
+                <button id="submit" type="submit" class="sign-up-btn">Reset a password</button>
+            </div>
+
+            <div class="container" *ngIf="tryToLogin">
+                <a id="submit" class="sign-up-btn btn" href="/login" routerLink="login">Log in</a>
+            </div>
+
+            <!-- <div class="container justify-content-center" *ngIf="loginError">
+                <p class="text-danger">
+                    {{ loginError }}
+                </p>
+            </div> -->
+        </form>
+    </div>
+</div>
