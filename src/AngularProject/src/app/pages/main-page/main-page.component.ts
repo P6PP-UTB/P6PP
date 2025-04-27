@@ -128,7 +128,7 @@ export class MainPageComponent {
       video.pause();
     } else if (!this.isHidden && video) {
       video.play();
-      video.muted = this.isMuted; // сохранить текущий статус звука
+      video.muted = this.isMuted;
     }
   }
   
