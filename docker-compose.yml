@@ -90,7 +90,7 @@ services:
     ports:
       - "5185:5185"
     environment:
-      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=user_db;User=root;Password=password123;
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=payment_db;User=root;Password=password123;
     depends_on:
       mysql:
         condition: service_healthy
