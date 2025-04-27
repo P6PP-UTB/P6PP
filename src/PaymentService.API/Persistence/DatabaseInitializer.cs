@@ -29,6 +29,10 @@ public class DatabaseInitializer
         {
             _logger.LogInformation("Checking if database '{Database}' exists...", _databaseName);
 
+            _logger.LogInformation("Admin Connection String: {ConnectionString}", _adminConnectionString);
+            _logger.LogInformation("Default Connection String: {ConnectionString}", _connectionString);
+
+
             await using var adminConnection = new MySqlConnection(_adminConnectionString);
             await adminConnection.OpenAsync();
 
@@ -80,5 +84,6 @@ public class DatabaseInitializer
             _logger.LogError("Error initializing database: {Message}", ex.Message);
             throw;
         }
+
     }
 }

@@ -3,7 +3,7 @@ using MySqlConnector;
 using Polly;
 using Polly.Retry;
 
-namespace PaymentsService.API.Persistence;
+namespace PaymentService.API.Persistence;
 
 public class DapperContext
 {
