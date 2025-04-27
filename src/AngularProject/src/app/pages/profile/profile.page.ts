@@ -17,6 +17,8 @@ export class ProfilePage implements OnInit {
   user: any;
   showEditForm = false;
   showSettingsForm = false;
+  hidePassword = true;
+  hideRepeatPassword = true;
   editForm!: FormGroup;
   settingsForm!: FormGroup;
 
@@ -51,7 +53,8 @@ export class ProfilePage implements OnInit {
         Validators.required, 
         Validators.minLength(8),
         Validators.pattern('^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$')
-      ]]
+      ]],
+      repeatPassword: ['', Validators.required]
     });
   }
 
@@ -80,12 +83,12 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  onResetPassword() {
+  onChangePassword() {
     if (this.settingsForm.invalid) return;
 
     const newPassword = this.settingsForm.value.newPassword;
     if (newPassword) {
-      this.userService.resetPassword(this.user.id, newPassword).subscribe(() => {
+      this.userService.changePassword(newPassword).subscribe(() => {
         this.showSettingsForm = false;
         this.toastr.success('Password reset successfully!');
       });
