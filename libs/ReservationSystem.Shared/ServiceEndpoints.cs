@@ -43,9 +43,11 @@ public static class ServiceEndpoints
     public static class PaymentService
     {
         private const string BaseUrl = "http://payment-service:5185";
-        public static string CreatePayment => $"{BaseUrl}/api/payment";
-        public static string GetPaymentById(int id) => $"{BaseUrl}/api/payments/{id}";
-        public static string UpdatePayment(int id) => $"{BaseUrl}/api/payment/{id}";
+        public static string CreatePayment => $"{BaseUrl}/api/createpayment";
+        public static string GetPaymentById(int id) => $"{BaseUrl}/api/getpayment/{id}";
+        public static string UpdatePayment(int id) => $"{BaseUrl}/api/updatepayment/{id}";
+        public static string CreateBalance => $"{BaseUrl}/api/createbalance";
+        public static string GetBalanceById(int id) => $"{BaseUrl}/api/getbalance/{id}";
     }
 
 }

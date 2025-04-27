@@ -59,7 +59,7 @@ public static class CreateBalanceEndpoint
 {
     public static void Register(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/balance",
+        app.MapPost("/api/createbalance",
             async (CreateBalanceRequest request,
                 CreateBalanceHandler handler,
                 CreateBalanceValidator validator,

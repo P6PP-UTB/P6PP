@@ -144,7 +144,7 @@ public static class UpdatePaymentEndpoint
 {
     public static void Register(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/payment{id}",
+        app.MapPost("/api/updatepayment{id:int}",
             async (UpdatePaymentRequest request,
                 UpdatePaymentHandler handler,
                 UpdatePaymentValidator validator,

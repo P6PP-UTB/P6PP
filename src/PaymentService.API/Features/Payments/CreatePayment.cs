@@ -85,7 +85,7 @@ public static class CreatePaymentEndpoint
 {
     public static void Register(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/payment",
+        app.MapPost("/api/createpayment",
             async (CreatePaymentRequest request,
                 CreatePaymentHandler handler,
                 CreatePaymentValidator validator,

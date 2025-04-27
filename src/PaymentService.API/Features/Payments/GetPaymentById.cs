@@ -32,7 +32,7 @@ public class GetPaymentByIdHandler
         var payment = await _PaymentService.GetPaymentByIdAsync(request.Id, cancellationToken);
 
         return payment is null
-            ? new ApiResult<Payment>(null, false, "Role not found")
+            ? new ApiResult<Payment>(null, false, "Payments not found")
             : new ApiResult<Payment>(payment);
     }
 }
@@ -41,7 +41,7 @@ public static class GetPaymentByIdEndpoint
 {
     public static void Register(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/payment/{id:int}",
+        app.MapGet("/api/getpayment/{id:int}",
             async (int id,
                 GetPaymentByIdHandler handler,
                 GetPaymentByIdValidator validator,
