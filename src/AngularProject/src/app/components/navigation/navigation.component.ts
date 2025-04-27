@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterModule, Router } from '@angular/router'; // Добавили Router
+import { RouterModule, Router } from '@angular/router'; 
 import { ToastrService } from 'ngx-toastr'; 
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { NotificationsComponent } from '../notifications/notifications.component';
 
 @Component({
   selector: 'app-navigation',
-  imports: [RouterModule, MatIconModule, CommonModule],
+  imports: [RouterModule, MatIconModule, CommonModule, NotificationsComponent],
   templateUrl: './navigation.component.html',
   styleUrl: './navigation.component.scss'
 })
@@ -18,7 +19,7 @@ export class NavigationComponent {
   constructor(
     private authService: AuthService,
     private toastr: ToastrService,
-    private router: Router // инжектим роутер
+    private router: Router 
   ) {}
 
   ngOnInit() {
@@ -30,6 +31,12 @@ export class NavigationComponent {
   logout() {
     this.authService.logout();
     this.toastr.success('You have successfully logged out', 'Goodbye!');
-    this.router.navigate(['/']); // тут редирект после логаута
+    this.router.navigate(['/']); 
+  }
+
+  showNotifications = false;
+
+  toggleNotifications() {
+    this.showNotifications = !this.showNotifications;
   }
 }

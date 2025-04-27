@@ -8,12 +8,17 @@
     <a class="nav-btn btn">Coaches</a>
     <a class="nav-btn btn" routerLink="/profile">Profile</a>
   </nav>
-  
+
   <div id="log-btns" *ngIf="!isLoggedIn">
     <a id="login-btn" class="nav-btn btn" routerLink="/login">Log in</a>
     <a id="signup-btn" class="nav-btn btn" routerLink="/signup">Sign up</a>
   </div>
-  
+
+  <nav>
+    <button id="notification-button" (click)="toggleNotifications()">
+      <mat-icon>notifications</mat-icon>
+    </button>
+  </nav>
 
   <div *ngIf="isLoggedIn" class="navigation-logged-in">
     <button class="nav-btn" id="balance" routerLink="/payment">
@@ -28,7 +33,5 @@
   </div>
 </div>
 
+<app-notifications *ngIf="showNotifications" (closed)="showNotifications = false"></app-notifications>
 
-<!-- <app-header></app-header> -->
-<!-- <app-sidebar-menu [isOpen]="isMenuOpen" (menuClosed)="onMenuClosed()"></app-sidebar-menu> -->
-<!-- <app-footer></app-footer> -->
