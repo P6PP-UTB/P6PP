@@ -7,6 +7,7 @@ import { Course } from './interfaces/course';
 export class CourseService {
   private requestAllURL = 'http://localhost:8080/api/services';
   private requestSingleURL = 'http://localhost:8080/api/services/';
+  private bookingURL = 'http://localhost:8080/api/Bookings';
 
   constructor(private http: HttpClient) {}
 
@@ -29,4 +30,8 @@ export class CourseService {
   // filterActualCources(courses){
 
   // }
+  bookService(serviceId: number): Observable<any> {
+    const body = { serviceId: serviceId };
+    return this.http.post(this.bookingURL, body);
+  }
 }
