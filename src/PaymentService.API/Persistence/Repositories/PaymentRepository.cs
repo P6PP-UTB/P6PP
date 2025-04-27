@@ -2,7 +2,7 @@
 using Dapper;
 using Microsoft.EntityFrameworkCore;
 using PaymentService.API.Persistence.Entities.DB.Models;
-using PaymentsService.API.Persistence;
+using PaymentService.API.Persistence;
 
 namespace PaymentService.API.Persistence.Repositories
 {

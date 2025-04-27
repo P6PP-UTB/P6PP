@@ -21,10 +21,10 @@ public class DatabaseSeeder
         _logger.LogInformation("Seeding Payments...");
 
         const string insertPaymentsQuery = @"
-           INSERT INTO Payments (PaymentID, UserId, RoleId, CreditAmount, Price, Status, TransactionType) VALUES
-           (1, 3, 1, 250, NULL, 'completed', 'credit'),
-           (2, 2, NULL, NULL, 200, 'completed', 'reservation'),
-           (3, 3, 1, NULL, 500, 'failed', 'reservation');
+           INSERT INTO Payment (PaymentID, UserId, RoleId, CreditAmount, Price, Status, TransactionType, CreatedAt) VALUES
+           (1, 3, 1, 250, 0, 'completed', 'credit', NOW()),
+           (2, 2, 3, 0, 200, 'completed', 'reservation', NOW()),
+           (3, 3, 1, 0, 500, 'failed', 'reservation', NOW());
         ";
 
         await connection.ExecuteAsync(insertPaymentsQuery);

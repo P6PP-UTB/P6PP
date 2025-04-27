@@ -3,7 +3,7 @@ using PaymentService.API.Extensions;
 using PaymentService.API.Features;
 using PaymentService.API.Features.Payments;
 using PaymentService.API.Persistence;
-using PaymentsService.API.Persistence;
+using PaymentService.API.Persistence;
 // Ensure the correct namespace is used for the DatabaseInitializer and DatabaseSeeder
 
 var builder = WebApplication.CreateBuilder(args);

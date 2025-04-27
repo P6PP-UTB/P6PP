@@ -7,7 +7,7 @@ using PaymentService.API.Persistence.Repositories;
 using PaymentService.API.Services;
 
 using DatabaseInitializer = PaymentService.API.Persistence.DatabaseInitializer;
-using PaymentsService.API.Persistence;
+using PaymentService.API.Persistence;
 
 namespace PaymentService.API.Extensions;
 
@@ -18,6 +18,7 @@ public static class ServiceExtensions
         // Register Db Context 
         services.AddSingleton<DapperContext>();
         services.AddSingleton<DatabaseInitializer>();
+        services.AddSingleton<DatabaseSeeder>();
         
         // Register Repositories
         services.AddScoped<PaymentRepository>();
