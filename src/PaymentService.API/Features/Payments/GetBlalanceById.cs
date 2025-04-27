@@ -41,7 +41,7 @@ public static class GetBalanceByIdEndpoint
 {
     public static void Register(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/credit/{UserId:int}",
+        app.MapGet("/api/UserCredit/{UserId:int}",
             async (int UserId,
                 GetBalanceByIdHandler handler,
                 GetBalanceByIdValidator validator,
