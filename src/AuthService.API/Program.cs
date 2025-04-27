@@ -142,10 +142,11 @@ if (!app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAngularDevClient");
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<AuthService.API.Middleware.TokenBlacklistMiddleware>();
-app.UseCors("AllowAngularDevClient");
 app.MapControllers();
 
 app.Run();

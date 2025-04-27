@@ -50,10 +50,18 @@ export class UserService {
     return this.http.put(`${this.userBaseUrl}/${id}`, payload);
   }
 
-  resetPassword(userId: number, newPassword: string): Observable<any> {
-    return this.http.post(`${this.authBaseUrl}/reset-password`, {
-      userId,
-      newPassword
+  // resetPassword(userId: number, newPassword: string): Observable<any> {
+  //   return this.http.post(`${this.authBaseUrl}/reset-password`, {
+  //     userId,
+  //     newPassword
+  //   });
+  // }
+
+  changePassword(newPassword: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    return this.http.post(`${this.authBaseUrl}/change-password`, {
+      newPassword,
+      token
     });
   }
 
