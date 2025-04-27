@@ -42,30 +42,50 @@
       <button type="submit" class="form-button">Save</button>
     </form>
 
-    <!-- ⚙️ Settings Form -->
-    <form *ngIf="showSettingsForm" [formGroup]="settingsForm" (ngSubmit)="onResetPassword()" class="form-block">
-      <h3 class="form-title">Reset Password</h3>
+   <!-- ⚙️ Settings Form -->
+  <form *ngIf="showSettingsForm" [formGroup]="settingsForm" (ngSubmit)="onChangePassword()" class="form-block">
+    <h3 class="form-title">Change Password</h3>
 
-      <input type="password" formControlName="newPassword" placeholder="New Password" class="form-input" />
-      
-      <p class="error-message"
-        *ngIf="settingsForm.get('newPassword')?.touched && settingsForm.get('newPassword')?.invalid">
-        <span *ngIf="settingsForm.get('newPassword')?.errors?.['required']">
-          Password is required.
-        </span>
-        <span *ngIf="settingsForm.get('newPassword')?.errors?.['minlength']">
-          Password must be at least 8 characters.
-        </span>
-        <span *ngIf="settingsForm.get('newPassword')?.errors?.['pattern']">
-          Must include uppercase, lowercase, number and special char.
-        </span>
-      </p>
+    <!-- Новый пароль -->
+    <div class="container">
+      <input id="newPassword"
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="newPassword"
+            placeholder="New Password"
+            class="form-input"
+            [ngClass]="{'error-input': settingsForm.get('newPassword')?.invalid && settingsForm.get('newPassword')?.touched}">
+      <button type="button" class="toggle-password" (click)="hidePassword = !hidePassword">👁</button>
+    </div>
 
-      <button type="submit" class="form-button">Reset</button>
-      <!-- <button type="button" class="form-button danger" (click)="onDeleteAccount()">Delete Account</button> -->
-      <button type="button" class="form-button danger">Delete Account</button>
-    </form>
+    <p class="error-message"
+      *ngIf="settingsForm.get('newPassword')?.touched && settingsForm.get('newPassword')?.invalid">
+      <span *ngIf="settingsForm.get('newPassword')?.errors?.['required']">Password is required. </span>
+      <span *ngIf="settingsForm.get('newPassword')?.errors?.['minlength']">Password must be at least 8 characters. </span>
+      <span *ngIf="settingsForm.get('newPassword')?.errors?.['pattern']">Must include uppercase, lowercase, number and special char.</span>
+    </p>
 
+    <!-- Повтор пароля -->
+    <div class="container">
+      <input id="repeatPassword"
+            [type]="hideRepeatPassword ? 'password' : 'text'"
+            formControlName="repeatPassword"
+            placeholder="Repeat Password"
+            class="form-input"
+            [ngClass]="{'error-input': settingsForm.get('repeatPassword')?.touched && settingsForm.get('repeatPassword')?.value !== settingsForm.get('newPassword')?.value}">
+      <button type="button" class="toggle-password" (click)="hideRepeatPassword = !hideRepeatPassword">👁</button>
+    </div>
+
+    <p class="error-message"
+      *ngIf="settingsForm.get('repeatPassword')?.touched && settingsForm.get('repeatPassword')?.value !== settingsForm.get('newPassword')?.value">
+      Passwords do not match.
+    </p>
+
+    <button type="submit"
+            class="form-button"
+            [disabled]="!settingsForm.valid || settingsForm.get('repeatPassword')?.value !== settingsForm.get('newPassword')?.value">
+      Change Password
+    </button>
+  </form>
     <!-- 📚 User Courses -->
     <div class="profile-events">
       <div class="courses">
