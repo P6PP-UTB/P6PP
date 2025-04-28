@@ -160,7 +160,7 @@ public class UserAuthService : IUserAuthService
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(5),
+            expires: DateTime.UtcNow.AddMinutes(60),
             signingCredentials: creds
         );
 
