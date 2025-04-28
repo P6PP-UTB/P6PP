@@ -1,11 +1,13 @@
-﻿using BookingService.API.Domain.Enums;
+﻿using BookingService.API.Common.Exceptions;
+using BookingService.API.Domain.Enums;
+using BookingService.API.Domain.Models;
 using BookingService.API.Features.Bookings.Commands;
 using BookingService.API.Features.Bookings.Models;
 using BookingService.API.Infrastructure;
-using BookingService.API.Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
-using BookingService.API.Domain.Models;
+using Microsoft.Extensions.Logging;
+using Moq;
+using ReservationSystem.Shared.Clients;
 
 public class CreateBookingCommandHandlerTests
 {
@@ -17,21 +19,22 @@ public class CreateBookingCommandHandlerTests
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: $"BookingTestDb_{System.Guid.NewGuid()}")
             .Options;
+        var mockClient = new Mock<NetworkHttpClient>(new Mock<HttpClient>().Object, new Mock<ILogger<NetworkHttpClient>>().Object);
 
         _dbContext = new DataContext(options);
-        _handler = new CreateBookingCommandHandler(_dbContext);
+        _handler = new CreateBookingCommandHandler(_dbContext, mockClient.Object);
     }
 
     [Fact]
     public async Task Should_CreateBooking_When_Valid()
     {
-        var room = new Room { Id = 1,Name = "Test Room", Capacity = 5 };
+        var room = new Room { Id = 1, Name = "Test Room", Capacity = 5 };
         var service = new Service
         {
             Id = 1,
             Room = room,
             IsCancelled = false,
-            Users = new List<int>()
+            Users = []
         };
 
         await _dbContext.Rooms.AddAsync(room);
@@ -67,13 +70,13 @@ public class CreateBookingCommandHandlerTests
     [Fact]
     public async Task Should_Throw_When_ServiceIsCancelled()
     {
-        var room = new Room { Id = 1,Name = "Canceled Room", Capacity = 5 };
+        var room = new Room { Id = 1, Name = "Canceled Room", Capacity = 5 };
         var service = new Service
         {
             Id = 2,
             Room = room,
             IsCancelled = true,
-            Users = new List<int>()
+            Users = []
         };
 
         await _dbContext.Rooms.AddAsync(room);
@@ -100,7 +103,7 @@ public class CreateBookingCommandHandlerTests
             Id = 3,
             Room = room,
             IsCancelled = false,
-            Users = new List<int> { 123 }
+            Users = [123]
         };
 
         var booking = new Booking
