@@ -77,7 +77,7 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedAsync();
 }
 
-
+//update
 app.UseHttpsRedirection();
 
 
