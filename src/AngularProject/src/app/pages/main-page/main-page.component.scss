@@ -20,16 +20,14 @@ body {
     height: 100vh;
     object-fit: cover;
   }
+
   .controls {
     position: absolute;
-    top: 20px;
+    top: 50vh;
     right: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    z-index: 2;
   }
-  
   .control-btn {
     background: rgba(0, 0, 0, 0.6);
     color: white;

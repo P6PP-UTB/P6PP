@@ -14,6 +14,24 @@ import { Course } from '../../services/interfaces/course';
   styleUrls: ['./course-page.component.scss']
 })
 export class CoursePageComponent {
+  constructor(
+    private courseService: CourseService,
+    private userService: UserService
+  ) {}
+
+  async ngOnInit() {
+    const currentUrl: string = window.location.href;
+    const id = this.getLastSegment(currentUrl);
+
+    this.courseService.getOneCourse(id).subscribe(response => {
+      this.course = response.data;
+      this.userService.getUserById(this.course.trainerId).subscribe(trainerResponse => {
+        console.log("Trainer response: ", trainerResponse);
+        this.trainer = trainerResponse.data.user.firstName + ' ' + trainerResponse.data.user.lastName;
+      });
+    });
+  }
+
   course: Course = {
     id: 99999999,
     trainerId: 99999999,
@@ -50,23 +68,6 @@ export class CoursePageComponent {
   // Метод для перехода к следующему изображению
   nextImage(): void {
     this.currentIndex = (this.currentIndex + 1) % this.imageUrls.length;
-  }
-
-  constructor(
-    private courseService: CourseService,
-    private userService: UserService
-  ) {}
-
-  async ngOnInit() {
-    const currentUrl: string = window.location.href;
-    const id = this.getLastSegment(currentUrl);
-
-    this.courseService.getOneCourse(id).subscribe(response => {
-      this.course = response.data;
-      this.userService.getUserById(this.course.trainerId).subscribe(trainerResponse => {
-        this.trainer = trainerResponse.data.user.firstName + ' ' + trainerResponse.data.user.lastName;
-      });
-    });
   }
 
   // Функция для получения последнего сегмента URL
