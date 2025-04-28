@@ -139,9 +139,9 @@ public class UserAuthService : IUserAuthService
 
     private string GenerateJwtToken(ApplicationUser user)
     {
-        var secretKey = _configuration["JWT_SECRET_KEY"];
-        var issuer = _configuration["JWT_ISSUER"];
-        var audience = _configuration["JWT_AUDIENCE"];
+        var secretKey = _configuration["JWT__SECRET_KEY"];
+        var issuer = _configuration["JWT__ISSUER"];
+        var audience = _configuration["JWT__AUDIENCE"];
 
         var claims = new List<Claim>
         {
