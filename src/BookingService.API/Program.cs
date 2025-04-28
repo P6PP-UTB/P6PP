@@ -1,4 +1,5 @@
 using BookingService.API;
+using ReservationSystem.Shared.Clients;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ builder.Services.AddSwagger();
 builder.Services.AddControllers()
     .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
     .AddEndpointValidation();
+
+builder.Services.AddHttpClient<NetworkHttpClient>();
 
 builder.Services.AddCors(options =>
 {
