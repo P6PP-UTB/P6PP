@@ -29,4 +29,5 @@ packages/
 *.db
 *.DS_Store
 Thumbs.db
+.qodo
 .github/copilot-instructions.md
