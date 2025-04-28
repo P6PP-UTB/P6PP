@@ -36,14 +36,19 @@ jobs:
     strategy:
       matrix:
         include:
+          - image: adminsettings
+            dockerfile: src/AdminSettings.API/Dockerfile
           - image: authservice
             dockerfile: src/AuthService.API/Dockerfile
           - image: bookingservice
             dockerfile: src/BookingService.API/Dockerfile
           - image: notificationservice
             dockerfile: src/NotificationService.API/Dockerfile
+          - image: paymentservice
+            dockerfile: src/PaymentService.API/Dockerfile
           - image: userservice
             dockerfile: src/UserService.API/Dockerfile
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
