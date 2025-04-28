@@ -17,10 +17,23 @@ builder.WebHost.ConfigureKestrel(options => { options.ListenAnyIP(8005); });
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 Console.WriteLine($"🔍 Connection string used: {connectionString}");
 
+if (string.IsNullOrEmpty(connectionString))
+{
+    Console.WriteLine("❌ ERROR: Connection string 'DefaultConnection' not found or is empty in configuration.");
+}
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36))));
-
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36)),
+        // Add MySQL options configuration here
+        mysqlOptions =>
+        {
+            mysqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5, // Number of retry attempts
+                maxRetryDelay: TimeSpan.FromSeconds(30), // Maximum delay between retries
+                errorNumbersToAdd: null // List of specific MySQL error numbers to retry (null uses defaults)
+            );
+        }
+    ));
 builder.Services.AddIdentity<ApplicationUser, Role>()
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
@@ -80,18 +93,18 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
-        var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
-        var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
-        var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+        var jwtSecretKey = Environment.GetEnvironmentVariable("JWT__SECRET_KEY");
+        var issuer = Environment.GetEnvironmentVariable("JWT__ISSUER");
+        var audience = Environment.GetEnvironmentVariable("JWT__AUDIENCE");
 
         if (string.IsNullOrEmpty(jwtSecretKey))
-            throw new ArgumentNullException(nameof(jwtSecretKey), "JWT_SECRET_KEY environment variable is not set.");
+            throw new ArgumentNullException(nameof(jwtSecretKey), "JWT__SECRET_KEY environment variable is not set.");
 
         if (string.IsNullOrEmpty(issuer))
-            throw new ArgumentNullException(nameof(issuer), "JWT_ISSUER environment variable is not set.");
+            throw new ArgumentNullException(nameof(issuer), "JWT__ISSUER environment variable is not set.");
 
         if (string.IsNullOrEmpty(audience))
-            throw new ArgumentNullException(nameof(audience), "JWT_AUDIENCE environment variable is not set.");
+            throw new ArgumentNullException(nameof(audience), "JWT__AUDIENCE environment variable is not set.");
 
         var key = Encoding.ASCII.GetBytes(jwtSecretKey);
 

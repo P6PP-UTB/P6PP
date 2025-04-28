@@ -38,15 +38,16 @@ jobs:
         include:
           - image: authservice
             dockerfile: src/AuthService.API/Dockerfile
+          - image: angularproject
+            path: src/AngularProject
+          - image: adminsettings
+            dockerfile: src/AdminSettings.API/Dockerfile
           - image: bookingservice
             dockerfile: src/BookingService.API/Dockerfile
           - image: notificationservice
             dockerfile: src/NotificationService.API/Dockerfile
           - image: userservice
             dockerfile: src/UserService.API/Dockerfile
-          - image: angularproject
-            dockerfile: src/AngularProject/Dockerfile
-            context: src/AngularProject
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,30 +60,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ${{ matrix.dockerfile }}
+          context: "{{defaultContext}}:${{ matrix.path }}"
+          file: "${{ matrix.dockerfile || 'Dockerfile' }}"
           push: true
-          tags: ${{ secrets.ACR_URL }}/cicd/${{ matrix.image }}:${{ vars.IMAGE_TAG }}
-  deploy_to_aci:
-    name: 'Deploy Angular to Azure Container Instance'
-    runs-on: ubuntu-latest
-    needs: [prepare, push_image]
-    environment: ${{ needs.prepare.outputs.env }}
-    steps:
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-      - name: Deploy to Azure Container Instances
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az container create \
-              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --name angular-app-${{ needs.prepare.outputs.env }} \
-              --image ${{ secrets.ACR_URL }}/cicd/angularproject:${{ vars.IMAGE_TAG }} \
-              --dns-name-label angular-app-${{ needs.prepare.outputs.env }} \
-              --ports 8011 \
-              --registry-username ${{ secrets.ACR_USERNAME }} \
-              --registry-password ${{ secrets.ACR_PASSWORD }}
+          tags: ${{ secrets.ACR_URL }}/${{ vars.REPO_USERNAME }}/${{ matrix.image }}:${{ vars.IMAGE_TAG }}

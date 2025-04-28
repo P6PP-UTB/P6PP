@@ -3,6 +3,7 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 8005
 #EXPOSE 8081
+COPY certs/DigiCertGlobalRootG2.crt.pem /app/certs/
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -21,7 +22,8 @@ RUN dotnet publish "AuthService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publ
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=base /app/certs/DigiCertGlobalRootG2.crt.pem /app/certs/
 ENTRYPOINT ["dotnet", "AuthService.API.dll"]
 
 # Spuštění migrací před spuštěním aplikace
-CMD ["sh", "-c", "dotnet AuthService.API.dll && dotnet ef database update"]
+#CMD ["sh", "-c", "dotnet AuthService.API.dll && dotnet ef database update"]

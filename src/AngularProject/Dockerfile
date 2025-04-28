@@ -1,32 +1,27 @@
-# Stage 1: Build the Angular app
-FROM node:20 AS build
+FROM node:20-alpine AS build
 WORKDIR /app
-
-# Copy package.json and package-lock.json
+# Kopírování souborů pro instalaci závislostí
 COPY package*.json ./
 RUN npm install
-
-# Copy the rest of the application code
+# Kopírování zbytku kódu
 COPY . .
-
-# Build the application
+# Sestavení Angular aplikace
+# RUN CI=false npm run build || echo "Build errors were ignored"
 RUN npm run build
+# Vypsat obsah dist adresáře pro kontrolu
+RUN ls -la dist/
 
-# Stage 2: Serve the app with Nginx
-FROM nginx:alpine
-WORKDIR /usr/share/nginx/html
-
-# Remove default nginx content
-RUN rm -rf ./*
-
-# Copy the built Angular app
-COPY --from=build /app/dist/client-app /usr/share/nginx/html
-
-# Copy custom nginx config
+# Produkční image založený na Nginx
+FROM nginx:alpine AS final
+# Kopírování sestavené aplikace do nginx - upravená cesta
+COPY --from=build /app/dist/client-app /usr/share/nginx/html/client-app
+RUN chmod -R 755 /usr/share/nginx/html && \
+    chown -R nginx:nginx /usr/share/nginx/html
+# Zkontrolovat obsah webového adresáře
+RUN ls -la /usr/share/nginx/html/
+# Kopírování vlastní Nginx konfigurace
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 8011 as specified in nginx.conf
+# Exponování portu pro komunikaci
 EXPOSE 8011
-
-# Start Nginx server
+# Spuštění Nginx serveru
 CMD ["nginx", "-g", "daemon off;"]
