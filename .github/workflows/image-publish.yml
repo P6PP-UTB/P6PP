@@ -38,6 +38,10 @@ jobs:
         include:
           - image: adminsettings
             dockerfile: src/AdminSettings.API/Dockerfile
+          - image: admindashboard
+            dockerfile: src/UserService.API/Dockerfile
+          - image: angularproject
+            path: src/AngularProject
           - image: authservice
             dockerfile: src/AuthService.API/Dockerfile
           - image: bookingservice
@@ -48,7 +52,6 @@ jobs:
             dockerfile: src/PaymentService.API/Dockerfile
           - image: userservice
             dockerfile: src/UserService.API/Dockerfile
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,7 +64,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ${{ matrix.dockerfile }}
+          context: "{{defaultContext}}:${{ matrix.path }}"
+          file: "${{ matrix.dockerfile || 'Dockerfile' }}"
           push: true
           tags: ${{ secrets.ACR_URL }}/cicd/${{ matrix.image }}:${{ vars.IMAGE_TAG }}
