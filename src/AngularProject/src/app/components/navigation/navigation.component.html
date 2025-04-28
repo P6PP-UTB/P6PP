@@ -14,14 +14,15 @@
     <a id="signup-btn" class="nav-btn btn" routerLink="/signup">Sign up</a>
   </div>
 
-  <nav>
-    <button id="notification-button" (click)="toggleNotifications()">
-      <mat-icon>notifications</mat-icon>
-    </button>
-  </nav>
+ 
 
   <div *ngIf="isLoggedIn" class="navigation-logged-in">
-    <button class="nav-btn" id="balance" routerLink="/payment">
+    <nav>
+      <button id="notification-button" (click)="toggleNotifications()">
+        <mat-icon>notifications</mat-icon>
+      </button>
+    </nav>
+    <button class="nav-btn nav-logout" id="balance" routerLink="/payment">
       {{MoneyBalance}},-
       <img src="assets/icons/robucks.svg" alt="money" class="icon" />
     </button>
