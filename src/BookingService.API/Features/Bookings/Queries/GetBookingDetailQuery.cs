@@ -1,8 +1,8 @@
 ﻿using BookingService.API.Common.Exceptions;
+using BookingService.API.Features.Bookings.Models;
 using BookingService.API.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using BookingService.API.Features.Bookings.Models;
 
 namespace BookingService.API.Features.Bookings.Queries;
 
