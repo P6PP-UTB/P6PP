@@ -5,7 +5,7 @@ using AdminSettings.Persistence.Repository;
 using AdminSettings.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-
+//using ReservationSystem.Shared.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +80,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
+//app.UseMiddleware<AuthMiddleware>();
 
 
 app.MapControllers();
