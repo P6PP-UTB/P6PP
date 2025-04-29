@@ -87,8 +87,9 @@ export class ProfilePage implements OnInit {
     if (this.settingsForm.invalid) return;
 
     const newPassword = this.settingsForm.value.newPassword;
-    if (newPassword) {
-      this.userService.changePassword(newPassword).subscribe(() => {
+    const repeatPassword = this.settingsForm.value.repeatPassword;
+    if (newPassword && repeatPassword) {
+      this.userService.changePassword(newPassword, repeatPassword).subscribe(() => {
         this.showSettingsForm = false;
         this.toastr.success('Password reset successfully!');
       });
