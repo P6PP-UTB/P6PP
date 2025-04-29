@@ -22,7 +22,7 @@ export class VerificationComponent {
       console.log(params);
 
       const baseUrl =
-        'https://authservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth/verify-email';
+        'https://authservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth/verify-email';
       const url = `${baseUrl}/${encodeURIComponent(
         userId
       )}/${encodeURIComponent(token)}`;

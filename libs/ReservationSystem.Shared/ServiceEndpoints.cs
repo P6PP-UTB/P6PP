@@ -22,7 +22,7 @@ public static class ServiceEndpoints
 
     public static class AuthService
     {
-        private const string BaseUrl = "https://authservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io";
+        private const string BaseUrl = "https://authservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io";
         public static string Login => $"{BaseUrl}/api/auth/login";
         public static string Register => $"{BaseUrl}/api/auth/register";
         public static string ResetPassword => $"{BaseUrl}/api/auth/reset-password";
@@ -50,7 +50,7 @@ public static class ServiceEndpoints
 
     public static class PaymentService
     {
-        private const string BaseUrl = "https://paymentservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io";
+        private const string BaseUrl = "https://paymentservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io";
         public static string CreatePayment => $"{BaseUrl}/api/createpayment";
         public static string GetPaymentById(int id) => $"{BaseUrl}/api//{id}";
         public static string UpdatePayment => $"{BaseUrl}/api/updatepayment";

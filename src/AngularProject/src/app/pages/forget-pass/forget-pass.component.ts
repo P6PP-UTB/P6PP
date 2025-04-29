@@ -32,10 +32,10 @@ export class ForgetPassComponent {
     if (this.resetForm.valid) {
       const email = this.resetForm.get('email')?.value;
   
-      console.log('Sending request to:', 'https://authservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth/reset-password?email=' + email);
+      console.log('Sending request to:', 'https://authservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth/reset-password?email=' + email);
       console.log('With body:', { email });
 
-      this.http.get('https://authservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth/reset-password?email=' + email)
+      this.http.get('https://authservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth/reset-password?email=' + email)
         .subscribe({
           next: (response) => {
             console.log('Response from backend:', response); 

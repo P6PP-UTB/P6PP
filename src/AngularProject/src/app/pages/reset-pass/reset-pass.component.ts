@@ -60,7 +60,7 @@ export class ResetPassComponent {
 
         this.http
           .post(
-            'https://authservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth/reset-password',
+            'https://authservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth/reset-password',
             payload
           )
           .subscribe({

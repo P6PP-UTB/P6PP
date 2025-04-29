@@ -24,7 +24,7 @@ export class UserService {
   private userBaseUrl =
     'https://userservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/user';
   private authBaseUrl =
-    'https://authservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth';
+    'https://authservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth';
 
   constructor(private http: HttpClient) {}
 

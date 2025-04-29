@@ -7,7 +7,7 @@ import { LoginPayload } from './interfaces/loginPayload';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private baseUrl =
-    'https://authservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth';
+    'https://authservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth';
   private _isLoggedIn$ = new BehaviorSubject<boolean>(this.hasToken());
 
   constructor(private http: HttpClient) {}
