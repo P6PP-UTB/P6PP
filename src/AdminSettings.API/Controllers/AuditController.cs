@@ -33,7 +33,7 @@ public class AuditController : ControllerBase
             return BadRequest("Invalid data");
 
         if (!int.TryParse(auditLog.UserId, out int userId) || !await _userServiceClient.UserExistsAsync(userId))
-            return NotFound($"Uživatel s ID {auditLog.UserId} neexistuje.");
+            return NotFound($"User with ID {auditLog.UserId} does not exist.");
 
         var id = await _auditLogService.CreateAsync(auditLog);
         return CreatedAtAction(nameof(GetAuditLogs), new { id }, auditLog);
@@ -44,7 +44,7 @@ public class AuditController : ControllerBase
     public async Task<IActionResult> GetUserAuditLogs(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] DateTime? fromDate = null, [FromQuery] DateTime? toDate = null)
     {
         if (!int.TryParse(userId, out int id) || !await _userServiceClient.UserExistsAsync(id))
-            return NotFound("Uživatel neexistuje");
+            return NotFound("User does not exist.");
 
         var logs = await _auditLogService.GetByUserAsync(userId, pageNumber, pageSize, fromDate, toDate);
         return Ok(logs);

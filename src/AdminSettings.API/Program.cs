@@ -5,6 +5,7 @@ using AdminSettings.Persistence.Repository;
 using AdminSettings.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+//using ReservationSystem.Shared.Middlewares;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +39,7 @@ builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
     client.BaseAddress = new Uri("http://user-service:5189");
 });
 
-
+builder.Services.AddHostedService<BackupSchedulerService>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<DapperContext>();
@@ -77,9 +78,14 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedAsync();
 }
 
-
+//update
 app.UseHttpsRedirection();
+
+//app.UseMiddleware<AuthMiddleware>();
+
+
 app.MapControllers();
+
 
 app.Run();
 

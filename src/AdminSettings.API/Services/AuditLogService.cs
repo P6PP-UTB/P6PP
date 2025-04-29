@@ -9,11 +9,14 @@ public class AuditLogService
     private readonly AuditLogRepository _repository;
     private readonly IMemoryCache _memoryCache;
     private const string CacheKey = "auditlogs";
+    private readonly SystemSettingsService _systemSettingsService;
 
-    public AuditLogService(AuditLogRepository repository, IMemoryCache memoryCache)
+
+    public AuditLogService(AuditLogRepository repository, IMemoryCache memoryCache, SystemSettingsService systemSettingsService)
     {
         _repository = repository;
         _memoryCache = memoryCache;
+        _systemSettingsService = systemSettingsService;
     }
 
     public async Task<IEnumerable<AuditLog>> GetAllAsync(int pageNumber, int pageSize, DateTime? fromDate, DateTime? toDate)
@@ -36,6 +39,11 @@ public class AuditLogService
 
     public async Task<int> CreateAsync(AuditLog log)
     {
+        if (!await _systemSettingsService.GetAuditLogEnabledAsync())
+        {
+            return 0;
+        }
+
         log.TimeStamp = DateTime.UtcNow;
 
         var id = await _repository.AddAsync(log);

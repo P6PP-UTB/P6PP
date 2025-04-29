@@ -83,6 +83,21 @@ services:
         condition: service_healthy
     networks:
       - backend
+    
+  payment-service:
+    build:
+      context: .
+      dockerfile: src/PaymentService.API/Dockerfile
+    container_name: payment-service
+    ports:
+      - "5185:5185"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=payment_db;User=root;Password=password123;
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - backend
 
 
   mysql:
@@ -103,6 +118,36 @@ services:
       interval: 10s
       retries: 5
       timeout: 5s
+
+  angular-frontend:
+    build: 
+      context: ./src/AngularProject
+      dockerfile: Dockerfile
+    container_name: angular-frontend
+    ports:
+      - "4201:8011"
+    networks:
+      - backend
+    depends_on:
+      - auth-service
+      - user-service
+      - notification-service
+
+  admin-dashboard:
+    build:
+      context: ./src/fitness-admin-dashboard
+      dockerfile: Dockerfile
+    container_name: admin-dashboard
+    ports:
+      - "8081:80"
+    networks:
+      - backend
+    depends_on:
+      - auth-service
+      - user-service
+      - booking-service
+      - admin-settings
+      - notification-service
 
 volumes:
   mysql_data:

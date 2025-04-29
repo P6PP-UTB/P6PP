@@ -1,4 +1,5 @@
 using BookingService.API;
+using ReservationSystem.Shared.Clients;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,31 @@ builder.Services.AddControllers()
     .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
     .AddEndpointValidation();
 
+builder.Services.AddHttpClient<NetworkHttpClient>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4201")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+// Ng serve Angular
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularNgClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 
 var app = builder.Build();
 
@@ -24,6 +50,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors("AllowAngularDevClient");
+app.UseCors("AllowAngularNgClient");
 
 app.MapControllers();
 

@@ -1,0 +1,48 @@
+.card{
+    background: #f2f2f2;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 305px;
+    width: 305px;
+}
+
+.card-title{
+    font-size: 20pt;
+}
+
+.image-wrapper {
+    height: 100px;
+    overflow: hidden;
+  }
+  
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.d-flex{
+    margin-top: auto;
+}
+
+.buy{
+    background-color: #EA2839;
+    color: white;
+    font-size: 14pt;
+}
+
+.buy:hover{
+    background-color: #b71c1c;
+}
+
+.info{
+    background-color: rgba(70, 80, 90, 1);
+    color: white;
+    font-size: 14pt;
+}
+
+.info:hover{
+    background-color: rgb(40, 50, 60, 1);
+    color: white;
+    font-size: 14pt;
+}

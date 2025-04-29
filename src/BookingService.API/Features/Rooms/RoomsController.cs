@@ -31,7 +31,7 @@ public sealed class RoomsController(IMediator mediator) : ApiControllerBase(medi
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ApiResult<ValidationProblemDetails>))]
     //[ProducesResponseType((int)HttpStatusCode.Unauthorized, Type = typeof(ApiResult<ProblemDetails>))]
     public async Task<IActionResult> Create(RoomRequest room)
-        => await ExecuteWithCreatedAtActionAsync(new CreateRoomCommand(room), nameof(GetDetail), response => response.Id);
+        => await ExecuteWithCreatedAtActionAsync(new CreateRoomCommand(room), nameof(GetDetail), response => new { roomId = response.Id });
 
     [HttpPut("{roomId}")]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResult<RoomResponse>))]

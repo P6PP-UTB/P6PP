@@ -1,0 +1,55 @@
+/* You can add global styles to this file, and also import other style files */
+@use "ngx-toastr/toastr";
+
+body{
+    margin: 0%;
+    overflow: hidden;
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* IE/Edge */
+}
+
+
+body { margin: 0; font-family: 'Source Sans 3'; }
+/* Убираем полосы прокрутки глобально, но прокрутка остаётся */
+html, body {
+    overflow: auto;
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* IE 10+ */
+    scroll-behavior: smooth;
+  }
+  
+  /* Chrome, Safari, Edge */
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent;
+    
+  }
+
+.container-back {
+    width: 1000px;
+    background-color: white;
+    min-height: 100vh;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+.header-main{
+  font-family: 'Source Sans 3';
+  font-size: 24pt;
+  font-weight: bold;
+  color: black;
+  padding: 20pt;
+  padding-bottom: 10pt;
+  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header{
+  font-family: 'Source Sans 3';
+  font-size: 24pt;
+  font-weight: bold;
+  color: black;
+  margin-top: 5.5vh;
+  margin-bottom: 1vh;
+  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

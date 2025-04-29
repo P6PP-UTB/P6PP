@@ -1,0 +1,18 @@
+<div class="card">
+    <div class="image-wrapper">
+        <img class="card-img-top cource-img" 
+        src="https://media.istockphoto.com/id/465383082/cs/fotografie/plavkyn%C4%9B-u-baz%C3%A9nu.jpg?s=612x612&w=0&k=20&c=PnaXB806MSefeEXG-slq5Fd1_eeaLSR2IsphBrWqmYI=" 
+        alt="Photo of {{ course.serviceName }}">
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">{{ course.serviceName }}</h5>
+        <div class="d-flex">
+            <div class="">
+                <a class="btn buy" href="#">Reserve</a>
+            </div>
+            <div class="ms-sm-auto">
+                <a class="btn info" href="/course/{{ course.id }}">More info</a>
+            </div>
+        </div>
+    </div>
+</div>

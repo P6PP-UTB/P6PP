@@ -1,13 +1,12 @@
 ﻿using BookingService.API.Common.Exceptions;
+using BookingService.API.Domain.Enums;
+using BookingService.API.Domain.Models;
 using BookingService.API.Features.Services.Commands;
 using BookingService.API.Infrastructure;
-using BookingService.API.Domain.Models;
-using BookingService.API.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Linq;
+using Microsoft.Extensions.Logging;
+using Moq;
+using ReservationSystem.Shared.Clients;
 
 public class DeleteServiceCommandHandlerTests
 {
@@ -19,9 +18,10 @@ public class DeleteServiceCommandHandlerTests
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: $"DeleteServiceTestDb_{System.Guid.NewGuid()}")
             .Options;
+        var mockClient = new Mock<NetworkHttpClient>(new Mock<HttpClient>().Object, new Mock<ILogger<NetworkHttpClient>>().Object);
 
         _dbContext = new DataContext(options);
-        _handler = new DeleteServiceCommandHandler(_dbContext);
+        _handler = new DeleteServiceCommandHandler(_dbContext, mockClient.Object);
     }
 
     [Fact]
