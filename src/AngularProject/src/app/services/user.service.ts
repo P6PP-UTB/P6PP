@@ -57,11 +57,11 @@ export class UserService {
   //   });
   // }
 
-  changePassword(newPassword: string): Observable<any> {
-    const token = localStorage.getItem('token');
+  changePassword(newPassword: string, repeatPassword: string): Observable<any> {
+    //const token = localStorage.getItem('token');
     return this.http.post(`${this.authBaseUrl}/change-password`, {
       newPassword,
-      token
+      repeatPassword
     });
   }
 
