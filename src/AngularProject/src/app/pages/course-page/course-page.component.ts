@@ -5,6 +5,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { CourseService } from '../../services/course.service';
 import { UserService } from '../../services/user.service';
 import { Course } from '../../services/interfaces/course';
+import { ToastrService } from 'ngx-toastr'; 
 
 @Component({
   selector: 'app-course-page',
@@ -16,36 +17,85 @@ import { Course } from '../../services/interfaces/course';
 export class CoursePageComponent {
   constructor(
     private courseService: CourseService,
-    private userService: UserService
+    private userService: UserService,
+    private toastr: ToastrService 
   ) {}
+
+  course!: Course;
+  trainer: string = '';
+  bookingId: number | null = null; // ЕСЛИ null — значит записи нет
 
   async ngOnInit() {
     const currentUrl: string = window.location.href;
     const id = this.getLastSegment(currentUrl);
-
+  
     this.courseService.getOneCourse(id).subscribe(response => {
       this.course = response.data;
       this.userService.getUserById(this.course.trainerId).subscribe(trainerResponse => {
         console.log("Trainer response: ", trainerResponse);
-        this.trainer = trainerResponse.data.user.firstName + ' ' + trainerResponse.data.user.lastName;
+        this.trainer = trainerResponse.firstName + ' ' + trainerResponse.lastName;
       });
+  
+      // СЮДА ПЕРЕНОСИМ ПОСЛЕ ТОГО КАК КУРС ПОЛУЧИЛИ!!!
+      this.checkIfBooked(this.course.id);
     });
   }
 
-  course: Course = {
-    id: 99999999,
-    trainerId: 99999999,
-    start: new Date(),
-    end: new Date(),
-    price: 99999999,
-    serviceName: "ServiceName",
-    currentCapacity: 99999999,
-    totalCapacity: 4999999990,
-    roomName: "RoomName",
-    isCancelled: false
-  };
+  // Проверяем, забронирован ли курс
+  checkIfBooked(courseId: number) {
+    this.courseService.getUserBookings().subscribe(response => {
+      const bookings = response.data || [];
+      const existingBooking = bookings.find((b: any) => b.serviceId === courseId);
 
-  trainer: string = '';
+      if (existingBooking) {
+        this.bookingId = existingBooking.id;
+      } else {
+        this.bookingId = null;
+      }
+    });
+  }
+
+  enrollOrCancel() {
+    if (this.bookingId) {
+      // Отмена записи
+      this.courseService.cancelBooking(this.bookingId).subscribe({
+        next: () => {
+          this.toastr.success('Booking cancelled successfully!', 'Success');
+          this.bookingId = null;
+        },
+        error: (err) => {
+          this.toastr.error(err.error?.message || 'Failed to cancel booking.', 'Error');
+        }
+      });
+    } else {
+      // Запись на курс
+      this.courseService.bookService(this.course.id).subscribe({
+        next: (response) => {
+          this.toastr.success('Enrolled successfully!', 'Success');
+          this.checkIfBooked(this.course.id); // Чекнем бронь снова
+        },
+        error: (err) => {
+          this.toastr.error(err.error?.message || 'Failed to enroll.', 'Error');
+        }
+      });
+    }
+  }
+
+
+  // course: Course = {
+  //   id: 99999999,
+  //   trainerId: 99999999,
+  //   start: new Date(),
+  //   end: new Date(),
+  //   price: 99999999,
+  //   serviceName: "ServiceName",
+  //   currentCapacity: 99999999,
+  //   totalCapacity: 4999999990,
+  //   roomName: "RoomName",
+  //   isCancelled: false
+  // };
+
+  // trainer: string = '';
 
   // Массив изображений
   imageUrls: string[] = [

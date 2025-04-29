@@ -34,4 +34,12 @@ export class CourseService {
     const body = { serviceId: serviceId };
     return this.http.post(this.bookingURL, body);
   }
+
+  getUserBookings(): Observable<any> {
+    return this.http.get(this.bookingURL);
+  }
+  
+  cancelBooking(bookingId: number): Observable<any> {
+    return this.http.delete(`${this.bookingURL}/${bookingId}`);
+  }
 }
