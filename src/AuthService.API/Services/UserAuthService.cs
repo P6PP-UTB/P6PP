@@ -167,37 +167,6 @@ public class UserAuthService : IUserAuthService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public async Task<ApiResult<object>> RequestPasswordChangeAsync(HttpContext httpContext)
-    {
-        var userIdClaim = httpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
-
-        if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out var userId))
-            return new ApiResult<object>(null, false, "Token does not contain valid user ID.");
-
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-
-        if (user is null)
-            return new ApiResult<object>(null, false, "User not found.");
-
-        var notificationUrl = ServiceEndpoints.NotificationService.SendPasswordResetEmail;
-        var rawToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(rawToken));
-        var resetUrl = $"://mojeapp.cz/reset-password?userId={user.UserId}&token={encodedToken}";
-
-        var body = new
-        {
-            Id = user.UserId,
-            Token = encodedToken
-        };
-
-        var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
-
-        if (!response.Success)
-            return new ApiResult<object>(null, false, response.Message);
-
-        return new ApiResult<object>(null);
-    }
-
     public async Task<ApiResult<object>> ChangePasswordAsync(HttpContext httpContext, ChangePasswordModel model)
     {
         var userIdClaim = httpContext.User.Claims.FirstOrDefault(c => c.Type == "userid");
@@ -206,15 +175,16 @@ public class UserAuthService : IUserAuthService
             return new ApiResult<object>(null, false, "Token does not contain valid user ID.");
 
         var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-
         if (user is null)
             return new ApiResult<object>(null, false, "User not found.");
 
-        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
-        var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
+        var removePasswordResult = await _userManager.RemovePasswordAsync(user);
+        if (!removePasswordResult.Succeeded)
+            return new ApiResult<object>(removePasswordResult.Errors, false, "Failed to remove old password.");
 
-        if (!result.Succeeded)
-            return new ApiResult<object>(result.Errors, false, "Password changed failed.");
+        var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
+        if (!addPasswordResult.Succeeded)
+            return new ApiResult<object>(addPasswordResult.Errors, false, "Failed to set new password.");
 
         return new ApiResult<object>(new { UserId = user.UserId, Email = user.Email }, true,
             "Password changed successfully.");
@@ -240,6 +210,7 @@ public class UserAuthService : IUserAuthService
             Id = user.UserId,
             Token = encodedToken
         };
+        Console.WriteLine($"Reset token:" + encodedToken);
 
         var response = await _httpClient.PostAsync<object, object>(notificationUrl, body, CancellationToken.None);
 
