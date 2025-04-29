@@ -35,7 +35,7 @@ builder.Services.AddDbContext<AdminSettingsDbContext>(options =>
 
 builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
 {
-    client.BaseAddress = new Uri("http://user-service:5189");
+    client.BaseAddress = new Uri("https://userservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io");
 });
 
 

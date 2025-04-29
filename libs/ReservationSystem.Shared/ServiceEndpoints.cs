@@ -5,7 +5,7 @@ public static class ServiceEndpoints
     public static class UserService
     {
         // USERS
-        private const string BaseUrl = "http://user-service:5189";
+        private const string BaseUrl = "https://userservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io";
         
         public static string CreateUser => $"{BaseUrl}/api/user";
         public static string GetUserById(int id) => $"{BaseUrl}/api/user/{id}";
@@ -22,7 +22,7 @@ public static class ServiceEndpoints
 
     public static class AuthService
     {
-        private const string BaseUrl = "http://auth-service:8005";
+        private const string BaseUrl = "https://authservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io";
         public static string Login => $"{BaseUrl}/api/auth/login";
         public static string Register => $"{BaseUrl}/api/auth/register";
         public static string ResetPassword => $"{BaseUrl}/api/auth/reset-password";
@@ -33,7 +33,7 @@ public static class ServiceEndpoints
     
     public static class NotificationService
     {
-        private const string BaseUrl = "http://notification-service:5181";
+        private const string BaseUrl = "https://notificationservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io";
         public static string SendEmail => $"{BaseUrl}/api/notification/sendemail";
         public static string SendVerificationEmail => $"{BaseUrl}/api/notification/user/sendverificationemail";
         public static string SendPasswordResetEmail => $"{BaseUrl}/api/notification/user/sendpasswordresetemail";
@@ -50,7 +50,7 @@ public static class ServiceEndpoints
 
     public static class PaymentService
     {
-        private const string BaseUrl = "http://payment-service:5185";
+        private const string BaseUrl = "https://paymentservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io";
         public static string CreatePayment => $"{BaseUrl}/api/createpayment";
         public static string GetPaymentById(int id) => $"{BaseUrl}/api//{id}";
         public static string UpdatePayment => $"{BaseUrl}/api/updatepayment";

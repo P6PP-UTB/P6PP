@@ -1,4 +1,4 @@
-@NotificationService.API_HostAddress = http://localhost:5181
+@NotificationService.API_HostAddress = https://notificationservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io
 
 GET {{NotificationService.API_HostAddress}}/notification/
 Accept: application/json

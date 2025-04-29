@@ -1,4 +1,4 @@
-@PaymentServiceAPI_HostAddress = http://localhost:5185
+@PaymentServiceAPI_HostAddress = https://paymentservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io
 
 GET {{PaymentServiceAPI_HostAddress}}/payment/
 Accept: application/json

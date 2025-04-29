@@ -1,4 +1,4 @@
-@AdminSettings_HostAddress = http://localhost:5026
+@AdminSettings_HostAddress = https://adminservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io
 
 GET {{AdminSettings_HostAddress}}/weatherforecast/
 Accept: application/json

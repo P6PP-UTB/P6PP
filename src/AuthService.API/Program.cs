@@ -64,9 +64,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularDevClient", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:4201")
+        policy.WithOrigins("https://front-end.thankfulflower-27b66160.polandcentral.azurecontainerapps.io")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -141,11 +141,11 @@ if (!app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<AuthService.API.Middleware.TokenBlacklistMiddleware>();
-app.UseCors("AllowAngularDevClient");
 app.MapControllers();
 
 app.Run();

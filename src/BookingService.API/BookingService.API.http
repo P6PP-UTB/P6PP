@@ -1,0 +1,6 @@
+@BookingService.API_HostAddress = https://bookingservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io
+
+GET {{BookingService.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

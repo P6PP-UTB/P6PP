@@ -35,6 +35,17 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("https://front-end.thankfulflower-27b66160.polandcentral.azurecontainerapps.io")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -69,6 +80,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowAngularDevClient");
 app.UseCors("AllowAngularNgClient");
+app.UseCors("AllowFrontend");
 
 app.UseRouting();
 

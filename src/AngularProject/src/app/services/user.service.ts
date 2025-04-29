@@ -21,8 +21,10 @@ interface UpdateUserRequest {
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private userBaseUrl = 'http://localhost:5189/api/user';
-  private authBaseUrl = 'http://localhost:8005/api/auth';
+  private userBaseUrl =
+    'https://userservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/user';
+  private authBaseUrl =
+    'https://authservice.internal.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth';
 
   constructor(private http: HttpClient) {}
 
@@ -35,7 +37,10 @@ export class UserService {
 
     try {
       const decoded: any = jwtDecode(token);
-      const userId = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+      const userId =
+        decoded[
+          'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+        ];
       return parseInt(userId);
     } catch (err) {
       console.error('Decoding error: ', err);
@@ -60,7 +65,7 @@ export class UserService {
   resetPassword(userId: number, newPassword: string): Observable<any> {
     return this.http.post(`${this.authBaseUrl}/reset-password`, {
       userId,
-      newPassword
+      newPassword,
     });
   }
 

@@ -5,8 +5,10 @@ import { Course } from './interfaces/course';
 
 @Injectable({ providedIn: 'root' })
 export class CourseService {
-  private requestAllURL = 'http://localhost:8080/api/services';
-  private requestSingleURL = 'http://localhost:8080/api/services/';
+  private requestAllURL =
+    'https://bookingservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/services';
+  private requestSingleURL =
+    'https://bookingservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/services/';
 
   constructor(private http: HttpClient) {}
 
@@ -14,19 +16,15 @@ export class CourseService {
     return this.http.get<Course[]>(this.requestAllURL);
   }
 
-  getOneCourse(id: any): Observable<any>{
+  getOneCourse(id: any): Observable<any> {
     const reqUrl = this.requestSingleURL + id.toString();
     return this.http.get<Course>(reqUrl);
   }
 
-  // async getAllCources(): Promise<Course[]>{
+  // async getAllCources(): Promise<Course[]>{{
   //   const data = await fetch(this.requestURL);
   //   return await data.json() ?? [];
   // }
-  
-  
-
   // filterActualCources(courses){
-
   // }
 }
