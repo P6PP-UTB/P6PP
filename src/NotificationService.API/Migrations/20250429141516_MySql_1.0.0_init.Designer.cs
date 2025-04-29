@@ -12,8 +12,8 @@ using NotificationService.API.Persistence.Entities.DB;
 namespace NotificationService.API.Migrations
 {
     [DbContext(typeof(NotificationDbContext))]
-    [Migration("20250423162002_MySql_1.0.17_MigrationAndTeplateFix")]
-    partial class MySql_1017_MigrationAndTeplateFix
+    [Migration("20250429141516_MySql_1.0.0_init")]
+    partial class MySql_100_init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -154,8 +154,8 @@ namespace NotificationService.API.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasMaxLength(3000)
-                        .HasColumnType("varchar(3000)");
+                        .HasMaxLength(10000)
+                        .HasColumnType("varchar(10000)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
