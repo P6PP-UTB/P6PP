@@ -46,9 +46,12 @@ body{
     grid-template-columns: repeat(3, 1fr);
 }
 
-#log-btns{
-    width: 135pt;
+#log-btns {
+    width: auto; /* убери фиксированную ширину */
     justify-self: end;
+    display: flex; /* добавь flex */
+    align-items: center; /* выровнять по центру */
+    gap: 10px; /* зазор между кнопками */
 }
 
 #login-btn{
@@ -93,6 +96,9 @@ body{
     gap: 15px;
 }
 
+#navigation-bar{
+    white-space: nowrap;
+}
 #notification-button {
   background-color: white;
   border: none;
@@ -119,3 +125,50 @@ body{
 .nav-logout {
     margin-right: 0;
 }
+
+@media (max-width: 768px) {
+    #navigation-bar {
+      display: none;
+      flex-direction: column;
+      background-color: white;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+  
+    #navigation-bar.open {
+      display: flex;
+    }
+  
+    .menu-btn {
+      display: flex;
+      position: relative;
+      justify-self: end;
+      align-self: flex-end;
+    //   position: absolute;
+    //   z-index: 111;
+    }
+  
+    #head-div {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      position: relative;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .menu-btn {
+      display: none;
+    }
+  
+    #navigation-bar {
+      display: flex;
+      flex-direction: row;
+      position: static;
+      box-shadow: none;
+    }
+  }
+  

@@ -1,25 +1,31 @@
 <div id="head-div">
   <a id="logo" class="btn" routerLink="">REZERVACE+</a>
 
-  <nav id="navigation-bar">
+  <nav id="navigation-bar" [ngClass]="{'open': isMenuOpen}">
     <a class="nav-btn btn" href="#" routerLink="">Home</a>
     <a class="nav-btn btn" href="#calendar">My calendar</a>
     <a class="nav-btn btn" href="#courses">Courses</a>
     <a class="nav-btn btn">Coaches</a>
     <a class="nav-btn btn" routerLink="/profile">Profile</a>
+   
   </nav>
 
   <div id="log-btns" *ngIf="!isLoggedIn">
+    
     <a id="login-btn" class="nav-btn btn" routerLink="/login">Log in</a>
     <a id="signup-btn" class="nav-btn btn" routerLink="/signup">Sign up</a>
+    <button class="menu-btn" (click)="isMenuOpen = !isMenuOpen" id="hamburger-button">
+      <i class="bi"  [ngClass]="isMenuOpen ? 'bi bi-x-lg fs-3' : 'bi bi-list fs-3'"></i>
+    </button>
   </div>
 
- 
+
 
   <div *ngIf="isLoggedIn" class="navigation-logged-in">
     <nav>
       <button id="notification-button" (click)="toggleNotifications()">
         <mat-icon>notifications</mat-icon>
+        
       </button>
     </nav>
     <button class="nav-btn nav-logout" id="balance" routerLink="/payment">

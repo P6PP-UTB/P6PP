@@ -24,17 +24,17 @@
           />
         
           <div class="controls">
-              <button class="control-btn" (click)="toggleMute()">
-                {{ isMuted ? 'Sound' : 'No Sound' }}
-              </button>
+            <button class="control-btn" (click)="toggleMute()">
+              <i class="bi" [ngClass]="isMuted ? 'bi-volume-mute fs-3' : 'bi-volume-up fs-3'"></i>
+            </button>
           
-              <button class="control-btn" (click)="toggleVideo()">
-                {{ isHidden ? 'Show' : ' Hide' }}
-              </button>
+            <button class="control-btn" (click)="toggleVideo()">
+              <i class="bi"  [ngClass]="isHidden ? 'bi-eye-slash fs-3' : 'bi-eye fs-3'"></i>
+            </button>
           </div>
         
           
-          <button class="scroll-btn" (click)="scrollDown()">down</button>
+          <button class="scroll-btn"  (click)="scrollDown()"><i class="bi bi-arrow-down-circle-fill fs-3"></i></button>
       </div>
     </section>
     <section class="scroll-section-content">

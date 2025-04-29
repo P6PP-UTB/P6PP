@@ -14,17 +14,36 @@ export class CalendarComponent {
   month: number = this.today.getMonth();
   year: number = this.today.getFullYear();
 
+  tomorrowDate: number = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1).getDate();
+
   weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   daysWithPadding: (number | null)[] = [];
 
   eventsToday: { title: string, time: string, color: string }[] = [];
   eventsTomorrow: { title: string, time: string, color: string }[] = [];
 
+  showMonthMenu: boolean = false;
+  months: string[] = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+
   constructor() {
     this.generateCalendar();
     const [todayEvents, tomorrowEvents] = this.getEvents();
     this.eventsToday = todayEvents;
     this.eventsTomorrow = tomorrowEvents;
+  }
+
+  toggleMonthMenu() {
+    this.showMonthMenu = !this.showMonthMenu;
+  }
+
+  selectMonth(selectedMonth: number) {
+    this.month = selectedMonth;
+    this.showMonthMenu = false;
+    this.generateCalendar();
   }
 
   getEvents() {
