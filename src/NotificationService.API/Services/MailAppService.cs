@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mail;
-using Microsoft.Extensions.Configuration;
+using DotNetEnv;
 using NotificationService.API.Persistence;
 
 namespace NotificationService.API.Services
@@ -19,14 +19,22 @@ namespace NotificationService.API.Services
 
         private readonly SmtpSettings _smtpSettings;
 
-        public MailAppService(IConfiguration configuration)
+        public MailAppService()
         {
-            _smtpSettings = configuration.GetSection("SmtpSettings").Get<SmtpSettings>();
+            Env.Load();
+            _smtpSettings = new SmtpSettings
+            {
+                Host = Env.GetString("SMTP_HOST"),
+                Port = int.TryParse(Env.GetString("SMTP_PORT"), out var port) ? port : 25,
+                EnableSsl = bool.TryParse(Env.GetString("SMTP_ENABLESSL"), out var enableSsl) && enableSsl,
+                Username = Env.GetString("SMTP_USERNAME"),
+                Password = Env.GetString("SMTP_PASSWORD"),
+                From = Env.GetString("SMTP_FROM"),
+            };
         }
 
         public async Task SendEmailAsync(EmailArgs emailArgs, IList<Attachment> attachments = null)
         {
-
             var mailMessage = new MailMessage
             {
                 From = new MailAddress(_smtpSettings.From),
