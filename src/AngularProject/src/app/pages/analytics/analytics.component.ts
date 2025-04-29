@@ -314,7 +314,7 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
       tap(response => console.log('Raw reservation response:', response)),
       catchError(error => {
         console.error('Error fetching reservations data:', error);
-        this.reservationsError = 'Failed to load reservation data. Using sample data.';
+        // this.reservationsError = 'Failed to load reservation data. Using sample data.';
         
         // Použijeme ukázková data
         return of(this.getSampleBookingData());
@@ -625,7 +625,7 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
       tap(response => console.log('Raw users response:', response)),
       catchError(error => {
         console.error('Error fetching users data:', error);
-        this.usersError = 'Failed to load users data. Using sample data.';
+        // this.usersError = 'Failed to load users data. Using sample data.';
         
         // Použijeme ukázková data místo hard-coded ukázky
         return of(this.getSampleUserData());
