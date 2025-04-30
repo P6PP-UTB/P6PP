@@ -30,7 +30,6 @@ public sealed class CreateServiceCommandHandler : IRequestHandler<CreateServiceC
             ?? throw new NotFoundException("Room not found");
 
         // todo: get trainer id from token
-        // todo: check if trainer has other services during start-end
         var service = request.Service.Map();
         service.RoomId = room.Id;
 
@@ -45,6 +44,19 @@ public sealed class CreateServiceCommandHandler : IRequestHandler<CreateServiceC
         if (overlappingServicesRoom.Any())
         {
             throw new ValidationException("Room is occupied during the selected time");
+        }
+
+        var overlappingServicesTrainer = await _context.Services
+            .Where(s =>
+                s.TrainerId == request.Service.TrainerId &&
+                !s.IsCancelled &&
+                s.Start < request.Service.End &&
+                s.End > request.Service.Start)
+            .ToListAsync(cancellationToken);
+
+        if (overlappingServicesTrainer.Any())
+        {
+            throw new ValidationException("Trainer is scheduled elsewhere during this time");
         }
 
         _context.Services.Add(service);
