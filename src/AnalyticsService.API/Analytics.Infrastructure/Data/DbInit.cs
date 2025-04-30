@@ -117,6 +117,34 @@ public class DatabaseInit
 
             await connection.ExecuteAsync(createServiceUsersTableQuery);
             _logger.LogInformation("'ServiceUsers' table checked/created successfully.");
+            
+            // Create Payments table
+            const string createPaymentsTableQuery = @"
+                CREATE TABLE IF NOT EXISTS Payments (
+                    PaymentID INT AUTO_INCREMENT PRIMARY KEY,
+                    UserId BIGINT NOT NULL,
+                    RoleId BIGINT NOT NULL,
+                    Price BIGINT NOT NULL,
+                    CreditAmount BIGINT NOT NULL,
+                    Status VARCHAR(50) NOT NULL,
+                    TransactionType VARCHAR(50) NOT NULL,
+                    CreatedAt DATETIME NOT NULL
+                );";
+
+            await connection.ExecuteAsync(createPaymentsTableQuery);
+            _logger.LogInformation("'Payments' table checked/created successfully.");
+
+            // Create UserCredits table
+            const string createUserCreditsTableQuery = @"
+                CREATE TABLE IF NOT EXISTS UserCredits (
+                    Id INT AUTO_INCREMENT PRIMARY KEY,
+                    UserId BIGINT NOT NULL,
+                    RoleId BIGINT NOT NULL,
+                    CreditBalance BIGINT NOT NULL
+                );";
+
+            await connection.ExecuteAsync(createUserCreditsTableQuery);
+            _logger.LogInformation("'UserCredits' table checked/created successfully.");
 
             // Add sample data if the tables are empty
             await SeedInitialData(connection);
@@ -139,35 +167,110 @@ public class DatabaseInit
                 INSERT INTO Rooms (Id, Name, Capacity, Status)
                 VALUES 
                 (1, 'Fitness Studio A', 20, 'Available'),
-                (2, 'Yoga Studio', 15, 'Available'),
-                (3, 'Cardio Zone', 30, 'Available');
+                (2, 'Yoga Room', 15, 'Available'),
+                (3, 'Fitness Hall', 30, 'Available');
             ");
         }
 
-        // Check if Bookings table has entries but Services doesn't
-        var bookingCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Bookings;");
+        // Check if Services table is empty
         var serviceCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Services;");
-        
-        if (bookingCount > 0 && serviceCount == 0)
+        if (serviceCount == 0)
         {
-            _logger.LogInformation("Creating services for existing bookings...");
+            _logger.LogInformation("Seeding services data...");
             await connection.ExecuteAsync(@"
                 INSERT INTO Services (Id, ServiceName, Start, End, Price, IsCancelled, TrainerId, RoomId)
-                SELECT 
-                    b.ServiceId,
-                    CONCAT('Service ', b.ServiceId),
-                    DATE_ADD(b.BookingDate, INTERVAL -1 HOUR),
-                    b.BookingDate,
-                    100.00,
-                    0,
-                    1, -- Default trainer ID
-                    CASE 
-                        WHEN b.ServiceId % 3 = 0 THEN 3
-                        WHEN b.ServiceId % 3 = 1 THEN 1
-                        ELSE 2
-                    END -- Assign rooms based on ServiceId
-                FROM Bookings b
-                WHERE NOT EXISTS (SELECT 1 FROM Services s WHERE s.Id = b.ServiceId);
+                VALUES 
+                (1, 'Basic Personal Training', '2025-04-15T10:00:00', '2025-04-15T11:00:00', 50.00, 0, 1, 1),
+                (2, 'Advanced Personal Training', '2025-04-16T16:00:00', '2025-04-16T17:30:00', 80.00, 0, 1, 1),
+                (3, 'Yoga Class', '2025-04-14T08:00:00', '2025-04-14T09:00:00', 30.00, 0, 5, 2),
+                (4, 'Group Training', '2025-04-12T17:00:00', '2025-04-12T18:00:00', 25.00, 0, 1, 3),
+                (5, 'Pilates Class', '2025-04-17T12:00:00', '2025-04-17T13:00:00', 35.00, 0, 5, 2),
+                (6, 'HIIT Workout', '2025-04-13T18:00:00', '2025-04-13T19:00:00', 40.00, 0, 1, 3);
+            ");
+        }
+
+        // Check if ServiceUsers table is empty
+        var serviceUsersCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM ServiceUsers;");
+        if (serviceUsersCount == 0)
+        {
+            _logger.LogInformation("Seeding service users data...");
+            await connection.ExecuteAsync(@"
+                INSERT INTO ServiceUsers (ServiceId, UserId)
+                VALUES 
+                (1, 4),
+                (2, 2), (2, 3),
+                (3, 6), (3, 4), (3, 2),
+                (4, 3),
+                (5, 2), (5, 6),
+                (6, 4), (6, 2), (6, 6), (6, 3);
+            ");
+        }
+
+        // Check if Bookings table is empty
+        var bookingCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Bookings;");
+        if (bookingCount == 0)
+        {
+            _logger.LogInformation("Seeding bookings data...");
+            await connection.ExecuteAsync(@"
+                INSERT INTO Bookings (Id, BookingDate, Status, UserId, ServiceId)
+                VALUES 
+                (1, '2025-04-08T14:30:00', 0, 4, 1),
+                (2, '2025-04-09T16:00:00', 1, 2, 1),
+                (3, '2025-04-07T09:15:00', 0, 6, 2),
+                (4, '2025-04-05T18:20:00', 2, 3, 3),
+                (5, '2025-04-10T11:45:00', 0, 2, 4),
+                (6, '2025-04-06T08:30:00', 0, 4, 5);
+            ");
+        }
+        
+        // Check if Payments table is empty
+        var paymentCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Payments;");
+        if (paymentCount == 0)
+        {
+            _logger.LogInformation("Seeding payments data...");
+            await connection.ExecuteAsync(@"
+                INSERT INTO Payments (UserId, RoleId, Price, CreditAmount, Status, TransactionType, CreatedAt)
+                VALUES 
+                (1, 1, 1000, 100, 'Completed', 'Purchase', '2025-04-19 21:28:17'),
+                (2, 0, 2000, 200, 'Pending', 'Subscription', '2025-04-21 20:15:00'),
+                (3, 0, 500, 50, 'Failed', 'Purchase', '2025-04-24 10:30:00'),
+                (4, 0, 1500, 150, 'Completed', 'Purchase', '2025-04-12 15:45:20'),
+                (5, 1, 3000, 300, 'Completed', 'Subscription', '2025-04-05 09:30:00'),
+                (6, 0, 800, 80, 'Pending', 'Purchase', '2025-04-18 18:20:30');
+            ");
+        }
+
+        // Check if UserCredits table is empty
+        var userCreditCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM UserCredits;");
+        if (userCreditCount == 0)
+        {
+            _logger.LogInformation("Seeding user credits data...");
+            await connection.ExecuteAsync(@"
+                INSERT INTO UserCredits (UserId, RoleId, CreditBalance)
+                VALUES 
+                (1, 1, 500),
+                (2, 0, 1000),
+                (3, 0, 200),
+                (4, 0, 750),
+                (5, 1, 1500),
+                (6, 0, 400);
+            ");
+        }
+
+        // Check if Users table is empty
+        var userCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Users;");
+        if (userCount == 0)
+        {
+            _logger.LogInformation("Seeding users data...");
+            await connection.ExecuteAsync(@"
+                INSERT INTO Users (Id, RoleId, State, Sex, Weight, Height, DateOfBirth, CreatedOn, UpdatedOn)
+                VALUES 
+                (1, 1, 'active', 'Male', 75.0, 185.0, '2002-04-12', '2025-04-10 19:00:00', '2025-04-10 19:00:00'),
+                (2, 0, 'active', 'Female', 62.0, 168.0, '1995-08-22', '2025-03-15 10:20:00', '2025-04-08 09:45:00'),
+                (3, 0, 'inactive', 'Male', 90.0, 178.0, '1988-03-10', '2025-02-28 16:30:00', '2025-04-01 11:20:00'),
+                (4, 0, 'active', 'Female', 58.0, 162.0, '2000-11-05', '2025-03-20 13:45:00', '2025-04-05 14:30:00'),
+                (5, 1, 'active', 'Male', 82.0, 190.0, '1992-06-18', '2025-01-10 08:15:00', '2025-03-25 17:10:00'),
+                (6, 0, 'active', 'Female', 65.0, 170.0, '1997-09-30', '2025-02-15 11:30:00', '2025-04-07 10:00:00');
             ");
         }
     }

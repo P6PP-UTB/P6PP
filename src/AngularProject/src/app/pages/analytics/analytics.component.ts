@@ -61,6 +61,18 @@ interface RoomSummary {
   name: string;
 }
 
+// Přidané rozhraní pro platby z API
+interface PaymentDto {
+  id: number;
+  userId: number;
+  roleId: number;
+  price: number;
+  creditAmount: number;
+  status: string;
+  transactionType: string;
+  createdAt: string;
+}
+
 enum BookingStatus {
   Confirmed = 0,
   Pending = 1,
@@ -70,6 +82,10 @@ enum BookingStatus {
 type BmiCategory = 'Underweight' | 'Normal' | 'Overweight' | 'Obese';
 
 type UserChartType = 'registration' | 'role' | 'status' | 'gender' | 'bmi'| 'ageGroup' ;
+
+// Typy grafů pro finance a rezervace
+type FinanceChartType = 'monthly' | 'daily' | 'status' | 'type';
+type ReservationChartType = 'monthly' | 'daily' | 'status' | 'room';
 
 const RESERVATIONS_DATA: DataItem[] = [
   { date: 'Jan', value: 156 },
@@ -102,6 +118,8 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   usersTableData: UserData[] = [];
   
   userChartType: UserChartType = 'registration';
+  financeChartType: FinanceChartType = 'monthly';
+  reservationChartType: ReservationChartType = 'monthly';
   
   userRoleFilter = 'all';
   userStateFilter = 'all';
@@ -118,6 +136,14 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   bookingDateRangeEnd: string | null = null;
   uniqueRooms: RoomSummary[] = [];
   
+  // Filtry pro platby
+  paymentStatusFilter = 'all';
+  paymentTypeFilter = 'all';
+  paymentSearchFilter = '';
+  paymentDateRangeStart: string | null = null;
+  paymentDateRangeEnd: string | null = null;
+  filteredPayments: PaymentDto[] = [];
+  
   isLoadingUsers = false;
   usersError: string | null = null;
 
@@ -132,8 +158,18 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   rawBookings: BookingDto[] = [];
   filteredBookings: BookingDto[] = [];
   
+  // Přidané proměnné pro platby
+  isLoadingPayments = false;
+  paymentsError: string | null = null;
+  rawPayments: PaymentDto[] = [];
+  totalPaymentsCount = 0;
+  totalPaymentsAmount = 0;
+  monthlyPaymentsCount = 0;
+  monthlyPaymentsAmount = 0;
+  
   private bookingsApiUrl = 'http://localhost:8006/api/Bookings';
   private usersApiUrl = 'http://localhost:8006/api/Users';
+  private paymentsApiUrl = 'http://localhost:8006/api/Payments';
   
   private currentDate = new Date();
 
@@ -158,6 +194,9 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   selectedBooking: BookingDto | null = null;
   showDetailedReservations = false;
 
+  // Inicializace grafu
+  dailyAnalyticsChartInstance: Chart | null = null;
+
   constructor(private http: HttpClient) {
     this.totalRevenue = 0;
     this.monthlyRevenue = 0;
@@ -168,11 +207,8 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.fetchReservations();
     this.fetchUsers();
+    this.fetchPayments();
     this.initializeFilterOptions();
-
-    // Simulované načítání dat
-    this.usersTableData = this.getSampleUserData();
-    
     this.initializeUserFilters();
   }
 
@@ -188,8 +224,8 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
 
   updateDashboardMetrics() {
     // Aktualizace metrik na analytics
-    this.totalRevenue = 0;
-    this.monthlyRevenue = 0;
+    this.totalRevenue = this.totalPaymentsAmount;
+    this.monthlyRevenue = this.monthlyPaymentsAmount;
     
     this.totalBookings = 0;
     this.monthlyBookings = 0;
@@ -314,10 +350,8 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
       tap(response => console.log('Raw reservation response:', response)),
       catchError(error => {
         console.error('Error fetching reservations data:', error);
-        // this.reservationsError = 'Failed to load reservation data. Using sample data.';
-        
-        // Použijeme ukázková data
-        return of(this.getSampleBookingData());
+        this.reservationsError = 'Failed to load reservation data.';
+        return of([]);
       }),
       finalize(() => {
         this.isLoadingReservations = false;
@@ -330,11 +364,11 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
         this.processReservationsData(this.filteredBookings);
         this.updateDashboardMetrics();
       } else {
-        console.log('No reservations found, using sample data');
-        this.rawBookings = this.getSampleBookingData();
-        this.filteredBookings = [...this.rawBookings];
+        console.log('No reservations found');
+        this.rawBookings = [];
+        this.filteredBookings = [];
         this.initializeFilterOptions();
-        this.processReservationsData(this.filteredBookings);
+        this.processReservationsData([]);
         this.updateDashboardMetrics();
       }
     });
@@ -625,10 +659,8 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
       tap(response => console.log('Raw users response:', response)),
       catchError(error => {
         console.error('Error fetching users data:', error);
-        // this.usersError = 'Failed to load users data. Using sample data.';
-        
-        // Použijeme ukázková data místo hard-coded ukázky
-        return of(this.getSampleUserData());
+        this.usersError = 'Failed to load users data.';
+        return of([]);
       }),
       finalize(() => {
         this.isLoadingUsers = false;
@@ -639,8 +671,8 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
         this.generateUsersChartData();
         this.initializeUserFilters();
       } else {
-        console.log('No users found, using sample data');
-        this.usersTableData = this.getSampleUserData();
+        console.log('No users found');
+        this.usersTableData = [];
         this.generateUsersChartData();
         this.initializeUserFilters();
       }
@@ -648,193 +680,11 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   }
 
   getSampleUserData(): UserData[] {
-    return [
-      {
-        id: 1,
-        roleId: 1,
-        state: 'active',
-        sex: 0,
-        weight: 75,
-        height: 185,
-        birthDate: '2002-04-12T00:00:00',
-        createdAt: '2025-04-10T19:00:00',
-        lastUpdated: '2025-04-10T19:00:00'
-      },
-      {
-        id: 2,
-        roleId: 0,
-        state: 'active',
-        sex: 1,
-        weight: 62,
-        height: 168,
-        birthDate: '1995-08-22T00:00:00',
-        createdAt: '2025-03-15T10:20:00',
-        lastUpdated: '2025-04-08T09:45:00'
-      },
-      {
-        id: 3,
-        roleId: 0,
-        state: 'inactive',
-        sex: 0,
-        weight: 90,
-        height: 178,
-        birthDate: '1988-03-10T00:00:00',
-        createdAt: '2025-02-28T16:30:00',
-        lastUpdated: '2025-04-01T11:20:00'
-      },
-      {
-        id: 4,
-        roleId: 0,
-        state: 'active',
-        sex: 1,
-        weight: 58,
-        height: 162,
-        birthDate: '2000-11-05T00:00:00',
-        createdAt: '2025-03-20T13:45:00',
-        lastUpdated: '2025-04-05T14:30:00'
-      },
-      {
-        id: 5,
-        roleId: 1,
-        state: 'active',
-        sex: 0,
-        weight: 82,
-        height: 190,
-        birthDate: '1992-06-18T00:00:00',
-        createdAt: '2025-01-10T08:15:00',
-        lastUpdated: '2025-03-25T17:10:00'
-      },
-      {
-        id: 6,
-        roleId: 0,
-        state: 'active',
-        sex: 1,
-        weight: 65,
-        height: 170,
-        birthDate: '1997-09-30T00:00:00',
-        createdAt: '2025-02-15T11:30:00',
-        lastUpdated: '2025-04-07T10:00:00'
-      }
-    ];
+    return [];
   }
 
   getSampleBookingData(): BookingDto[] {
-    return [
-      {
-        id: 1,
-        bookingDate: '2025-04-08T14:30:00.0000000',
-        status: 'Confirmed',
-        userId: 4,
-        serviceId: 1,
-        service: {
-          trainerId: 1,
-          serviceName: 'Basic Personal Training',
-          start: '2025-04-15T10:00:00.0000000',
-          end: '2025-04-15T11:00:00.0000000',
-          roomId: 1,
-          room: {
-            name: 'Fitness Studio A',
-            capacity: 20
-          },
-          users: [4]
-        }
-      },
-      {
-        id: 2,
-        bookingDate: '2025-04-09T16:00:00.0000000',
-        status: 'Pending',
-        userId: 2,
-        serviceId: 1,
-        service: {
-          trainerId: 1,
-          serviceName: 'Advanced Personal Training',
-          start: '2025-04-16T16:00:00.0000000',
-          end: '2025-04-16T17:30:00.0000000',
-          roomId: 1,
-          room: {
-            name: 'Fitness Studio A',
-            capacity: 20
-          },
-          users: [2, 3]
-        }
-      },
-      {
-        id: 3,
-        bookingDate: '2025-04-07T09:15:00.0000000',
-        status: 'Confirmed',
-        userId: 6,
-        serviceId: 2,
-        service: {
-          trainerId: 5,
-          serviceName: 'Yoga Class',
-          start: '2025-04-14T08:00:00.0000000',
-          end: '2025-04-14T09:00:00.0000000',
-          roomId: 2,
-          room: {
-            name: 'Yoga Room',
-            capacity: 15
-          },
-          users: [6, 4, 2]
-        }
-      },
-      {
-        id: 4,
-        bookingDate: '2025-04-05T18:20:00.0000000',
-        status: 'Cancelled',
-        userId: 3,
-        serviceId: 3,
-        service: {
-          trainerId: 1,
-          serviceName: 'Group Training',
-          start: '2025-04-12T17:00:00.0000000',
-          end: '2025-04-12T18:00:00.0000000',
-          roomId: 3,
-          room: {
-            name: 'Fitness Hall',
-            capacity: 30
-          },
-          users: [3]
-        }
-      },
-      {
-        id: 5,
-        bookingDate: '2025-04-10T11:45:00.0000000',
-        status: 'Confirmed',
-        userId: 2,
-        serviceId: 4,
-        service: {
-          trainerId: 5,
-          serviceName: 'Pilates Class',
-          start: '2025-04-17T12:00:00.0000000',
-          end: '2025-04-17T13:00:00.0000000',
-          roomId: 2,
-          room: {
-            name: 'Yoga Room',
-            capacity: 15
-          },
-          users: [2, 6]
-        }
-      },
-      {
-        id: 6,
-        bookingDate: '2025-04-06T08:30:00.0000000',
-        status: 'Confirmed',
-        userId: 4,
-        serviceId: 5,
-        service: {
-          trainerId: 1,
-          serviceName: 'HIIT Workout',
-          start: '2025-04-13T18:00:00.0000000',
-          end: '2025-04-13T19:00:00.0000000',
-          roomId: 3,
-          room: {
-            name: 'Fitness Hall',
-            capacity: 30
-          },
-          users: [4, 2, 6, 3]
-        }
-      }
-    ];
+    return [];
   }
 
   generateUsersChartData() {
@@ -1244,6 +1094,12 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
     return Math.round((this.getActiveUsersCount() / this.getTotalUsersCount()) * 100);
   }
 
+  getCompletedPaymentsPercentage(): number {
+    if (this.rawPayments.length === 0) return 0;
+    const completedPayments = this.rawPayments.filter(payment => payment.status === 'Completed').length;
+    return Math.round((completedPayments / this.rawPayments.length) * 100);
+  }
+
   initializeChart() {
     setTimeout(() => {
       this.renderChart();
@@ -1317,7 +1173,14 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
       return;
     }
     
-    let chartType: 'line' | 'bar' = 'line';
+    let chartType: 'bar' = 'bar'; // Vždy sloupcový graf
+    
+    // Nastavení pro různé typy grafů
+    let tension = 0.3;
+    let borderWidth = 1;
+    let pointRadius = 4;
+    let fill = false;
+    
     let chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -1356,20 +1219,16 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
       }
     };
     
-    if (this.activeTab === 'users' && this.userChartType !== 'registration') {
-      chartType = 'bar';
-    }
-    
     let datasets = [{
       label: this.getValueLabel(),
       data: data.values,
       backgroundColor: 'rgba(234, 40, 56, 0.32)',
       borderColor: 'rgb(234, 40, 56)',
-      borderWidth: 2,
-      tension: 0.3,
+      borderWidth: borderWidth,
+      tension: tension,
       pointBackgroundColor: 'rgb(234, 40, 56)',
-      pointRadius: 4,
-      fill: chartType === 'line' ? true : false
+      pointRadius: pointRadius,
+      fill: fill
     }];
     
     this.chartInstance = new Chart(canvas, {
@@ -1393,9 +1252,17 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   getActiveData(): DataItem[] {
     switch (this.activeTab) {
       case 'finances':
-        return this.financesData;
+        if (this.financeChartType === 'monthly') {
+          return this.financesData;
+        } else {
+          return this.usersData;
+        }
       case 'reservations':
-        return this.reservationsData;
+        if (this.reservationChartType === 'monthly') {
+          return this.reservationsData;
+        } else {
+          return this.usersData;
+        }
       case 'users':
         return this.usersData;
       default:
@@ -1483,6 +1350,17 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
       // Nastavení výchozího pohledu pro záložky - tabulka pro všechny mimo overview
       this.viewMode = 'table';
       setTimeout(() => {
+        // Nastavíme výchozí typy grafů při přepnutí na záložku
+        if (tab === 'finances') {
+          this.financeChartType = 'monthly';
+          this.generateFinancesChartData();
+        } else if (tab === 'reservations') {
+          this.reservationChartType = 'monthly';
+          this.generateReservationsChartData();
+        } else if (tab === 'users') {
+          this.userChartType = 'registration';
+          this.generateUsersChartData();
+        }
         this.renderChart();
       }, 0);
     }
@@ -1492,6 +1370,8 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
       this.resetReservationFilters();
     } else if (tab === 'users') {
       this.resetUserFilters();
+    } else if (tab === 'finances') {
+      this.resetPaymentFilters();
     }
   }
 
@@ -1502,6 +1382,10 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
         // V případě users záložky generujeme uživatelské grafy
         if (this.activeTab === 'users') {
           this.generateUsersChartData();
+        } else if (this.activeTab === 'finances') {
+          this.generateFinancesChartData();
+        } else if (this.activeTab === 'reservations') {
+          this.generateReservationsChartData();
         }
         this.renderChart();
       }, 0);
@@ -1526,9 +1410,29 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   getYAxisLabel(): string {
     switch (this.activeTab) {
       case 'finances':
-        return 'Revenue ($)';
+        switch (this.financeChartType) {
+          case 'monthly':
+          case 'daily':
+            return 'Revenue ($)';
+          case 'status':
+            return 'Revenue by Status ($)';
+          case 'type':
+            return 'Revenue by Type ($)';
+          default:
+            return 'Revenue ($)';
+        }
       case 'reservations':
-        return 'Number of Reservations';
+        switch (this.reservationChartType) {
+          case 'monthly':
+          case 'daily':
+            return 'Number of Reservations';
+          case 'status':
+            return 'Reservations by Status';
+          case 'room':
+            return 'Reservations by Room';
+          default:
+            return 'Number of Reservations';
+        }
       case 'users':
         switch (this.userChartType) {
           case 'registration':
@@ -1551,8 +1455,31 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   getXAxisLabel(): string {
     switch (this.activeTab) {
       case 'finances':
+        switch (this.financeChartType) {
+          case 'monthly':
+            return 'Month';
+          case 'daily':
+            return 'Day';
+          case 'status':
+            return 'Payment Status';
+          case 'type':
+            return 'Transaction Type';
+          default:
+            return 'Period';
+        }
       case 'reservations':
-        return 'Month';
+        switch (this.reservationChartType) {
+          case 'monthly':
+            return 'Month';
+          case 'daily':
+            return 'Day';
+          case 'status':
+            return 'Reservation Status';
+          case 'room':
+            return 'Room';
+          default:
+            return 'Period';
+        }
       case 'users':
         switch (this.userChartType) {
           case 'registration':
@@ -1578,9 +1505,31 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   getValueLabel(): string {
     switch (this.activeTab) {
       case 'finances':
-        return 'Revenue ($)';
+        switch (this.financeChartType) {
+          case 'monthly':
+            return 'Monthly Revenue';
+          case 'daily':
+            return 'Daily Revenue';
+          case 'status':
+            return 'Revenue by Status';
+          case 'type':
+            return 'Revenue by Type';
+          default:
+            return 'Revenue ($)';
+        }
       case 'reservations':
-        return 'Number of Reservations';
+        switch (this.reservationChartType) {
+          case 'monthly':
+            return 'Monthly Reservations';
+          case 'daily':
+            return 'Daily Reservations';
+          case 'status':
+            return 'Reservations by Status';
+          case 'room':
+            return 'Reservations by Room';
+          default:
+            return 'Number of Reservations';
+        }
       case 'users':
         switch (this.userChartType) {
           case 'registration':
@@ -1648,13 +1597,115 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
     return '#ea2839';
   }
 
-  // Získání denních dat pro aktuální měsíc
+  // Nová metoda pro načítání plateb
+  fetchPayments() {
+    this.isLoadingPayments = true;
+    this.paymentsError = null;
+    
+    this.http.get<PaymentDto[]>(this.paymentsApiUrl).pipe(
+      tap(response => console.log('Raw payments response:', response)),
+      catchError(error => {
+        console.error('Error fetching payments data:', error);
+        this.paymentsError = 'Failed to load payments data.';
+        return of([]);
+      }),
+      finalize(() => {
+        this.isLoadingPayments = false;
+      })
+    ).subscribe(payments => {
+      if (payments && payments.length > 0) {
+        this.rawPayments = payments;
+        this.filteredPayments = [...this.rawPayments];
+        this.processPaymentsData(payments);
+      } else {
+        console.log('No payments found');
+        this.rawPayments = [];
+        this.filteredPayments = [];
+        this.totalPaymentsAmount = 0;
+        this.monthlyPaymentsAmount = 0;
+      }
+      
+      this.updateDashboardMetrics();
+      if (this.activeTab === 'overview') {
+        this.initializeDailyAnalyticsChart();
+      }
+    });
+  }
+  
+  // Nová metoda pro zpracování dat o platbách
+  processPaymentsData(payments: PaymentDto[]) {
+    this.totalPaymentsCount = payments.length;
+    this.totalPaymentsAmount = payments
+      .reduce((sum, payment) => sum + (payment.status === 'Completed' ? payment.price : 0), 0);
+    
+    // Výpočet měsíčních plateb (za poslední 30 dní)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const recentPayments = payments.filter(p => new Date(p.createdAt) >= thirtyDaysAgo);
+    this.monthlyPaymentsCount = recentPayments.length;
+    this.monthlyPaymentsAmount = recentPayments
+      .reduce((sum, payment) => sum + (payment.status === 'Completed' ? payment.price : 0), 0);
+    
+    // Zpracování dat pro graf
+    const monthlyData: {[key: string]: number} = {};
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    months.forEach(month => {
+      monthlyData[month] = 0;
+    });
+    
+    payments.forEach(payment => {
+      if (payment.createdAt && payment.status === 'Completed') {
+        const date = new Date(payment.createdAt);
+        const month = months[date.getMonth()];
+        monthlyData[month] += payment.price;
+      }
+    });
+    
+    this.financesData = Object.keys(monthlyData)
+      .map(month => ({
+        date: month,
+        value: monthlyData[month]
+      }))
+      .sort((a, b) => {
+        const monthOrder = { 'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 
+                          'Jun': 5, 'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 
+                          'Nov': 10, 'Dec': 11 };
+        return monthOrder[a.date as keyof typeof monthOrder] - monthOrder[b.date as keyof typeof monthOrder];
+      });
+  }
+
+  // Upravená metoda pro získání denních příjmů
   getDailyRevenueData(): DataItem[] {
     const now = new Date();
     const days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    // Vrátíme pole s nulovými hodnotami pro všechny dny v měsíci
-    return Array.from({ length: days }, (_, i) => ({ date: (i + 1).toString(), value: 0 }));
+    
+    // Příprava pole pro všechny dny v měsíci
+    const dailyRevenue: {[key: number]: number} = {};
+    for (let i = 1; i <= days; i++) {
+      dailyRevenue[i] = 0;
+    }
+    
+    // Načtení všech plateb pro aktuální měsíc
+    this.rawPayments.filter(payment => {
+      const paymentDate = new Date(payment.createdAt);
+      return paymentDate.getMonth() === now.getMonth() && 
+             paymentDate.getFullYear() === now.getFullYear() &&
+             payment.status === 'Completed';
+    }).forEach(payment => {
+      const paymentDate = new Date(payment.createdAt);
+      const day = paymentDate.getDate();
+      dailyRevenue[day] += payment.price;
+    });
+    
+    // Vrácení dat ve formátu pro graf
+    return Array.from({ length: days }, (_, i) => ({ 
+      date: (i + 1).toString(), 
+      value: dailyRevenue[i + 1] 
+    }));
   }
+
   getDailyReservationsData(): DataItem[] {
     const now = new Date();
     const days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -1671,6 +1722,7 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
     });
     return Array.from({ length: days }, (_, i) => ({ date: (i + 1).toString(), value: byDay[i + 1] }));
   }
+  
   getDailyNewUsersData(): DataItem[] {
     const now = new Date();
     const days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -1689,7 +1741,6 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
   }
 
   // Inicializace grafu
-  dailyAnalyticsChartInstance: Chart | null = null;
   initializeDailyAnalyticsChart() {
     setTimeout(() => {
       const canvas = document.getElementById('dailyAnalyticsChart') as HTMLCanvasElement;
@@ -1838,17 +1889,15 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
     this.applyReservationFilters();
   }
   
+  // Upravená metoda exportToCsv, která volá specifickou metodu dle aktuální záložky
   exportToCsv() {
-    let csvContent = '';
-    let fileName = '';
-    
     if (this.activeTab === 'users') {
       // Použijeme data z backend API, pokud jsou k dispozici
-      const users = this.usersTableData.length > 0 ? this.getFilteredUsers() : this.getSampleUserData();
+      const users = this.getFilteredUsers();
       if (users.length === 0) return;
       
       // Hlavička CSV
-      csvContent = 'ID,Role,Status,Gender,Weight (kg),Height (cm),BMI,Birth Date,Age,Registered,Last Updated\n';
+      let csvContent = 'ID,Role,Status,Gender,Weight (kg),Height (cm),BMI,Birth Date,Age,Registered,Last Updated\n';
       
       // Data řádků
       users.forEach(user => {
@@ -1874,15 +1923,26 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
         }).join(',') + '\n';
       });
       
-      fileName = 'users_export.csv';
+      // Vytvoření a stažení souboru
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'users_export.csv');
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
     else if (this.activeTab === 'reservations') {
       // Použijeme data z backend API, pokud jsou k dispozici
-      const reservations = this.rawBookings.length > 0 ? this.filteredBookings : this.getSampleBookingData();
+      const reservations = this.rawBookings.length > 0 ? this.filteredBookings : [];
       if (reservations.length === 0) return;
       
       // Hlavička CSV
-      csvContent = 'ID,User ID,Trainer ID,Service,Room,Capacity,Users,Booking Date,Status\n';
+      let csvContent = 'ID,User ID,Trainer ID,Service,Room,Capacity,Users,Booking Date,Status\n';
       
       // Data řádků
       reservations.forEach(booking => {
@@ -1906,22 +1966,299 @@ export class AnalyticsComponent implements OnInit, AfterViewInit {
         }).join(',') + '\n';
       });
       
-      fileName = 'reservations_export.csv';
-    }
-    
-    if (csvContent) {
       // Vytvoření a stažení souboru
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
       
       link.setAttribute('href', url);
-      link.setAttribute('download', fileName);
+      link.setAttribute('download', 'reservations_export.csv');
       link.style.visibility = 'hidden';
       
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
+    else if (this.activeTab === 'finances') {
+      this.exportPaymentsToCsv();
+    }
+  }
+
+  // Filtrovací metody pro platby
+  onPaymentStatusFilterChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.paymentStatusFilter = select.value;
+    this.applyPaymentFilters();
+  }
+  
+  onPaymentTypeFilterChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.paymentTypeFilter = select.value;
+    this.applyPaymentFilters();
+  }
+  
+  onPaymentSearchChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.paymentSearchFilter = input.value;
+    this.applyPaymentFilters();
+  }
+  
+  onPaymentDateFromChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.paymentDateRangeStart = input.value;
+    this.applyPaymentFilters();
+  }
+  
+  onPaymentDateToChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.paymentDateRangeEnd = input.value;
+    this.applyPaymentFilters();
+  }
+  
+  resetPaymentFilters() {
+    this.paymentStatusFilter = 'all';
+    this.paymentTypeFilter = 'all';
+    this.paymentSearchFilter = '';
+    this.paymentDateRangeStart = null;
+    this.paymentDateRangeEnd = null;
+    
+    const selects = [
+      'paymentStatusSelect',
+      'paymentTypeSelect'
+    ];
+    
+    selects.forEach(id => {
+      const select = document.getElementById(id) as HTMLSelectElement;
+      if (select) select.value = 'all';
+    });
+    
+    const searchInput = document.getElementById('paymentSearchInput') as HTMLInputElement;
+    if (searchInput) searchInput.value = '';
+    
+    this.filteredPayments = [...this.rawPayments];
+    
+    if (this.activeTab === 'finances' && this.viewMode === 'chart') {
+      setTimeout(() => this.renderChart(), 100);
+    }
+  }
+  
+  applyPaymentFilters() {
+    this.filteredPayments = this.rawPayments.filter(payment => {
+      // Status filter
+      if (this.paymentStatusFilter !== 'all') {
+        if (payment.status.toLowerCase() !== this.paymentStatusFilter.toLowerCase()) {
+          return false;
+        }
+      }
+      
+      // Type filter
+      if (this.paymentTypeFilter !== 'all') {
+        if (payment.transactionType.toLowerCase() !== this.paymentTypeFilter.toLowerCase()) {
+          return false;
+        }
+      }
+      
+      // Search filter
+      if (this.paymentSearchFilter && this.paymentSearchFilter.trim() !== '') {
+        const searchTerm = this.paymentSearchFilter.toLowerCase();
+        const paymentId = payment.id.toString();
+        const userId = payment.userId.toString();
+        const price = payment.price.toString();
+        const creditAmount = payment.creditAmount.toString();
+        
+        // Hledej ve všech relevantních polích
+        if (!paymentId.includes(searchTerm) && 
+            !userId.includes(searchTerm) && 
+            !price.includes(searchTerm) && 
+            !creditAmount.includes(searchTerm)) {
+          return false;
+        }
+      }
+      
+      // Date filter
+      if (payment.createdAt) {
+        const paymentDate = new Date(payment.createdAt);
+        
+        if (this.paymentDateRangeStart) {
+          const startDate = new Date(this.paymentDateRangeStart);
+          if (paymentDate < startDate) {
+            return false;
+          }
+        }
+        
+        if (this.paymentDateRangeEnd) {
+          const endDate = new Date(this.paymentDateRangeEnd);
+          endDate.setHours(23, 59, 59, 999); // End of day
+          if (paymentDate > endDate) {
+            return false;
+          }
+        }
+      }
+      
+      return true;
+    });
+  }
+  
+  clearPaymentSearch() {
+    this.paymentSearchFilter = '';
+    const searchInput = document.getElementById('paymentSearchInput') as HTMLInputElement;
+    if (searchInput) searchInput.value = '';
+    this.applyPaymentFilters();
+  }
+  
+  // Export metoda pro platby
+  exportPaymentsToCsv() {
+    if (this.filteredPayments.length === 0) return;
+    
+    // Hlavička CSV
+    let csvContent = 'ID,User ID,Role,Price,Credits,Status,Type,Date\n';
+    
+    // Data řádků
+    this.filteredPayments.forEach(payment => {
+      const row = [
+        payment.id,
+        payment.userId,
+        this.formatRole(payment.roleId),
+        payment.price,
+        payment.creditAmount,
+        payment.status,
+        payment.transactionType,
+        payment.createdAt ? payment.createdAt.split('T')[0] : 'N/A' // Format date as YYYY-MM-DD
+      ];
+      
+      // Escape any commas in text fields and wrap with quotes if needed
+      csvContent += row.map(cell => {
+        const cellStr = String(cell);
+        return cellStr.includes(',') ? `"${cellStr}"` : cellStr;
+      }).join(',') + '\n';
+    });
+    
+    // Vytvoření a stažení souboru
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'payments_export.csv');
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  onFinanceChartTypeChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.financeChartType = select.value as FinanceChartType;
+    this.generateFinancesChartData();
+    this.renderChart();
+  }
+
+  onReservationChartTypeChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.reservationChartType = select.value as ReservationChartType;
+    this.generateReservationsChartData();
+    this.renderChart();
+  }
+
+  // Metoda pro generování dat grafu financí podle zvoleného typu
+  generateFinancesChartData() {
+    switch (this.financeChartType) {
+      case 'monthly':
+        // Použiju stávající data, která jsou už připravena po fetchPayments()
+        break;
+      case 'daily':
+        this.usersData = this.getDailyRevenueData();
+        break;
+      case 'status':
+        this.generateStatusFinanceChartData();
+        break;
+      case 'type':
+        this.generateTypeFinanceChartData();
+        break;
+    }
+  }
+
+  // Metoda pro generování dat grafu rezervací podle zvoleného typu
+  generateReservationsChartData() {
+    switch (this.reservationChartType) {
+      case 'monthly':
+        // Použiju stávající data, která jsou už připravena v reservationsData
+        break;
+      case 'daily':
+        this.usersData = this.getDailyReservationsData();
+        break;
+      case 'status':
+        this.generateStatusReservationChartData();
+        break;
+      case 'room':
+        this.generateRoomReservationChartData();
+        break;
+    }
+  }
+
+  // Generování dat pro grafy financí podle statusů
+  generateStatusFinanceChartData() {
+    const statusCount: { [key: string]: number } = {
+      'Completed': 0,
+      'Pending': 0,
+      'Failed': 0
+    };
+    
+    this.rawPayments.forEach(payment => {
+      statusCount[payment.status] = (statusCount[payment.status] || 0) + payment.price;
+    });
+    
+    this.usersData = Object.keys(statusCount).map(status => ({
+      date: status,
+      value: statusCount[status]
+    }));
+  }
+
+  // Generování dat pro grafy financí podle typů transakce
+  generateTypeFinanceChartData() {
+    const typeCount: { [key: string]: number } = {};
+    
+    this.rawPayments.forEach(payment => {
+      typeCount[payment.transactionType] = (typeCount[payment.transactionType] || 0) + payment.price;
+    });
+    
+    this.usersData = Object.keys(typeCount).map(type => ({
+      date: type,
+      value: typeCount[type]
+    }));
+  }
+
+  // Generování dat pro grafy rezervací podle statusů
+  generateStatusReservationChartData() {
+    const statusCount: { [key: string]: number } = {
+      'Confirmed': 0,
+      'Pending': 0,
+      'Cancelled': 0
+    };
+    
+    this.rawBookings.forEach(booking => {
+      statusCount[booking.status] = (statusCount[booking.status] || 0) + 1;
+    });
+    
+    this.usersData = Object.keys(statusCount).map(status => ({
+      date: status,
+      value: statusCount[status]
+    }));
+  }
+
+  // Generování dat pro grafy rezervací podle místností
+  generateRoomReservationChartData() {
+    const roomCount: { [key: string]: number } = {};
+    
+    this.rawBookings.forEach(booking => {
+      const roomName = booking.service?.room?.name || 'Unknown';
+      roomCount[roomName] = (roomCount[roomName] || 0) + 1;
+    });
+    
+    this.usersData = Object.keys(roomCount).map(room => ({
+      date: room,
+      value: roomCount[room]
+    }));
   }
 }

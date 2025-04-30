@@ -42,15 +42,41 @@
             <i class="material-icons select-icon">keyboard_arrow_down</i>
           </div>
         </div>
+        
+        <!-- Chart type selector - show only for finances tab -->
+        <div class="chart-type-selector" *ngIf="activeTab === 'finances' && viewMode === 'chart'">
+          <div class="select-wrapper">
+            <select id="financeChartTypeSelect" (change)="onFinanceChartTypeChange($event)">
+              <option value="monthly">Monthly Revenue</option>
+              <option value="daily">Daily Revenue</option>
+              <option value="status">Revenue by Status</option>
+              <option value="type">Revenue by Type</option>
+            </select>
+            <i class="material-icons select-icon">keyboard_arrow_down</i>
+          </div>
+        </div>
+        
+        <!-- Chart type selector - show only for reservations tab -->
+        <div class="chart-type-selector" *ngIf="activeTab === 'reservations' && viewMode === 'chart'">
+          <div class="select-wrapper">
+            <select id="reservationChartTypeSelect" (change)="onReservationChartTypeChange($event)">
+              <option value="monthly">Monthly Reservations</option>
+              <option value="daily">Daily Reservations</option>
+              <option value="status">Reservations by Status</option>
+              <option value="room">Reservations by Room</option>
+            </select>
+            <i class="material-icons select-icon">keyboard_arrow_down</i>
+          </div>
+        </div>
 
-        <!-- Export button - Show for users and reservations tabs -->
-        <button class="export-button" *ngIf="activeTab === 'users' || activeTab === 'reservations'" (click)="exportToCsv()">
+        <!-- Export button - Show for users, finances and reservations tabs -->
+        <button class="export-button" *ngIf="activeTab === 'users' || activeTab === 'reservations' || activeTab === 'finances'" (click)="exportToCsv()">
           <i class="material-icons">file_download</i>
           Export
         </button>
 
-        <!-- View toggle button - Show for users and reservations tabs -->
-        <button class="view-toggle" *ngIf="activeTab === 'users'" (click)="toggleView()">
+        <!-- View toggle button - Show for users, finances and reservations tabs -->
+        <button class="view-toggle" *ngIf="activeTab === 'users' || activeTab === 'finances' || activeTab === 'reservations'" (click)="toggleView()">
           <i class="material-icons">{{ viewMode === 'chart' ? 'table_chart' : 'insert_chart' }}</i>
           {{ viewMode === 'chart' ? 'Table View' : 'Chart View' }}
         </button>
@@ -67,8 +93,8 @@
             <div class="stat-card-header">
               <h3>Monthly Revenue</h3>
             </div>
-            <div class="stat-value">$0</div>
-            <div class="stat-subtext">Will be added soon</div>
+            <div class="stat-value">${{ monthlyRevenue }}</div>
+            <div class="stat-subtext">Current month</div>
           </div>
 
           <!-- Monthly Reservations Card -->
@@ -151,7 +177,31 @@
                 </div>
               </ng-container>
               <ng-container *ngSwitchCase="1">
-                <div style="padding: 32px; text-align: center; color: #888; font-size: 18px;">Finances overview will be added soon.</div>
+                <div class="occupancy-info">
+                  <div class="occupancy-metric">
+                    <div class="circular-progress">
+                      <svg viewBox="0 0 36 36">
+                        <path class="circle-bg"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        <path class="circle"
+                          [attr.stroke-dasharray]="getCompletedPaymentsPercentage() + ', 100'"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        <text x="18" y="20.35" class="percentage">{{ getCompletedPaymentsPercentage() }}%</text>
+                      </svg>
+                    </div>
+                    <p>Completed Payments</p>
+                  </div>
+                  <!-- Finances Info Card -->
+                  <div class="reservation-overview-card">
+                    <div class="reservation-overview-label">Finance Statistics</div>
+                    <div class="reservation-overview-value">
+                      ${{ monthlyPaymentsAmount }} Revenue This Month
+                    </div>
+                    <div class="reservation-overview-value" style="margin-top: 8px;">
+                      {{ monthlyPaymentsCount }} {{ monthlyPaymentsCount === 1 ? 'Transaction' : 'Transactions' }} This Month
+                    </div>
+                  </div>
+                </div>
               </ng-container>
               <ng-container *ngSwitchCase="2">
                 <!-- Upravená stránka Reservations Overview s daty z booking endpointu -->
@@ -376,7 +426,147 @@
       <div *ngIf="activeTab !== 'overview'" class="data-view">
         <!-- Finances Tab -->
         <div *ngIf="activeTab === 'finances'" class="finances-tab">
-          <div style="padding: 32px; text-align: center; color: #888; font-size: 18px;">Financial statistics will be added soon.</div>
+          <!-- Filtry pro Finances -->
+          <div class="reservation-filters">
+            <div class="filter-container">
+              <div class="filter-row">
+                <!-- Search Input - Full Width -->
+                <div class="filter-group full-width">
+                  <label for="paymentSearchInput">Search:</label>
+                  <div class="input-wrapper search-wrapper">
+                    <input type="text" id="paymentSearchInput" placeholder="Search finances..." 
+                         (input)="onPaymentSearchChange($event)" [value]="paymentSearchFilter" />
+                    <span class="clear-search" *ngIf="paymentSearchFilter" (click)="clearPaymentSearch()">✕</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="filter-row">
+                <!-- Status Filter -->
+                <div class="filter-group">
+                  <label for="paymentStatusSelect">Status:</label>
+                  <div class="select-wrapper">
+                    <select id="paymentStatusSelect" (change)="onPaymentStatusFilterChange($event)">
+                      <option value="all">All Statuses</option>
+                      <option value="completed">Completed</option>
+                      <option value="pending">Pending</option>
+                      <option value="failed">Failed</option>
+                    </select>
+                    <i class="material-icons select-icon">keyboard_arrow_down</i>
+                  </div>
+                </div>
+                
+                <!-- Type Filter -->
+                <div class="filter-group">
+                  <label for="paymentTypeSelect">Transaction Type:</label>
+                  <div class="select-wrapper">
+                    <select id="paymentTypeSelect" (change)="onPaymentTypeFilterChange($event)">
+                      <option value="all">All Types</option>
+                      <option value="purchase">Purchase</option>
+                      <option value="subscription">Subscription</option>
+                    </select>
+                    <i class="material-icons select-icon">keyboard_arrow_down</i>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="filter-row">
+                <!-- Date Range -->
+                <div class="filter-group date-range">
+                  <label for="paymentDateFromInput">From:</label>
+                  <div class="input-wrapper">
+                    <input type="date" id="paymentDateFromInput" 
+                          (change)="onPaymentDateFromChange($event)" [value]="paymentDateRangeStart || ''" />
+                  </div>
+                </div>
+                
+                <div class="filter-group date-range">
+                  <label for="paymentDateToInput">To:</label>
+                  <div class="input-wrapper">
+                    <input type="date" id="paymentDateToInput" 
+                          (change)="onPaymentDateToChange($event)" [value]="paymentDateRangeEnd || ''" />
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Reset filters button -->
+              <div class="filter-row">
+                <div class="filter-group reset-button-container">
+                  <button class="reset-filters-button" (click)="resetPaymentFilters()">
+                    <span class="reset-icon">✕</span> Reset Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div *ngIf="isLoadingPayments" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading payments data...</p>
+          </div>
+          
+          <div *ngIf="paymentsError && !isLoadingPayments" class="error-state">
+            <i class="material-icons">error_outline</i>
+            <p>{{ paymentsError }}</p>
+          </div>
+          
+          <!-- Chart View - When in chart mode -->
+          <div *ngIf="!isLoadingPayments && viewMode === 'chart'" class="chart-view">
+            <!-- Empty State for no data -->
+            <div *ngIf="financesData.length === 0" class="empty-state">
+              <i class="material-icons">insert_chart</i>
+              <h2>No Finances Data Available</h2>
+              <p>There are currently no financial records in the system.</p>
+            </div>
+            
+            <!-- The Chart -->
+            <div *ngIf="financesData.length > 0" class="chart-container">
+              <canvas id="dataChart"></canvas>
+            </div>
+          </div>
+          
+          <!-- Table View -->
+          <div *ngIf="!isLoadingPayments && viewMode === 'table'" class="table-view">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User ID</th>
+                  <th>Trainer ID</th>
+                  <th>Price</th>
+                  <th>Credits</th>
+                  <th>Status</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let payment of filteredPayments">
+                  <td>{{ payment.id }}</td>
+                  <td>{{ payment.userId }}</td>
+                  <td>{{ payment.roleId === 1 ? payment.userId : 'N/A' }}</td>
+                  <td>${{ payment.price }}</td>
+                  <td>{{ payment.creditAmount }}</td>
+                  <td>
+                    <span class="status-badge" 
+                          [ngClass]="payment.status === 'Completed' ? 'success' : 
+                                    payment.status === 'Pending' ? 'warning' : 'danger'">
+                      {{ payment.status }}
+                    </span>
+                  </td>
+                  <td>{{ payment.transactionType }}</td>
+                  <td>{{ formatReservationDate(payment.createdAt) }}</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <!-- Empty state -->
+            <div *ngIf="filteredPayments.length === 0" class="empty-state">
+              <i class="material-icons">payments</i>
+              <h3>No Payments Found</h3>
+              <p>There are currently no payments in the system or matching your filters.</p>
+            </div>
+          </div>
         </div>
         
         <!-- Reservations Tab - Special Handling for API Integration -->
