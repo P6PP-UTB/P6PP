@@ -33,38 +33,76 @@ namespace AdminSettings.Controllers
             return result ? NoContent() : NotFound("System settings not found.");
         }
 
-        [HttpGet("system-settings/timezones")]
-        public async Task<IActionResult> GetTimezones()
+        [HttpGet("system-settings/BackupSetting")]
+        public async Task<IActionResult> GetDatabaseBackupSetting()
         {
-            var timezones = await _systemSettingsService.GetTimezonesAsync();
-            return timezones.Any() ? Ok(timezones) : NotFound("No timezones available.");
+            var databaseBackupSetting = await _systemSettingsService.GetDatabaseBackupSettingsAsync();
+            return Ok(databaseBackupSetting);
         }
 
-        [HttpPut("system-settings/timezones")]
-        public async Task<IActionResult> UpdateTimezone([FromBody] Timezone timezone)
+        [HttpPut("system-settings/BackupSetting")]
+        public async Task<IActionResult> UpdateDatabaseBackupSetting([FromBody] DatabaseBackupSetting backupSetting)
         {
-            if (!ModelState.IsValid || timezone == null)
-                return BadRequest("Invalid timezone data.");
-
-            var result = await _systemSettingsService.UpdateTimezoneAsync(timezone);
-            return result ? NoContent() : NotFound("Timezone not found.");
+            if (!ModelState.IsValid || backupSetting == null)
+                return BadRequest("Invalid backup setting data.");
+            var result = await _systemSettingsService.UpdateDatabaseBackupSettingAsync(backupSetting);
+            return result ? NoContent() : NotFound("Backup setting not found.");
         }
 
-        [HttpGet("system-settings/currencies")]
-        public async Task<IActionResult> GetCurrencies()
+        [HttpGet("system-settings/audit-log-enabled")]
+        public async Task<IActionResult> GetAuditLogEnabled()
         {
-            var currencies = await _systemSettingsService.GetCurrenciesAsync();
-            return currencies.Any() ? Ok(currencies) : NotFound("No currencies available.");
+            var auditLogEnabled = await _systemSettingsService.GetAuditLogEnabledAsync();
+            return Ok(auditLogEnabled);
         }
 
-        [HttpPut("system-settings/currencies")]
-        public async Task<IActionResult> UpdateCurrency([FromBody] Currency currency)
+        [HttpPut("system-settings/audit-log-enabled/{enabled}")]
+        public async Task<IActionResult> SetAuditLogEnabled(bool enabled)
         {
-            if (!ModelState.IsValid || currency == null)
-                return BadRequest("Invalid currency data.");
+            var settings = await _systemSettingsService.GetSystemSettingsAsync();
+            if (settings == null)
+                return NotFound(new { Message = "System settings not found." });
 
-            var result = await _systemSettingsService.UpdateCurrencyAsync(currency);
-            return result ? NoContent() : NotFound("Currency not found.");
+            settings.AuditLogEnabled = enabled;
+            var result = await _systemSettingsService.UpdateSystemSettingsAsync(settings);
+            return result
+                ? Ok(new { Message = $"Audit log has been {(enabled ? "enabled" : "disabled")}." })
+                : StatusCode(500, new { Message = "Failed to update audit log setting." });
+        }
+
+        [HttpGet("system-settings/notification-enabled")]
+        public async Task<IActionResult> GetNotificationEnabled()
+        {
+            var notificationEnabled = await _systemSettingsService.GetNotificationEnabledAsync();
+            return Ok(notificationEnabled);
+        }
+
+        [HttpPut("system-settings/backup/manual/{enabled}")]
+        public async Task<IActionResult> SetManualBackupEnabled(bool enabled)
+        {
+            var settings = await _systemSettingsService.GetSystemSettingsAsync();
+            if (settings == null)
+                return NotFound(new { Message = "System settings not found." });
+
+            settings.DatabaseBackupSetting.ManualBackupEnabled = enabled;
+            var result = await _systemSettingsService.UpdateSystemSettingsAsync(settings);
+            return result
+                ? Ok(new { Message = $"Manual backup has been {(enabled ? "enabled" : "disabled")}." })
+                : StatusCode(500, new { Message = "Failed to update manual backup setting." });
+        }
+
+        [HttpPut("system-settings/backup/automatic/{enabled}")]
+        public async Task<IActionResult> SetAutomaticBackupEnabled(bool enabled)
+        {
+            var settings = await _systemSettingsService.GetSystemSettingsAsync();
+            if (settings == null)
+                return NotFound(new { Message = "System settings not found." });
+
+            settings.DatabaseBackupSetting.AutomaticBackupEnabled = enabled;
+            var result = await _systemSettingsService.UpdateSystemSettingsAsync(settings);
+            return result
+                ? Ok(new { Message = $"Automatic backup has been {(enabled ? "enabled" : "disabled")}." })
+                : StatusCode(500, new { Message = "Failed to update automatic backup setting." });
         }
     }
 }

@@ -17,4 +17,6 @@ public sealed class Service : Entity<int>
     [ForeignKey(nameof(RoomId))]
     public int RoomId { get; set; }
     public Room? Room { get; set; }
+
+    public IList<Booking> Bookings { get; set; } = [];
 }

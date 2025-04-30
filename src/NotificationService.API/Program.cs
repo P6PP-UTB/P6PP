@@ -7,6 +7,9 @@ using static NotificationService.API.Features.SendBookingConfirmationEmailHandle
 // This is just an example how you CAN structure your microservice,
 // you can do it differently, but this is lightweight and easy to understand.
 
+// Must copy .env file to src/NotificationService.API/.env from 
+//https://utbcz-my.sharepoint.com/:u:/g/personal/d_polisensky_utb_cz/EYDRy2vNdJVOuvkczhD52hEBvXXz_6dHmyH54ftcqKgESA?e=W4C41l
+// use UTB account to download it
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure port here + launchSettings.json ( + later Dockerfile EXPOSE XXXX)
