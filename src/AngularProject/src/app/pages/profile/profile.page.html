@@ -26,14 +26,31 @@
     <!-- 🔧 Edit Profile Form -->
     <form *ngIf="showEditForm" [formGroup]="editForm" (ngSubmit)="onSaveProfile()" class="form-block">
       <h3 class="form-title">Update Profile</h3>
-      <input type="text" formControlName="username" placeholder="Username" class="form-input" />
+      <label for="username">Username</label>
+      <input type="text" formControlName="username" placeholder="New username" class="form-input" />
+
+      <label for="firstName">First Name</label>
       <input type="text" formControlName="firstName" placeholder="First Name" class="form-input" />
+
+      <label for="lastName">Last name</label>
       <input type="text" formControlName="lastName" placeholder="Last Name" class="form-input" />
-      <input type="email" formControlName="email" placeholder="Email" class="form-input" />
-      <input type="text" formControlName="phoneNumber" placeholder="Phone Number" class="form-input" />
+
+      <label for="email">Email</label>
+      <input type="email" formControlName="email" placeholder="new_email@mail.com" class="form-input" />
+
+      <label for="phoneNumber">Phone number</label>
+      <input type="text" formControlName="phoneNumber" placeholder="+420111222333" class="form-input" />
+
+      <label for="weight">Weight</label>
       <input type="number" formControlName="weight" placeholder="Weight (kg)" class="form-input" />
+
+      <label for="height">Height</label>
       <input type="number" formControlName="height" placeholder="Height (cm)" class="form-input" />
-      <input type="date" formControlName="dateOfBirth" placeholder="Date of birth" class="form-input"/>
+
+      <!-- <label for="dateOfBirth">Birthday</label>
+      <input type="date" formControlName="dateOfBirth" placeholder="Date of birth" class="form-input"/> -->
+
+      <label for="sex">Sex</label>
       <select formControlName="sex" class="form-input">
         <option value="" disabled selected hidden>Select Gender</option>
         <option value="Male">Male</option>
@@ -42,11 +59,12 @@
       <button type="submit" class="form-button">Save</button>
     </form>
 
-   <!-- ⚙️ Settings Form -->
+  <!-- ⚙️ Settings Form -->
   <form *ngIf="showSettingsForm" [formGroup]="settingsForm" (ngSubmit)="onChangePassword()" class="form-block">
     <h3 class="form-title">Change Password</h3>
 
     <!-- Новый пароль -->
+    <label for="newPassword">Set a new password</label>
     <div class="container">
       <input id="newPassword"
             [type]="hidePassword ? 'password' : 'text'"
@@ -56,6 +74,8 @@
             [ngClass]="{'error-input': settingsForm.get('newPassword')?.invalid && settingsForm.get('newPassword')?.touched}">
       <button type="button" class="toggle-password" (click)="hidePassword = !hidePassword">👁</button>
     </div>
+
+    <label for="repeatPassword">Repeat a new password</label>
     <div class="container">  
       <input id="repeatPassword"
             [type]="hideRepeatPassword ? 'password' : 'text'"

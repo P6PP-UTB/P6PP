@@ -31,6 +31,7 @@ export class ProfilePage implements OnInit {
   ngOnInit() {
     this.userService.getCurrentUser().subscribe((user) => {
       this.user = user;
+      console.log("User: ", user)
       this.initForms();
     });
   }
@@ -45,7 +46,7 @@ export class ProfilePage implements OnInit {
       weight: [this.user?.weight || ''],
       height: [this.user?.height || ''],
       sex: [this.user?.sex || ''],
-      dateOfBirth: [this.user?.dateOfBirth ? this.user.dateOfBirth.split('T')[0] : '']
+      // dateOfBirth: [this.user?.dateOfBirth ? this.user.dateOfBirth.split('T')[0] : '']
     });
 
     this.settingsForm = this.fb.group({
