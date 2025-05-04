@@ -3,8 +3,8 @@
       <header class="calendar-header">
          
             <button class="month-button" (click)="toggleMonthMenu()">Month <i class="bi"  [ngClass]="showMonthMenu ? 'bi bi-chevron-up fs-5' : 'bi bi-chevron-down fs-5'"></i></button>
-              <h2>{{ getMonthName() }} {{ year }}</h2>
-              <button class="reservation-button"><i class="bi bi-plus-circle fs-5"></i> Reservation</button>
+            <h2>{{ getMonthName() }} {{ year }}</h2>
+            <a class="reservation-button btn" href="#courses"><i class="bi bi-plus-circle fs-5"></i> Reservation</a>
  
       </header>
 
