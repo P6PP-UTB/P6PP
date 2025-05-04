@@ -23,16 +23,13 @@ export class MainPageComponent {
   isHidden = false;
   currentVideoTime = 0;
 
-
   constructor(
     private courseService: CourseService,
   ){
 
   }
 
-  //courses: Course[] = [];
-
-  // TESTING DATA !!!COMMENT 31:3!!!
+  // TESTING DATA !!!
   courses: Course[] = [
     {
       id: 1,
@@ -80,7 +77,7 @@ export class MainPageComponent {
       currentCapacity: 35,
       totalCapacity: 40,
       roomName: "Room 6",
-      isCancelled: false
+      isCancelled: true
     },
     {
       id: 5,
@@ -98,12 +95,16 @@ export class MainPageComponent {
 
   ngOnInit(){
     this.courseService.getAllCourses().subscribe(courcesResponse => {
-      this.courses = courcesResponse.data;
+      this.courses = this.filterCources(courcesResponse.data);
       console.log("course arr: ", this.courses);
     });
-    
-    //this.courseService.getAllCources().then((coursesList: Course[] = this.courses) => this.courses = coursesList)
   }
+
+  filterCources(courcesArr: Course[]) {
+    const res: Course[] = courcesArr.filter(course => !course.isCancelled);
+    return res;
+  }
+  
 
   scrollDown() {
     const cont = document.querySelector('.scroll-container');
@@ -115,6 +116,7 @@ export class MainPageComponent {
     }
     window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
   }
+
   ngAfterViewInit() {
     const video = this.bgVideoRef?.nativeElement;
     if (video) {
@@ -163,7 +165,6 @@ export class MainPageComponent {
     }, 0);
   }
 
-  
   onVideoEnded() {
     this.isHidden = true;
   }
