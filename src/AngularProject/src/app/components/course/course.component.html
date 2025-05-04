@@ -10,7 +10,7 @@
     <h5 class="card-title">{{ course.serviceName }}</h5>
 
     <p><strong>Time:</strong> {{ course.start | date:'HH:mm' }} - {{ course.end | date:'HH:mm' }}</p>
-    <p><strong>Free slots:</strong> {{ course.totalCapacity - course.currentCapacity }}</p>
+    <p [ngClass]="{'full': course.totalCapacity - course.currentCapacity == 0}"><strong>Free slots:</strong> {{ course.totalCapacity - course.currentCapacity }}</p>
     <p><strong>Price:</strong> {{ course.price }} Kč</p>
 
     
