@@ -1,6 +1,5 @@
 import { Component, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common'
-import { AppComponent } from '../../app.component';
 import { NavigationComponent } from "../../components/navigation/navigation.component";
 import { CalendarComponent } from "../../components/calendar/calendar.component";
 import { FooterComponent } from '../../components/footer/footer.component';
@@ -13,7 +12,7 @@ import { CourseService } from '../../services/course.service';
 
 @Component({
   selector: 'app-main-page',
-  imports: [FooterComponent,NavigationComponent, CommonModule, CalendarComponent, CourseComponent],
+  imports: [FooterComponent, NavigationComponent, CommonModule, CalendarComponent, CourseComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss'
 })
@@ -24,7 +23,7 @@ export class MainPageComponent {
   currentVideoTime = 0;
 
   constructor(
-    private courseService: CourseService,
+    private courseService: CourseService
   ){
 
   }
@@ -50,7 +49,7 @@ export class MainPageComponent {
       end: new Date(),
       price: 200,
       serviceName: "Yoga",
-      currentCapacity: 35,
+      currentCapacity: 40,
       totalCapacity: 40,
       roomName: "Room 1",
       isCancelled: false
@@ -95,16 +94,10 @@ export class MainPageComponent {
 
   ngOnInit(){
     this.courseService.getAllCourses().subscribe(courcesResponse => {
-      this.courses = this.filterCources(courcesResponse.data);
-      console.log("course arr: ", this.courses);
+      this.courses = this.courseService.filterCources(courcesResponse.data)
+      console.log("Sorted course arr: ", this.courses);
     });
-  }
-
-  filterCources(courcesArr: Course[]) {
-    const res: Course[] = courcesArr.filter(course => !course.isCancelled);
-    return res;
-  }
-  
+  } 
 
   scrollDown() {
     const cont = document.querySelector('.scroll-container');

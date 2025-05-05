@@ -1,20 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UserService } from '../../services/user.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+
 import { NavigationComponent } from '../../components/navigation/navigation.component';
 import { FooterComponent } from '../../components/footer/footer.component';
+
+import { CourseService } from '../../services/course.service';
+import { UserService } from '../../services/user.service';
 import { ToastrService } from 'ngx-toastr';
+
+import { BookingResponse } from '../../services/interfaces/booking';
+import { Course } from '../../services/interfaces/course';
+import { CourseComponent } from "../../components/course/course.component";
 
 @Component({
   selector: 'app-profile.page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NavigationComponent, FooterComponent],
+  imports: [CommonModule, ReactiveFormsModule, NavigationComponent, FooterComponent, CourseComponent],
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.scss'
 })
 export class ProfilePage implements OnInit {
   user: any;
+  bookings: Course[] = [];
+
   showEditForm = false;
   showSettingsForm = false;
   hidePassword = true;
@@ -25,7 +34,8 @@ export class ProfilePage implements OnInit {
   constructor(
     private userService: UserService,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private courseService: CourseService
   ) {}
 
   ngOnInit() {
@@ -33,6 +43,12 @@ export class ProfilePage implements OnInit {
       this.user = user;
       console.log("User: ", user)
       this.initForms();
+    });
+
+    this.courseService.getUserBookings().subscribe((bookingResponse) => {
+      console.log("Booking response: ", bookingResponse);
+      this.bookings = this.courseService.getUserCourses(bookingResponse)
+      console.log("Got bookings: ", this.bookings)
     });
   }
 

@@ -110,16 +110,19 @@
     <div class="profile-events">
       <div class="courses">
         <h3>Your Courses</h3>
-        <div class="course-card">
+        <!-- <div class="course-card">
           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh41yBS-mlfFbMI8mgEE4wZDexvPO8J_bVlg&s" alt="Yoga Course" />
           <div class="course-info">
             <strong>YOGA</strong>
             <button class="more-info-btn">More Info</button>
           </div>
+        </div> -->
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+          <app-course *ngFor="let course of bookings" [course]="course" />
         </div>
       </div>
   
-      <div class="upcoming">
+      <!-- <div class="upcoming">
         <h3>Coming up</h3>
         <div class="upcoming-card">
           <img src="https://akns-images.eonline.com/eol_images/Entire_Site/2019226/rs_1024x759-190326044524-1024-Conor-McGregor-LT-032619-GettyImages-1047272848.jpg?fit=around%7C1024:759&output-quality=90&crop=1024:759;center,top" alt="Coach" />
@@ -130,7 +133,7 @@
             <button class="calendar-btn">Open Calendar</button>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </section>
 </div>
