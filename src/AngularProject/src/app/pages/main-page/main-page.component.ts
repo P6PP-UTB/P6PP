@@ -10,7 +10,7 @@ import { Course } from '../../services/interfaces/course';
 import { CourseService } from '../../services/course.service';
 // move to Navigation component
 import { UserService } from '../../services/user.service';
-
+import { PaymentService } from '../../services/payment.service';
 
 @Component({
   selector: 'app-main-page',
@@ -29,7 +29,7 @@ export class MainPageComponent {
 
   constructor(
     private courseService: CourseService,
-    private userService: UserService
+    private userService: UserService,
   ){
 
   }
@@ -98,6 +98,8 @@ export class MainPageComponent {
     },
   ];
 
+
+
   ngOnInit(){
     // move to Navigation component
     this.userService.getCurrentUser().subscribe((user) => {
@@ -109,7 +111,10 @@ export class MainPageComponent {
       this.courses = this.courseService.filterCources(courcesResponse.data)
       console.log("Sorted course arr: ", this.courses);
     });
-  } 
+
+    
+  }
+  
 
   scrollDown() {
     const cont = document.querySelector('.scroll-container');

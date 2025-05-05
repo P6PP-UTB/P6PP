@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavigationComponent } from "../../components/navigation/navigation.component";
-
+import { PaymentService } from '../../services/payment.service';
+import { UserService } from '../../services/user.service';
 @Component({
   selector: 'app-payment',
   imports: [NavigationComponent],
@@ -10,6 +11,11 @@ import { NavigationComponent } from "../../components/navigation/navigation.comp
 export class PaymentComponent {
   paymentAmount = '0,0CZK';
   private numericAmount = 0;
+
+
+  constructor(private paymentService: PaymentService,
+    private userService: UserService
+  ){}
 
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -31,5 +37,49 @@ export class PaymentComponent {
       input.setSelectionRange(this.paymentAmount.length, this.paymentAmount.length);
     }
   }
+
+  depositMoney(): void {
+    const userIdString = localStorage.getItem('userId');
+  
+    if (!userIdString) {
+      console.error('userId не найден в localStorage');
+      return;
+    }
+  
+    const userId = Number(userIdString);
+    if (isNaN(userId)) {
+      console.error('Некорректный userId');
+      return;
+    }
+  
+    this.userService.getUserById(userId).subscribe({
+      next: user => {
+        if (!user) {
+          console.error('Пользователь не найден');
+          return;
+        }
+  
+        const roleId = user.roleId;
+  
+        this.paymentService.createPayment({
+          userId: userId,
+          roleId: roleId,
+          transactionType: 'credit',
+          amount: this.numericAmount
+        }).subscribe({
+          next: response => {
+            console.log('Платёж успешно создан:', response);
+          },
+          error: err => {
+            console.error('Ошибка при создании платежа:', err);
+          }
+        });
+      },
+      error: err => {
+        console.error('Ошибка при получении пользователя:', err);
+      }
+    });
+  }
+  
 }
 
