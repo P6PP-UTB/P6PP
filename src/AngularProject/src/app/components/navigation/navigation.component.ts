@@ -16,6 +16,8 @@ export class NavigationComponent {
   isMenuOpen = false;
   isLoggedIn = false;
   MoneyBalance = 123;
+  userId: number | null | undefined;
+
   constructor(
     private authService: AuthService,
     private toastr: ToastrService,
@@ -25,6 +27,12 @@ export class NavigationComponent {
   ngOnInit() {
     this.authService.isLoggedIn$.subscribe(status => {
       this.isLoggedIn = status;
+
+      this.userId = this.authService.getUserId()
+
+      if(this.userId != null || this.userId != 0){
+        
+      }
     });
   }
 
