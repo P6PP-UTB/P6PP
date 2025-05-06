@@ -45,7 +45,7 @@ public class SendVerificationEmailHandler
     public async Task<ApiResult<SendVerificationEmailResponse>> Handle(SendVerificationEmail request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        String host = _configuration["AppUIDomain"] ?? "https://noHostSpecified";
+        String host = _configuration["Hosts:AppUIDomain"] ?? "https://noHostSpecified";
 
         var user = await _userAppService.GetUserByIdAsync(request.Id);
 

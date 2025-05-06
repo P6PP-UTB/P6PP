@@ -45,7 +45,7 @@ public class SendPasswordResetEmailHandler
     public async Task<ApiResult<SendPasswordResetEmailResponse>> Handle(SendPasswordResetEmail request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        String host = _configuration["AppUIDomain"] ?? "https://noHostSpecified";
+        String host = _configuration["Hosts:AppUIDomain"] ?? "https://noHostSpecified";
 
         var user = await _userAppService.GetUserByIdAsync(request.Id);
 
