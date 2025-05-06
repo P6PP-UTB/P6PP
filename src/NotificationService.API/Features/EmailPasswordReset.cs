@@ -26,21 +26,26 @@ public class SendPasswordResetEmailHandler
     private readonly TemplateAppService _templateAppService;
     private readonly UserAppService _userAppService;
     private readonly NotificationLogService _notificationLogService;
+    private readonly IConfiguration _configuration;
 
     public SendPasswordResetEmailHandler(MailAppService mailAppService,
                                          TemplateAppService templateAppService,
                                          UserAppService userAppService,
-                                         NotificationLogService notificationLogService)
+                                         NotificationLogService notificationLogService,
+                                         IConfiguration configuration
+    )
     {
         _mailAppService = mailAppService;
         _templateAppService = templateAppService;
         _userAppService = userAppService;
         _notificationLogService = notificationLogService;
+        _configuration = configuration;
     }
 
     public async Task<ApiResult<SendPasswordResetEmailResponse>> Handle(SendPasswordResetEmail request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        String host = _configuration["AppUIDomain"] ?? "https://noHostSpecified";
 
         var user = await _userAppService.GetUserByIdAsync(request.Id);
 
@@ -61,6 +66,7 @@ public class SendPasswordResetEmailHandler
         template.Text = template.Text.Replace("{name}", $"{user.FirstName} {user.LastName}");
         template.Text = template.Text.Replace("{userId}", user.Id.ToString());
         template.Text = template.Text.Replace("{token}", request.token);
+        template.Text = template.Text.Replace("{host}", host);
 
         var emailArgs = new EmailArgs
         {

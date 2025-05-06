@@ -361,7 +361,7 @@ public class TemplateInit
                                     </p>
 
                                     <div class=""button-container"">
-                                      <a href=""http://localhost:4201/email_verification?userId={userId}&token={token}"">Activate Account</a>
+                                    <a href=""{host}/email_verification?userId={userId}&token={token}"">Activate Account</a>
                                     </div>
 
                                     <p>
@@ -558,7 +558,7 @@ public class TemplateInit
                                     </p>
 
                                     <div class=""button-container"">
-                                      <a href=""http://localhost:4201/password_reset?userId={userId}&token={token}"" rel=""noopener noreferrer""
+                                    <a href=""{host}/password_reset?userId={userId}&token={token}"" rel=""noopener noreferrer""
                                         >Reset Password</a
                                       >
                                     </div>
