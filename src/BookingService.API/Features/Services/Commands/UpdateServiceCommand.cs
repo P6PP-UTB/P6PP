@@ -33,6 +33,19 @@ public sealed class UpdateServiceCommandHandler : IRequestHandler<UpdateServiceC
             .FirstOrDefaultAsync(r => r.Id == request.Service.RoomId, cancellationToken)
             ?? throw new NotFoundException("Room not found");
 
+        var overlappingServicesRoom = await _context.Services
+            .Where(s =>
+                s.RoomId == request.Service.RoomId &&
+                !s.IsCancelled &&
+                s.Start < request.Service.End &&
+                s.End > request.Service.Start)
+            .ToListAsync(cancellationToken);
+
+        if (overlappingServicesRoom.Any())
+        {
+            throw new ValidationException("Room is occupied during the selected time");
+        }
+
         request.Service.MapTo(service);
         await _context.SaveChangesAsync(cancellationToken);
 
