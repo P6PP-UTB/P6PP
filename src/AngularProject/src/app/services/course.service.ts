@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { lastValueFrom, Observable, of } from 'rxjs';
+import { lastValueFrom, Observable, of,BehaviorSubject, Subject} from 'rxjs';
 import { Course } from './interfaces/course';
 import { BookingResponse } from './interfaces/booking';
 import { Booking } from './interfaces/booking';
+
 
 @Injectable({ providedIn: 'root' })
 export class CourseService {
   private requestAllURL = 'http://localhost:8080/api/services';
   private requestSingleURL = 'http://localhost:8080/api/services/';
   private bookingURL = 'http://localhost:8080/api/Bookings';
-
+  private refreshBookingsSubject = new Subject<void>();
+  refreshBookings$ = this.refreshBookingsSubject.asObservable();
   constructor(private http: HttpClient) {}
 
   getAllCourses(): Observable<any> {
@@ -22,6 +24,10 @@ export class CourseService {
     return this.http.get<Course>(reqUrl);
   }
 
+  notifyRefreshBookings() {
+    this.refreshBookingsSubject.next();
+  }
+  
   filterCources(courcesArr: Course[]) {
     const res: Course[] = courcesArr.filter(course => !course.isCancelled);
     res.sort((a, b) => {

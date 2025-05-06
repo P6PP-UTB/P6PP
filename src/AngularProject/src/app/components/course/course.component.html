@@ -32,7 +32,9 @@
       <!-- Кнопки -->
       <div class="d-flex">
         <div>
-          <button class="btn buy" (click)="reserveCourse(course.id)">Reserve</button>
+          <button class="btn buy" [ngClass]="{'btn cancel': isBooked}" (click)="toggleReservation()">
+            {{ isBooked ? 'Cancel' : 'Reserve' }}
+          </button>
         </div>
         <div class="ms-sm-auto">
           <a class="btn info" [routerLink]="['/course', course.id]">More info</a>

@@ -34,21 +34,31 @@ export class CalendarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadBookings();
+    this.courseService.refreshBookings$.subscribe(() => {
+      this.loadBookings();
+    });
+  }
+
+
+  loadBookings() {
     this.courseService.getUserBookings().subscribe((response) => {
       const bookings = response.data || [];
-  
+
       const loadedCourses: Course[] = [];
       let completed = 0;
-  
-      if (bookings.length === 0) return;
-  
+
+      if (bookings.length === 0) {
+        this.populateCalendarEvents([]);
+        return;
+      }
+
       bookings.forEach((booking: any) => {
         this.courseService.getOneCourse(booking.serviceId.toString()).subscribe((res) => {
           loadedCourses.push(res.data);
           completed++;
-  
+
           if (completed === bookings.length) {
-            // все курсы загружены
             this.populateCalendarEvents(loadedCourses);
           }
         });
