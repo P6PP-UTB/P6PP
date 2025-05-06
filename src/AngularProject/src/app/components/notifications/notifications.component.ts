@@ -1,5 +1,6 @@
-import { Component, HostListener, Output, EventEmitter } from '@angular/core';
+import { Component, HostListener, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-notifications',
@@ -8,15 +9,23 @@ import { CommonModule } from '@angular/common';
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss']
 })
-export class NotificationsComponent {
+export class NotificationsComponent implements OnInit {
+  
+  constructor(private notificationService: NotificationService) {
+  }
+
+  public ngOnInit(): void {
+    this.notificationService.notifications$.subscribe(data => {
+      console.log(data);
+      this.notifications = data;
+    })
+
+    console.log(this.notifications);
+  }
 
   @Output() closed = new EventEmitter<void>();
 
-  notifications = [
-    { message: 'Your booking has been cancelled' },
-    { message: 'New course available!' },
-    { message: 'Payment was successful' }
-  ];
+  public notifications: any;
 
   closeNotifications() {
     this.closed.emit();
