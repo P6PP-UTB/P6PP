@@ -3,7 +3,6 @@
 <div class="section-content">
     <div *ngIf="course" class="container-back">
   
-      <!-- Слайдер изображений -->
       <div class="image-slider">
         <button class="slider-button left" (click)="prevImage()">
           <span>&#10094;</span>
@@ -16,10 +15,7 @@
         </button>
       </div>
       
-  
-      <!-- Content container matching the image width -->
       <div class="content-container">
-        <!-- Информация о курсе и тренере -->
         <div class="info-row">
           <div class="left-info justify-content-left">
             <div class="info">{{ course.serviceName }}</div>
@@ -58,8 +54,7 @@
             <div class="coach-name">{{ trainer || 'Coach name' }}</div>
           </div>
         </div>
-  
-        <!-- Описание курса -->
+
         <!-- <div class="course-description">
           <h2>About the course</h2>
           <p>Description</p>

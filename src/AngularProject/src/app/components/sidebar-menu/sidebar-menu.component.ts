@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { ToastrService } from 'ngx-toastr'; // Импортируем ToastrService
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-sidebar-menu',

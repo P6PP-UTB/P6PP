@@ -31,7 +31,7 @@ export class PaymentService {
     return this.http.get<any>(reqUrl).pipe(
       map(response => response.data.creditBalance),
       catchError(error => {
-        console.error('Ошибка при получении баланса:', error);
+        console.error('Error in receiving balance:', error);
         return throwError(() => error);
       })
     );
@@ -40,7 +40,7 @@ export class PaymentService {
   createPayment(payment: Payment): Observable<any> {
     return this.http.post<any>(this.createPaymentUrl, payment).pipe(
       catchError(error => {
-        console.error('Ошибка при создании платежа:', error);
+        console.error('Error during payment creation:', error);
         return throwError(() => error);
       })
     );

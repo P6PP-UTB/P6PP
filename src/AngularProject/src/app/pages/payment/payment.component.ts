@@ -42,20 +42,20 @@ export class PaymentComponent {
     const userIdString = localStorage.getItem('userId');
   
     if (!userIdString) {
-      console.error('userId не найден в localStorage');
+      console.error('userId not found in local storage');
       return;
     }
   
     const userId = Number(userIdString);
     if (isNaN(userId)) {
-      console.error('Некорректный userId');
+      console.error('Invalid userId');
       return;
     }
   
     this.userService.getUserById(userId).subscribe({
       next: user => {
         if (!user) {
-          console.error('Пользователь не найден');
+          console.error('User not found');
           return;
         }
   
@@ -68,15 +68,15 @@ export class PaymentComponent {
           amount: this.numericAmount
         }).subscribe({
           next: response => {
-            console.log('Платёж успешно создан:', response);
+            console.log('Payment successfully created:', response);
           },
           error: err => {
-            console.error('Ошибка при создании платежа:', err);
+            console.error('Error during payment creation:', err);
           }
         });
       },
       error: err => {
-        console.error('Ошибка при получении пользователя:', err);
+        console.error('Error on user retrieval:', err);
       }
     });
   }

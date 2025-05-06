@@ -76,7 +76,7 @@ export class CourseComponent implements OnInit {
       this.courseService.bookService(this.course.id).subscribe({
         next: () => {
           this.toastr.success('Course reserved successfully!', 'Success');
-          this.checkIfBooked(this.course.id); // обновим состояние
+          this.checkIfBooked(this.course.id);
           this.courseService.notifyRefreshBookings();
         },
         error: (err: any) => {

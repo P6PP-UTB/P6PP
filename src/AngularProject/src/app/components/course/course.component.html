@@ -8,20 +8,16 @@
   </div>
 
   <div class="card-body d-flex flex-column">
-    <!-- Верхний блок: название -->
     <div>
       <h5 class="card-title">{{ course.serviceName }}</h5>
     </div>
 
-    <!-- Нижний блок: всё остальное -->
     <div class="mt-auto">
-      <!-- Дата и время -->
       <div class="d-flex justify-content-between">
         <p class="mb-1"><strong>Date:</strong> {{ course.start | date:'dd.MM.yyyy' }}</p>
         <p class="mb-1"><strong>Time:</strong> {{ course.start | date:'HH:mm' }} - {{ course.end | date:'HH:mm' }}</p>
       </div>
 
-      <!-- Слоты и цена -->
       <div class="d-flex justify-content-between">
         <p class="mb-2" [ngClass]="{'full': course.totalCapacity - course.currentCapacity == 0}">
           <strong>Free slots:</strong> {{ course.totalCapacity - course.currentCapacity }}
@@ -29,18 +25,19 @@
         <p class="mb-2"><strong>Price:</strong> {{ course.price }} Kč</p>
       </div>
 
-      <!-- Кнопки -->
       <div class="d-flex justify-content-between">
         <div>
           <button
-          class="btn"
+          class="btn buy"
           [ngClass]="{
-            'buy': !isBooked,
+            'buy': !isBooked && course.totalCapacity - course.currentCapacity != 0,
             'cancel': isBooked
           }"
+
+          [ngClass]="{'disabled': course.totalCapacity - course.currentCapacity == 0 && !isBooked}"
           (click)="toggleReservation()"
         >
-          {{ isBooked ? 'Cancel' : 'Reserve' }}
+          {{ isBooked ? 'Cancel booking' : 'Reserve' }}
         </button>
         </div>
         <div class="ms-sm-auto">

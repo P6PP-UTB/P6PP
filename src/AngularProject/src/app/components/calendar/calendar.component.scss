@@ -13,10 +13,10 @@
 
 .calendar-header {
   display: flex;
-  justify-content: flex-start; /* элементы выравниваются слева */
-  align-items: center; /* элементы по центру по вертикали */
-  gap: 20px; /* отступ между элементами */
-  flex-wrap: wrap; /* если на мобильном экране места не хватит */
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
   margin-bottom: 1vh;
 }
 
@@ -189,14 +189,14 @@
 }
 
 .month-menu {
-  position: absolute; /* добавь */
-  top: 100px; /* настроить по месту */
-  left: 20px; /* настрой смещение */
-  z-index: 100; /* выше всего */
+  position: absolute;
+  top: 100px;
+  left: 20px;
+  z-index: 100;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 4px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* красивый тенёк */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .month-menu div {

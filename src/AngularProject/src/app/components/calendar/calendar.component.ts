@@ -164,11 +164,9 @@ export class CalendarComponent implements OnInit {
     this.eventsTomorrow = this.eventsByDate[tomorrowStr] || [];
   }
 
-
+  // Seed function to choose a color of course in calendar
   getDeterministicColor(courseName: string): string {
     const colors = ['#EA2839', '#EC741B', '#6EBEA0', '#46505A','#F3D196','#6C9753','#DBA3C1','#9C8CDE','#9B4648'];
-  
-    // Простейший хеш-функция (как сид)
     let hash = 0;
     for (let i = 0; i < courseName.length; i++) {
       hash = courseName.charCodeAt(i) + ((hash << 5) - hash);
@@ -177,6 +175,4 @@ export class CalendarComponent implements OnInit {
     const index = Math.abs(hash) % colors.length;
     return colors[index];
   }
-  
-  
 }

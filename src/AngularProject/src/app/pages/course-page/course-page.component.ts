@@ -23,7 +23,7 @@ export class CoursePageComponent {
 
   course!: Course;
   trainer: string = '';
-  bookingId: number | null = null; // ЕСЛИ null — значит записи нет
+  bookingId: number | null = null; // If  NULL - booking is not exists
 
   async ngOnInit() {
     const currentUrl: string = window.location.href;
@@ -36,12 +36,10 @@ export class CoursePageComponent {
         this.trainer = trainerResponse.firstName + ' ' + trainerResponse.lastName;
       });
   
-      // СЮДА ПЕРЕНОСИМ ПОСЛЕ ТОГО КАК КУРС ПОЛУЧИЛИ!!!
       this.checkIfBooked(this.course.id);
     });
   }
 
-  // Проверяем, забронирован ли курс
   checkIfBooked(courseId: number) {
     this.courseService.getUserBookings().subscribe(response => {
       const bookings = response.data || [];
@@ -57,7 +55,6 @@ export class CoursePageComponent {
 
   enrollOrCancel() {
     if (this.bookingId) {
-      // Отмена записи
       this.courseService.cancelBooking(this.bookingId).subscribe({
         next: () => {
           this.toastr.success('Booking cancelled successfully!', 'Success');
@@ -68,11 +65,10 @@ export class CoursePageComponent {
         }
       });
     } else {
-      // Запись на курс
       this.courseService.bookService(this.course.id).subscribe({
         next: (response) => {
           this.toastr.success('Enrolled successfully!', 'Success');
-          this.checkIfBooked(this.course.id); // Чекнем бронь снова
+          this.checkIfBooked(this.course.id);
         },
         error: (err) => {
           this.toastr.error(err.error?.message || 'Failed to enroll.', 'Error');
@@ -81,46 +77,29 @@ export class CoursePageComponent {
     }
   }
 
-
-  // course: Course = {
-  //   id: 99999999,
-  //   trainerId: 99999999,
-  //   start: new Date(),
-  //   end: new Date(),
-  //   price: 99999999,
-  //   serviceName: "ServiceName",
-  //   currentCapacity: 99999999,
-  //   totalCapacity: 4999999990,
-  //   roomName: "RoomName",
-  //   isCancelled: false
-  // };
-
-  // trainer: string = '';
-
-  // Массив изображений
+  // Example image array
   imageUrls: string[] = [
     'https://goo.su/kSY4URo?',
-    'https://goo.su/YyOz7YE',
-    'https://tse3.mm.bing.net/th?id=OIG2.5bowY.5mQdQKTIv5qY1g&pid=ImgGn'
+    'https://tse1.mm.bing.net/th?id=OIG3.uUITmFrj0U3EZKUrsMjq&cb=iwc1&pid=ImgGn',
+    'https://images.pexels.com/photos/7045575/pexels-photo-7045575.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    'https://tse3.mm.bing.net/th?id=OIG2.5bowY.5mQdQKTIv5qY1g&pid=ImgGn',
+    'https://images.pexels.com/photos/3839058/pexels-photo-3839058.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+
   ];
   currentIndex = 0;
 
-  // Геттер для текущего изображения
   get currentImage(): string {
     return this.imageUrls[this.currentIndex];
   }
 
-  // Метод для перехода к предыдущему изображению
   prevImage(): void {
     this.currentIndex = (this.currentIndex - 1 + this.imageUrls.length) % this.imageUrls.length;
   }
 
-  // Метод для перехода к следующему изображению
   nextImage(): void {
     this.currentIndex = (this.currentIndex + 1) % this.imageUrls.length;
   }
 
-  // Функция для получения последнего сегмента URL
   private getLastSegment(url: string): string {
     const parts = url.split('/');
     return parts.pop() || '1';

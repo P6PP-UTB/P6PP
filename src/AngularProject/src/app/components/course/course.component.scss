@@ -31,18 +31,22 @@
     font-size: 14pt;
 }
 
-
 .cancel{
-    background-color: white;
+    background-color: transparent;
     color: #EA2839;
+    font-size: 14pt;
+    border-width: 1px;
+    border-color: #EA2839;
+}
+
+.cancel:hover, .cancel:focus{
+    color: #000000;
+    border-color: #000000;
     font-size: 14pt;
 }
 
-
-.cancel:hover{
-    background-color: transparent;
-    color: #0000;
-    font-size: 14pt;
+.cancel:focus{
+    background-color: #0000004f;
 }
 
 .buy:hover{

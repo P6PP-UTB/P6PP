@@ -40,7 +40,7 @@ export class NavigationComponent {
         this.balance = balance;
       },
       error: (err) => {
-        console.error('Не удалось получить баланс:', err);
+        console.error('Failed to get a balance:', err);
       }
     });
   }

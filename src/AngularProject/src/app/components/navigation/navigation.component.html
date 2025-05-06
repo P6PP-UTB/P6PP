@@ -5,7 +5,6 @@
     <a class="nav-btn btn" href="#" routerLink="">Home</a>
     <a class="nav-btn btn" href="#calendar">My calendar</a>
     <a class="nav-btn btn" href="#courses">Courses</a>
-    <!-- <a class="nav-btn btn">Coaches</a> -->
     <a class="nav-btn btn" routerLink="/profile">Profile</a>
     <a class="nav-btn btn balance-mobile" routerLink="/payment">
       {{balance}},-
@@ -24,11 +23,11 @@
     <div *ngIf="isLoggedIn" class="navigation-logged-in">
       <nav>
         <button id="notification-button" (click)="toggleNotifications()">
-          <mat-icon>notifications</mat-icon>
+          <mat-icon id="noti">notifications</mat-icon>
           
         </button>
       </nav>
-      <button class="nav-btn nav-logout balance-desktop" routerLink="/payment">
+      <button class="nav-balance nav-logout balance-desktop" routerLink="/payment">
         {{balance}},-
         <img src="assets/icons/robucks.svg" alt="money" class="icon" />
       </button>
