@@ -126,6 +126,14 @@ body{
     margin-right: 0;
 }
 
+.nav-btns {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    align-self: end;
+}
+
+
 @media (max-width: 768px) {
     #navigation-bar {
       display: none;
@@ -172,3 +180,61 @@ body{
     }
   }
   
+  .balance-desktop {
+    background-color: #EA2839;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12pt;
+    font-weight: bold;
+  }
+  
+  .balance-desktop .icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .balance-mobile {
+    display: none;
+    background-color: #EA2839;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 10px 0;
+    align-items: center;
+    gap: 6px;
+    font-size: 12pt;
+    font-weight: bold;
+  }
+  
+  .balance-mobile .icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* Поведение по медиа-запросу */
+  @media (max-width: 768px) {
+    .balance-desktop {
+      display: none;
+    }
+  
+    .balance-mobile {
+      display: block;
+      width: fit-content;
+      align-self: center;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .balance-desktop {
+      display: inline-flex;
+    }
+  
+    .balance-mobile {
+      display: none;
+    }
+  }

@@ -7,37 +7,42 @@
     <a class="nav-btn btn" href="#courses">Courses</a>
     <!-- <a class="nav-btn btn">Coaches</a> -->
     <a class="nav-btn btn" routerLink="/profile">Profile</a>
+    <a class="nav-btn btn balance-mobile" routerLink="/payment">
+      {{balance}},-
+      <img src="assets/icons/robucks.svg" alt="money" class="icon" />
+    </a>
    
   </nav>
 
-  <div id="log-btns" *ngIf="!isLoggedIn">
+  <div class="nav-btns">
+    <div id="log-btns" *ngIf="!isLoggedIn">
     
-    <a id="login-btn" class="nav-btn btn" routerLink="/login">Log in</a>
-    <a id="signup-btn" class="nav-btn btn" routerLink="/signup">Sign up</a>
+      <a id="login-btn" class="nav-btn btn" routerLink="/login">Log in</a>
+      <a id="signup-btn" class="nav-btn btn" routerLink="/signup">Sign up</a>
+    </div>
+  
+    <div *ngIf="isLoggedIn" class="navigation-logged-in">
+      <nav>
+        <button id="notification-button" (click)="toggleNotifications()">
+          <mat-icon>notifications</mat-icon>
+          
+        </button>
+      </nav>
+      <button class="nav-btn nav-logout balance-desktop" routerLink="/payment">
+        {{balance}},-
+        <img src="assets/icons/robucks.svg" alt="money" class="icon" />
+      </button>
+      <div id="logout-btn">
+        <button class="nav-btn" (click)="logout()">
+          Log out
+        </button>
+      </div>
+    </div>
     <button class="menu-btn" (click)="isMenuOpen = !isMenuOpen" id="hamburger-button">
       <i class="bi"  [ngClass]="isMenuOpen ? 'bi bi-x-lg fs-3' : 'bi bi-list fs-3'"></i>
     </button>
   </div>
-
-
-
-  <div *ngIf="isLoggedIn" class="navigation-logged-in">
-    <nav>
-      <button id="notification-button" (click)="toggleNotifications()">
-        <mat-icon>notifications</mat-icon>
-        
-      </button>
-    </nav>
-    <button class="nav-btn nav-logout" id="balance" routerLink="/payment">
-      {{balance}},-
-      <img src="assets/icons/robucks.svg" alt="money" class="icon" />
-    </button>
-    <div id="logout-btn">
-      <button class="nav-btn" (click)="logout()">
-        Log out
-      </button>
-    </div>
-  </div>
+  
 </div>
 
 <app-notifications *ngIf="showNotifications" (closed)="showNotifications = false"></app-notifications>
