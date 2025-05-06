@@ -55,7 +55,7 @@ namespace NotificationService.API.Services
             ApiResult<ServiceResponse>? response = null;
             try
             {
-                response = await _httpClient.GetAsync<ServiceResponse>("{host}/api/Services/" + serviceId);
+                response = await _httpClient.GetAsync<ServiceResponse>($"{host}/api/Services/" + serviceId);
                 Console.WriteLine(response.Data);
 
             }
