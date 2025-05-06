@@ -19,23 +19,21 @@
           <!-- Weekday names -->
           <div *ngFor="let day of weekdays" class="calendar-cell-header">{{ day }}</div>
           <!-- Calendar days -->
-          <div *ngFor="let day of daysWithPadding" class="calendar-cell" [class.today]="isToday(day)" [class.empty]="day === null">
-              <span class="day-number">{{ day || '' }}</span>
-              <div class="events-in-cell">
-                  <ng-container *ngIf="day && isToday(day)">
-                      <div *ngFor="let event of eventsToday" class="event-entry colored-event-entry" [style.backgroundColor]="event.color">
-                          <!-- <span class="event-dot" [style.backgroundColor]="event.color"></span> -->
-                          <span class="event-title-in-cell">{{ event.title }}</span>
-                      </div>
-                  </ng-container>
-                  <ng-container *ngIf="day && day === tomorrowDate && month === today.getMonth() && year === today.getFullYear()">
-                      <div *ngFor="let event of eventsTomorrow" class="event-entry colored-event-entry" [style.backgroundColor]="event.color">
-                         <!-- <span class="event-dot" [style.backgroundColor]="event.color"></span> -->
-                         <span class="event-title-in-cell">{{ event.title }}</span>
-                     </div>
-                 </ng-container>
-              </div>
-          </div>
+          <div *ngFor="let day of daysWithPadding" 
+                class="calendar-cell" 
+                [class.today]="isToday(day)" 
+                [class.empty]="day === null">
+            
+                <span class="day-number">{{ day || '' }}</span>
+            
+                    <div class="events-in-cell">
+                        <ng-container *ngIf="day">
+                            <div *ngFor="let event of getEventsForDate(year, month, day)" class="event-entry colored-event-entry" [style.backgroundColor]="event.color">
+                                <span class="event-title-in-cell">{{ event.title }}</span>
+                            </div>
+                        </ng-container>
+                </div>
+            </div>
       </div>
   </main>
 
