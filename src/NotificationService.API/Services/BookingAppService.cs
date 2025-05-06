@@ -17,25 +17,28 @@ namespace NotificationService.API.Services
         private readonly UserAppService _userAppService;
         private readonly TemplateAppService _templateAppService;
         private readonly MailAppService _mailAppService;
+        private readonly IConfiguration _configuration;
 
         public BookingAppService(NetworkHttpClient httpClient, NotificationDbContext notificationDbContext,
-            UserAppService userAppService,
-            TemplateAppService templateAppService, MailAppService mailAppService)
+                                 UserAppService userAppService,
+                                 TemplateAppService templateAppService, MailAppService mailAppService,
+                                 IConfiguration configuration)
         {
             _httpClient = httpClient;
             _notificationDbContext = notificationDbContext;
             _userAppService = userAppService;
             _templateAppService = templateAppService;
             _mailAppService = mailAppService;
+            _configuration = configuration;
         }
 
         public async Task<BookingResponse?> GetBookingByIdAsync(int id)
         {
+            String host = _configuration["Hosts:Booking"]!;
             ApiResult<BookingResponse>? response = null;
             try
             {
-               
-                response = await _httpClient.GetAsync<BookingResponse>("http://host.docker.internal:8080/api/Bookings/" + id);
+                response = await _httpClient.GetAsync<BookingResponse>($"{host}/api/Bookings/" + id);
                 Console.WriteLine(response.Data);
             }
             catch (Exception e)
@@ -48,10 +51,11 @@ namespace NotificationService.API.Services
 
         public async Task<ServiceResponse?> GetServiceByIdAsync(int serviceId)
         {
+            String host = _configuration["Hosts:Services"]!;
             ApiResult<ServiceResponse>? response = null;
             try
             {
-                response = await _httpClient.GetAsync<ServiceResponse>("http://host.docker.internal:8080/api/Services/" + serviceId);
+                response = await _httpClient.GetAsync<ServiceResponse>("{host}/api/Services/" + serviceId);
                 Console.WriteLine(response.Data);
 
             }
