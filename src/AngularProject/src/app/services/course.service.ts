@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { lastValueFrom, Observable, of } from 'rxjs';
+import { lastValueFrom, Observable, of,BehaviorSubject, Subject} from 'rxjs';
 import { Course } from './interfaces/course';
+import { BookingResponse } from './interfaces/booking';
+import { Booking } from './interfaces/booking';
+
 
 @Injectable({ providedIn: 'root' })
 export class CourseService {
   private requestAllURL = 'http://localhost:8080/api/services';
   private requestSingleURL = 'http://localhost:8080/api/services/';
   private bookingURL = 'http://localhost:8080/api/Bookings';
-
+  private refreshBookingsSubject = new Subject<void>();
+  refreshBookings$ = this.refreshBookingsSubject.asObservable();
   constructor(private http: HttpClient) {}
 
   getAllCourses(): Observable<any> {
@@ -20,16 +24,19 @@ export class CourseService {
     return this.http.get<Course>(reqUrl);
   }
 
-  // async getAllCources(): Promise<Course[]>{
-  //   const data = await fetch(this.requestURL);
-  //   return await data.json() ?? [];
-  // }
+  notifyRefreshBookings() {
+    this.refreshBookingsSubject.next();
+  }
   
-  
+  filterCources(courcesArr: Course[]) {
+    const res: Course[] = courcesArr.filter(course => !course.isCancelled);
+    res.sort((a, b) => {
+      return new Date(b.start).getTime() - new Date(a.start).getTime();
+    });
+    
+    return res;
+  }
 
-  // filterActualCources(courses){
-
-  // }
   bookService(serviceId: number): Observable<any> {
     const body = { serviceId: serviceId };
     return this.http.post(this.bookingURL, body);
@@ -37,6 +44,19 @@ export class CourseService {
 
   getUserBookings(): Observable<any> {
     return this.http.get(this.bookingURL);
+  }
+
+  getUserCourses(booking: BookingResponse) {
+    const res: Course[] = [];
+
+    for (const book of booking.data){
+      this.getOneCourse(book.serviceId.toString()).subscribe(response => {
+        res.push(response.data)
+      })
+    }
+
+    res.sort((a, b) => b.start.getTime() - a.start.getTime());
+    return res;
   }
   
   cancelBooking(bookingId: number): Observable<any> {

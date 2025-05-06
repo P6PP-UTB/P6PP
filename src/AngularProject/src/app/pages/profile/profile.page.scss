@@ -188,6 +188,9 @@
     }
   }
   .error-message {
+    max-width: 360px;
+    font-family: 'Source Sans 3';
+    font-weight: bold;
     color: #EA2839;
     font-size: 14px;
     margin: 0;
@@ -196,5 +199,13 @@
   .error-input{
     box-shadow: 0px 0px 6px #EA2839 inset;
   }
-  
+ 
+  label{
+    font-family: 'Source Sans 3';
+    font-weight: bold;
+  }
+}
+
+app-course{
+  margin: 0% 10%;
 }

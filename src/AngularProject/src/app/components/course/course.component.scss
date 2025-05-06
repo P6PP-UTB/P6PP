@@ -1,7 +1,7 @@
 .card{
     background: #f2f2f2;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 305px;
+    height: 100%;
     width: 305px;
 }
 
@@ -31,6 +31,20 @@
     font-size: 14pt;
 }
 
+
+.cancel{
+    background-color: white;
+    color: #EA2839;
+    font-size: 14pt;
+}
+
+
+.cancel:hover{
+    background-color: transparent;
+    color: #0000;
+    font-size: 14pt;
+}
+
 .buy:hover{
     background-color: #b71c1c;
 }
@@ -45,4 +59,8 @@
     background-color: rgb(40, 50, 60, 1);
     color: white;
     font-size: 14pt;
+}
+
+.full{
+    color: #b71c1c;
 }

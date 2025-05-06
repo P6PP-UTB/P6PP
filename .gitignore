@@ -1,3 +1,6 @@
+# Ignore .env file for SMTP configuration
+src/NotificationService.API/.env
+
 # Ignore build and output directories
 bin/
 obj/

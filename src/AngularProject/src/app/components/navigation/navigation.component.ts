@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { NotificationsComponent } from '../notifications/notifications.component';
-
+import { PaymentService } from '../../services/payment.service';
 @Component({
   selector: 'app-navigation',
   imports: [RouterModule, MatIconModule, CommonModule, NotificationsComponent],
@@ -15,16 +15,33 @@ import { NotificationsComponent } from '../notifications/notifications.component
 export class NavigationComponent {
   isMenuOpen = false;
   isLoggedIn = false;
-  MoneyBalance = 123;
+  userId: number | null | undefined;
+  balance: number | null = null;
+
   constructor(
     private authService: AuthService,
     private toastr: ToastrService,
-    private router: Router 
+    private router: Router,
+    private paymentService: PaymentService
   ) {}
 
   ngOnInit() {
     this.authService.isLoggedIn$.subscribe(status => {
       this.isLoggedIn = status;
+
+      this.userId = this.authService.getUserId()
+
+      if(this.userId != null || this.userId != 0){
+        
+      }
+    });
+    this.paymentService.getUserBalance().subscribe({
+      next: (balance) => {
+        this.balance = balance;
+      },
+      error: (err) => {
+        console.error('Не удалось получить баланс:', err);
+      }
     });
   }
 

@@ -15,7 +15,16 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4201")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 builder.Services.AddScoped<DapperContext>();
 
 
@@ -36,7 +45,7 @@ using (var scope = app.Services.CreateScope())
     var dbSeeder = services.GetRequiredService<DatabaseSeeder>();
     await dbSeeder.SeedAsync();
 }
-
+app.UseCors("AllowAngularDevClient");
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

@@ -1,6 +1,5 @@
 import { Component, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common'
-import { AppComponent } from '../../app.component';
 import { NavigationComponent } from "../../components/navigation/navigation.component";
 import { CalendarComponent } from "../../components/calendar/calendar.component";
 import { FooterComponent } from '../../components/footer/footer.component';
@@ -9,11 +8,13 @@ import { CourseComponent } from '../../components/course/course.component';
 import { Course } from '../../services/interfaces/course';
 
 import { CourseService } from '../../services/course.service';
-
+// move to Navigation component
+import { UserService } from '../../services/user.service';
+import { PaymentService } from '../../services/payment.service';
 
 @Component({
   selector: 'app-main-page',
-  imports: [FooterComponent,NavigationComponent, CommonModule, CalendarComponent, CourseComponent],
+  imports: [FooterComponent, NavigationComponent, CommonModule, CalendarComponent, CourseComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss'
 })
@@ -23,16 +24,17 @@ export class MainPageComponent {
   isHidden = false;
   currentVideoTime = 0;
 
+  // move to Navigation component
+  user: any;
 
   constructor(
     private courseService: CourseService,
+    private userService: UserService,
   ){
 
   }
 
-  //courses: Course[] = [];
-
-  // TESTING DATA !!!COMMENT 31:3!!!
+  // TESTING DATA !!!
   courses: Course[] = [
     {
       id: 1,
@@ -53,7 +55,7 @@ export class MainPageComponent {
       end: new Date(),
       price: 200,
       serviceName: "Yoga",
-      currentCapacity: 35,
+      currentCapacity: 40,
       totalCapacity: 40,
       roomName: "Room 1",
       isCancelled: false
@@ -80,7 +82,7 @@ export class MainPageComponent {
       currentCapacity: 35,
       totalCapacity: 40,
       roomName: "Room 6",
-      isCancelled: false
+      isCancelled: true
     },
     {
       id: 5,
@@ -96,14 +98,23 @@ export class MainPageComponent {
     },
   ];
 
+
+
   ngOnInit(){
-    this.courseService.getAllCourses().subscribe(courcesResponse => {
-      this.courses = courcesResponse.data;
-      console.log("course arr: ", this.courses);
+    // move to Navigation component
+    this.userService.getCurrentUser().subscribe((user) => {
+      this.user = user;
+      console.log("User: ", user)
     });
+
+    this.courseService.getAllCourses().subscribe(courcesResponse => {
+      this.courses = this.courseService.filterCources(courcesResponse.data)
+      console.log("Sorted course arr: ", this.courses);
+    });
+
     
-    //this.courseService.getAllCources().then((coursesList: Course[] = this.courses) => this.courses = coursesList)
   }
+  
 
   scrollDown() {
     const cont = document.querySelector('.scroll-container');
@@ -115,6 +126,7 @@ export class MainPageComponent {
     }
     window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
   }
+
   ngAfterViewInit() {
     const video = this.bgVideoRef?.nativeElement;
     if (video) {
@@ -163,7 +175,6 @@ export class MainPageComponent {
     }, 0);
   }
 
-  
   onVideoEnded() {
     this.isHidden = true;
   }
