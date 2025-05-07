@@ -3,9 +3,6 @@ src/NotificationService.API/.env
 
 
 
-#env for services angular frontend
-src/environments/environment.ts
-src/environments/environment.prod.ts
 
 
 # Ignore build and output directories
