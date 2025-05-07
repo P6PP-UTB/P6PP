@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-
+import { environment } from '../../enviroments/enviroment';
 interface UpdateUserRequest {
   username?: string;
   firstName?: string;
@@ -17,9 +17,8 @@ interface UpdateUserRequest {
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private userBaseUrl = 'http://localhost:5189/api/user';
-  private authBaseUrl = 'http://localhost:8005/api/auth';
-
+  private userBaseUrl = environment.api.user;
+  private authBaseUrl = environment.api.auth;
   constructor(private http: HttpClient) {}
 
   getStoredUserId(): number | null {

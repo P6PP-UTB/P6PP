@@ -4,13 +4,13 @@ import { lastValueFrom, Observable, of,BehaviorSubject, Subject} from 'rxjs';
 import { Course } from './interfaces/course';
 import { BookingResponse } from './interfaces/booking';
 import { Booking } from './interfaces/booking';
-
+import { environment } from '../../enviroments/enviroment';
 
 @Injectable({ providedIn: 'root' })
 export class CourseService {
-  private requestAllURL = 'http://localhost:8080/api/services';
-  private requestSingleURL = 'http://localhost:8080/api/services/';
-  private bookingURL = 'http://localhost:8080/api/Bookings';
+  private requestAllURL = `${environment.api.course}/services`;
+  private requestSingleURL = `${environment.api.course}/services/`;
+  private bookingURL = `${environment.api.course}/Bookings`;
   private refreshBookingsSubject = new Subject<void>();
   refreshBookings$ = this.refreshBookingsSubject.asObservable();
   constructor(private http: HttpClient) {}

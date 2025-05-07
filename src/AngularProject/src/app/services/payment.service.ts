@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../enviroments/enviroment';
 
 export interface Payment {
   userId: number;
@@ -14,8 +15,9 @@ export interface Payment {
   providedIn: 'root'
 })
 export class PaymentService {
-  private getBalanceUrl = 'http://localhost:5185/api/getbalance/';
-  private createPaymentUrl = 'http://localhost:5185/api/createpayment';
+  private getBalanceUrl = `${environment.api.payment}/getbalance`;
+  private createPaymentUrl = `${environment.api.payment}/createpayment`;
+
 
   constructor(private http: HttpClient) {}
 
