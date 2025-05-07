@@ -24,6 +24,7 @@ export class CoursePageComponent {
   course!: Course;
   trainer: string = '';
   bookingId: number | null = null; // If  NULL - booking is not exists
+  isLoading = false;
 
   async ngOnInit() {
     const currentUrl: string = window.location.href;
@@ -54,27 +55,34 @@ export class CoursePageComponent {
   }
 
   enrollOrCancel() {
-    if (this.bookingId) {
-      this.courseService.cancelBooking(this.bookingId).subscribe({
-        next: () => {
-          this.toastr.success('Booking cancelled successfully!', 'Success');
-          this.bookingId = null;
-        },
-        error: (err) => {
-          this.toastr.error(err.error?.message || 'Failed to cancel booking.', 'Error');
-        }
-      });
-    } else {
-      this.courseService.bookService(this.course.id).subscribe({
-        next: (response) => {
-          this.toastr.success('Enrolled successfully!', 'Success');
-          this.checkIfBooked(this.course.id);
-        },
-        error: (err) => {
-          this.toastr.error(err.error?.message || 'Failed to enroll.', 'Error');
-        }
-      });
-    }
+    setTimeout(() => {
+      this.isLoading = true;
+      if (this.bookingId) {
+        this.courseService.cancelBooking(this.bookingId).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.toastr.success('Booking cancelled successfully!', 'Success');
+            this.bookingId = null;
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.toastr.error(err.error?.message || 'Failed to cancel booking.', 'Error');
+          }
+        });
+      } else {
+        this.courseService.bookService(this.course.id).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            this.toastr.success('Enrolled successfully!', 'Success');
+            this.checkIfBooked(this.course.id);
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.toastr.error(err.error?.message || 'Failed to enroll.', 'Error');
+          }
+        });
+      }
+    }, 500);
   }
 
   // Example image array
