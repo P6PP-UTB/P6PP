@@ -18,7 +18,7 @@ export class SignupPage {
   hideRepeatPassword = true;
   registrationError: string | null = null;
   showVerifyMessage: boolean = false;
-
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -56,42 +56,48 @@ export class SignupPage {
   }
 
   onSubmit() {
-    console.log("Signing up...")
-    this.registrationError = null;
-  
-    if (this.signupForm.valid) {
-      const form = this.signupForm.value;
-  
-      const payload = {
-        userName: form.username,
-        email: form.email,
-        password: form.password,
-        firstName: form.name,
-        lastName: form.surname
-      };
+    setTimeout(() => {
+      this.isLoading = true;
+      console.log("Signing up...")
+      this.registrationError = null;
+    
+      if (this.signupForm.valid) {
+        const form = this.signupForm.value;
+    
+        const payload = {
+          userName: form.username,
+          email: form.email,
+          password: form.password,
+          firstName: form.name,
+          lastName: form.surname
+        };
 
-      console.log("Payload: ", payload);
-  
-      this.authService.registerUser(payload).subscribe({
-        next: () => {
-          console.log("Success. Wait couple of minutes and check email")
-          this.showVerifyMessage = true;
-        },
-        error: (err) => {
-          console.log("Error occured")
-          if (err.status === 400 && err.error?.message) {
-            console.log("ERROR: ", err.error.message);
-            this.registrationError = err.error.message;
-          } else {
-            console.log("UNEXPECTED ERROR: ", err.error.message);
-            this.registrationError = 'Something went wrong, try again later.';
+        console.log("Payload: ", payload);
+    
+        this.authService.registerUser(payload).subscribe({
+          next: () => {
+            this.isLoading = false;
+            console.log("Success. Wait couple of minutes and check email")
+            this.showVerifyMessage = true;
+          },
+          error: (err) => {
+            this.isLoading = false;
+            console.log("Error occured")
+            if (err.status === 400 && err.error?.message) {
+              console.log("ERROR: ", err.error.message);
+              this.registrationError = err.error.message;
+            } else {
+              console.log("UNEXPECTED ERROR: ", err.error.message);
+              this.registrationError = 'Something went wrong, try again later.';
+            }
           }
-        }
-      });
-  
-    } else {
-      console.warn('Invalid form:', this.signupForm.value);
-      this.registrationError = "Check all fields for errors"
-    }
+        });
+    
+      } else {
+        this.isLoading = false;
+        console.warn('Invalid form:', this.signupForm.value);
+        this.registrationError = "Check all fields for errors"
+      }
+    }, 1000);
   }
 }
