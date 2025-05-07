@@ -5,7 +5,7 @@ using UserService.API.Persistence.Entities;
 
 namespace UserService.API.Features;
 
-public record UpdateUserRequest(string Username, string FirstName, string LastName, string Email, string? PhoneNumber = null, decimal? Weight = null, decimal? Height = null, string? Sex = null);
+public record UpdateUserRequest(string Username, string FirstName, string LastName, string Email, string? PhoneNumber = null, decimal? Weight = null, decimal? Height = null, string? Sex = null, DateTime? DateOfBirth = null);
 
 public class UpdateUserValidator : AbstractValidator<UpdateUserRequest>
 {
@@ -51,6 +51,10 @@ public class UpdateUserValidator : AbstractValidator<UpdateUserRequest>
             .Must(IsValidSex)
             .When(x => x.Sex != null)
             .WithMessage("Sex must be 'male' or 'female' or 'other'");
+        
+        RuleFor(x => x.DateOfBirth)
+            .Must(date => date == null || date <= DateTime.Now)
+            .WithMessage("Date of birth must be in the past");
     }
 
     private bool IsValidSex(string sex)
@@ -92,6 +96,7 @@ public class UpdateUserHandler
         user.Height = request.Height ?? user.Height;
         user.Sex = request.Sex ?? user.Sex;
         user.UpdatedOn = DateTime.UtcNow;
+        user.DateOfBirth = request.DateOfBirth ?? user.DateOfBirth;
 
         await _userService.UpdateUserAsync(user, cancellationToken);
 

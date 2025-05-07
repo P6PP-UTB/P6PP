@@ -1,3 +1,4 @@
+using ReservationSystem.Shared.Cors;
 using ReservationSystem.Shared.Middlewares;
 using UserService.API.Abstraction;
 using UserService.API.Extensions;
@@ -14,14 +15,18 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5189);
 });
 
+var corsSettingsSection = builder.Configuration.GetSection("Cors");
+builder.Services.Configure<CorsSettings>(corsSettingsSection);
+var corsSettings = corsSettingsSection.Get<CorsSettings>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDevClient", policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "http://localhost:4201")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(corsSettings.AllowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
