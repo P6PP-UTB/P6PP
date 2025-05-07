@@ -28,22 +28,35 @@
       <div class="d-flex justify-content-between">
         <div>
           <button
-          class="btn buy"
-          [ngClass]="{
-            'buy': !isBooked && course.totalCapacity - course.currentCapacity != 0,
-            'cancel': isBooked
-          }"
-
-          [ngClass]="{'disabled': course.totalCapacity - course.currentCapacity == 0 && !isBooked}"
-          (click)="toggleReservation()"
-        >
-          {{ isBooked ? 'Cancel booking' : 'Reserve' }}
-        </button>
+            id="reserve"
+            class="btn position-relative d-flex justify-content-center align-items-center"
+            [ngClass]="{
+              'buy': !isBooked && course.totalCapacity - course.currentCapacity != 0,
+              'cancel': isBooked,
+              'disabled': course.totalCapacity - course.currentCapacity == 0 && !isBooked
+            }"
+            (click)="toggleReservation()"
+            [disabled]="isLoading"
+          >
+            <ng-container *ngIf="isLoading; else label">
+              <div
+                class="spinner-border spinner-border-sm text-light"
+                role="status"
+              >
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </ng-container>
+      
+            <ng-template #label>
+              {{ isBooked ? 'Cancel' : 'Reserve' }}
+            </ng-template>
+          </button>
         </div>
+      
         <div class="ms-sm-auto">
           <a class="btn info" [routerLink]="['/course', course.id]">More info</a>
         </div>
-      </div>
+      </div>      
     </div>
   </div>
 </div>

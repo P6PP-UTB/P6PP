@@ -25,6 +25,10 @@
     margin-top: auto;
 }
 
+#reserve{
+    min-height: 42px;
+}
+
 .buy{
     background-color: #EA2839;
     color: white;
@@ -32,21 +36,18 @@
 }
 
 .cancel{
-    background-color: transparent;
-    color: #EA2839;
+    background-color: #46505A;
+    color: #ffffff;
     font-size: 14pt;
-    border-width: 1px;
-    border-color: #EA2839;
 }
 
 .cancel:hover, .cancel:focus{
-    color: #000000;
-    border-color: #000000;
+    background-color: rgb(70, 69, 69);
     font-size: 14pt;
 }
 
 .cancel:focus{
-    background-color: #0000004f;
+    background-color: #40464d;
 }
 
 .buy:hover{
@@ -54,17 +55,21 @@
 }
 
 .info{
-    background-color: rgba(70, 80, 90, 1);
+    background-color: #11889b;
     color: white;
     font-size: 14pt;
 }
 
 .info:hover{
-    background-color: rgb(40, 50, 60, 1);
+    background-color: #0e535e;
     color: white;
     font-size: 14pt;
 }
 
 .full{
     color: #b71c1c;
+}
+
+.custom-color{
+    color: #FFFFFF;
 }

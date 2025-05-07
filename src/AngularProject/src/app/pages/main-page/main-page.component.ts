@@ -23,6 +23,7 @@ export class MainPageComponent {
   isHidden = false;
   currentVideoTime = 0;
   user: any;
+  isLoading: boolean = false;
 
   constructor(
     private courseService: CourseService,

@@ -18,6 +18,7 @@ export class CourseComponent implements OnInit {
   @Input() course!: Course;
   trainerName: string = '';
   isBooked: boolean = false;
+  isLoading: boolean = false;
   bookingId: number | null = null;
 
   constructor(
@@ -60,36 +61,44 @@ export class CourseComponent implements OnInit {
   }
 
   toggleReservation(): void {
-    if (this.isBooked && this.bookingId) {
-      this.courseService.cancelBooking(this.bookingId).subscribe({
-        next: () => {
-          this.toastr.info('Reservation cancelled.', 'Cancelled');
-          this.isBooked = false;
-          this.bookingId = null;
-          this.courseService.notifyRefreshBookings();
-        },
-        error: () => {
-          this.toastr.error('Failed to cancel reservation.', 'Error');
-        }
-      });
-    } else {
-      this.courseService.bookService(this.course.id).subscribe({
-        next: () => {
-          this.toastr.success('Course reserved successfully!', 'Success');
-          this.checkIfBooked(this.course.id);
-          this.courseService.notifyRefreshBookings();
-        },
-        error: (err: any) => {
-          const errorMessage = err.error?.message || 'An error occurred while booking the course.';
-
-          console.log(errorMessage)
-          if(errorMessage == "Invalid JWT: UserId claim is missing."){
-            this.toastr.error("You should be logged in to make a reservation.", 'Error');
-          }else{
-            this.toastr.error(errorMessage, 'Error');
+    
+    setTimeout(() => {
+      this.isLoading = true;
+      if (this.isBooked && this.bookingId) {
+        this.courseService.cancelBooking(this.bookingId).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.toastr.info('Reservation cancelled.', 'Cancelled');
+            this.isBooked = false;
+            this.bookingId = null;
+            this.courseService.notifyRefreshBookings();
+          },
+          error: () => {
+            this.isLoading = false;
+            this.toastr.error('Failed to cancel reservation.', 'Error');
           }
-        }
-      });
-    }
+        });
+      } else {
+        this.courseService.bookService(this.course.id).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.toastr.success('Course reserved successfully!', 'Success');
+            this.checkIfBooked(this.course.id);
+            this.courseService.notifyRefreshBookings();
+          },
+          error: (err: any) => {
+            this.isLoading = false;
+            const errorMessage = err.error?.message || 'An error occurred while booking the course.';
+
+            console.log(errorMessage)
+            if(errorMessage == "Invalid JWT: UserId claim is missing."){
+              this.toastr.error("You should be logged in to make a reservation.", 'Error');
+            }else{
+              this.toastr.error(errorMessage, 'Error');
+            }
+          }
+        });
+      }
+    }, 500)
   }
 }

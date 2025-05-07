@@ -98,6 +98,6 @@ export class SignupPage {
         console.warn('Invalid form:', this.signupForm.value);
         this.registrationError = "Check all fields for errors"
       }
-    }, 1000);
+    }, 500);
   }
 }
