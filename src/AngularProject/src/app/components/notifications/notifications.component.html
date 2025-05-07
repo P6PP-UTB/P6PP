@@ -1,5 +1,6 @@
 <div id="notifications-container" class="notifications-popup">
   <h4>Notifications</h4>
+  <p *ngIf="notifications.length == 0 || notifications == null">No new notifications</p>
   <ul>
     <li *ngFor="let notification of notifications">
       {{ notification.message }}

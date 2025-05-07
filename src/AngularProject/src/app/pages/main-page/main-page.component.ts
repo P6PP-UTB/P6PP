@@ -8,7 +8,6 @@ import { CourseComponent } from '../../components/course/course.component';
 import { Course } from '../../services/interfaces/course';
 
 import { CourseService } from '../../services/course.service';
-// move to Navigation component
 import { UserService } from '../../services/user.service';
 import { PaymentService } from '../../services/payment.service';
 
@@ -23,8 +22,6 @@ export class MainPageComponent {
   isMuted = true;
   isHidden = false;
   currentVideoTime = 0;
-
-  // move to Navigation component
   user: any;
 
   constructor(
@@ -99,7 +96,6 @@ export class MainPageComponent {
   ];
 
   ngOnInit(){
-    // move to Navigation component
     this.userService.getCurrentUser().subscribe((user) => {
       this.user = user;
       console.log("User: ", user)
@@ -109,8 +105,6 @@ export class MainPageComponent {
       this.courses = this.courseService.filterCources(courcesResponse.data)
       console.log("Sorted course arr: ", this.courses);
     });
-
-    
   }
   
   scrollDown() {
@@ -148,7 +142,7 @@ export class MainPageComponent {
     if (video) {
       if (!this.isHidden) {
        
-        this.currentVideoTime = video.currentTime; // сохранить позицию
+        this.currentVideoTime = video.currentTime;
         video.pause();
       }
     }
@@ -159,7 +153,7 @@ export class MainPageComponent {
       const newVideo = this.bgVideoRef?.nativeElement;
       if (newVideo) {
         if (!this.isHidden) {
-          newVideo.currentTime = this.currentVideoTime; // восстановить позицию
+          newVideo.currentTime = this.currentVideoTime;
           newVideo.muted = this.isMuted;
           newVideo.autoplay = true;
           newVideo.play().catch(error => {
