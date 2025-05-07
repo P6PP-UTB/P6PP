@@ -98,8 +98,6 @@ export class MainPageComponent {
     },
   ];
 
-
-
   ngOnInit(){
     // move to Navigation component
     this.userService.getCurrentUser().subscribe((user) => {
@@ -115,7 +113,6 @@ export class MainPageComponent {
     
   }
   
-
   scrollDown() {
     const cont = document.querySelector('.scroll-container');
     if(cont){

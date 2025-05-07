@@ -81,7 +81,13 @@ export class CourseComponent implements OnInit {
         },
         error: (err: any) => {
           const errorMessage = err.error?.message || 'An error occurred while booking the course.';
-          this.toastr.error(errorMessage, 'Error');
+
+          console.log(errorMessage)
+          if(errorMessage == "Invalid JWT: UserId claim is missing."){
+            this.toastr.error("You should be logged in to make a reservation.", 'Error');
+          }else{
+            this.toastr.error(errorMessage, 'Error');
+          }
         }
       });
     }

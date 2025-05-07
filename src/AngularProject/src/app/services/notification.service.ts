@@ -8,7 +8,7 @@ import { UserService } from './user.service';
 })
 
 export class NotificationService {
-  private apiUrl = 'http://localhost:5181/api/notification'; // URL для получения уведомлений
+  private apiUrl = 'http://localhost:5181/api/notification';
   private notificationsSubject = new BehaviorSubject<any[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
 
@@ -17,7 +17,6 @@ export class NotificationService {
     private userService: UserService
   ) { }
 
-  // Метод для получения уведомлений
   public loadNotifications(): void {
     const userId = this.userService.getStoredUserId();
     
