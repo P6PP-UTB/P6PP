@@ -99,6 +99,21 @@ services:
     networks:
       - backend
 
+  analytics-service:
+     build:
+       context: .
+       dockerfile: src/AnalyticsService.API/Analytics/Dockerfile
+     container_name: analytics-service
+     ports:
+       - "8006:8006"
+     environment:
+       - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=analytics_db;User=root;Password=password123;
+     depends_on:
+       mysql:
+         condition: service_healthy
+     networks:
+       - backend
+       
 
   mysql:
     image: mysql:latest
@@ -107,7 +122,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password123
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backups:/backups
@@ -151,7 +166,7 @@ services:
       - booking-service
       - admin-settings
       - notification-service
-
+      - analytics-service
 volumes:
   mysql_data:
 
