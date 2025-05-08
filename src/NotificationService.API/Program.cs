@@ -21,18 +21,18 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularDevClient", policy =>
-    {
-        policy.WithOrigins("http://localhost:4201")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
+    options.AddPolicy("AllowAngularDevClient",
+        builder => builder
+            .WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
 
-// TODO: Fix server version hardcode
 ServerVersion serverVersion = new MySqlServerVersion("8.0.35");
 
 String connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
