@@ -21,6 +21,7 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
 {
@@ -39,6 +40,7 @@ Console.WriteLine("Connection string TEST Notification: " + connectionString);
 builder.Services.AddDbContext<NotificationDbContext>(
     optionsBuilder => optionsBuilder.UseMySql(connectionString, serverVersion)
 );
+
 // Register services
 builder.Services.RegisterServices(builder.Configuration);
 
@@ -98,5 +100,3 @@ app.UseEndpoints(endpoints =>
 });
 
 app.Run();
-
-

@@ -5,6 +5,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { CourseService } from '../../services/course.service';
 import { UserService } from '../../services/user.service';
 import { Course } from '../../services/interfaces/course';
+import { ToastrService } from 'ngx-toastr'; 
 
 @Component({
   selector: 'app-course-page',
@@ -14,62 +15,99 @@ import { Course } from '../../services/interfaces/course';
   styleUrls: ['./course-page.component.scss']
 })
 export class CoursePageComponent {
-  course: Course = {
-    id: 99999999,
-    trainerId: 99999999,
-    start: new Date(),
-    end: new Date(),
-    price: 99999999,
-    serviceName: "ServiceName",
-    currentCapacity: 99999999,
-    totalCapacity: 4999999990,
-    roomName: "RoomName",
-    isCancelled: false
-  };
-
-  trainer: string = '';
-
-  // Массив изображений
-  imageUrls: string[] = [
-    'https://goo.su/kSY4URo?',
-    'https://goo.su/YyOz7YE',
-    'https://tse3.mm.bing.net/th?id=OIG2.5bowY.5mQdQKTIv5qY1g&pid=ImgGn'
-  ];
-  currentIndex = 0;
-
-  // Геттер для текущего изображения
-  get currentImage(): string {
-    return this.imageUrls[this.currentIndex];
-  }
-
-  // Метод для перехода к предыдущему изображению
-  prevImage(): void {
-    this.currentIndex = (this.currentIndex - 1 + this.imageUrls.length) % this.imageUrls.length;
-  }
-
-  // Метод для перехода к следующему изображению
-  nextImage(): void {
-    this.currentIndex = (this.currentIndex + 1) % this.imageUrls.length;
-  }
-
   constructor(
     private courseService: CourseService,
-    private userService: UserService
+    private userService: UserService,
+    private toastr: ToastrService 
   ) {}
+
+  course!: Course;
+  trainer: string = '';
+  bookingId: number | null = null; // If  NULL - booking is not exists
+  isLoading = false;
 
   async ngOnInit() {
     const currentUrl: string = window.location.href;
     const id = this.getLastSegment(currentUrl);
-
+  
     this.courseService.getOneCourse(id).subscribe(response => {
       this.course = response.data;
       this.userService.getUserById(this.course.trainerId).subscribe(trainerResponse => {
-        this.trainer = trainerResponse.data.user.firstName + ' ' + trainerResponse.data.user.lastName;
+        console.log("Trainer response: ", trainerResponse);
+        this.trainer = trainerResponse.firstName + ' ' + trainerResponse.lastName;
       });
+  
+      this.checkIfBooked(this.course.id);
     });
   }
 
-  // Функция для получения последнего сегмента URL
+  checkIfBooked(courseId: number) {
+    this.courseService.getUserBookings().subscribe(response => {
+      const bookings = response.data || [];
+      const existingBooking = bookings.find((b: any) => b.serviceId === courseId);
+
+      if (existingBooking) {
+        this.bookingId = existingBooking.id;
+      } else {
+        this.bookingId = null;
+      }
+    });
+  }
+
+  enrollOrCancel() {
+    setTimeout(() => {
+      this.isLoading = true;
+      if (this.bookingId) {
+        this.courseService.cancelBooking(this.bookingId).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.toastr.success('Booking cancelled successfully!', 'Success');
+            this.bookingId = null;
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.toastr.error(err.error?.message || 'Failed to cancel booking.', 'Error');
+          }
+        });
+      } else {
+        this.courseService.bookService(this.course.id).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            this.toastr.success('Enrolled successfully!', 'Success');
+            this.checkIfBooked(this.course.id);
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.toastr.error(err.error?.message || 'Failed to enroll.', 'Error');
+          }
+        });
+      }
+    }, 500);
+  }
+
+  // Example image array
+  imageUrls: string[] = [
+    'https://goo.su/kSY4URo?',
+    'https://tse1.mm.bing.net/th?id=OIG3.uUITmFrj0U3EZKUrsMjq&cb=iwc1&pid=ImgGn',
+    'https://images.pexels.com/photos/7045575/pexels-photo-7045575.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    'https://tse3.mm.bing.net/th?id=OIG2.5bowY.5mQdQKTIv5qY1g&pid=ImgGn',
+    'https://images.pexels.com/photos/3839058/pexels-photo-3839058.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+
+  ];
+  currentIndex = 0;
+
+  get currentImage(): string {
+    return this.imageUrls[this.currentIndex];
+  }
+
+  prevImage(): void {
+    this.currentIndex = (this.currentIndex - 1 + this.imageUrls.length) % this.imageUrls.length;
+  }
+
+  nextImage(): void {
+    this.currentIndex = (this.currentIndex + 1) % this.imageUrls.length;
+  }
+
   private getLastSegment(url: string): string {
     const parts = url.split('/');
     return parts.pop() || '1';

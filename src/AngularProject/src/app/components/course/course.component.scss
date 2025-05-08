@@ -1,7 +1,7 @@
 .card{
     background: #f2f2f2;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 305px;
+    height: 100%;
     width: 305px;
 }
 
@@ -25,10 +25,29 @@
     margin-top: auto;
 }
 
+#reserve{
+    min-height: 42px;
+}
+
 .buy{
     background-color: #EA2839;
     color: white;
     font-size: 14pt;
+}
+
+.cancel{
+    background-color: #46505A;
+    color: #ffffff;
+    font-size: 14pt;
+}
+
+.cancel:hover, .cancel:focus{
+    background-color: rgb(70, 69, 69);
+    font-size: 14pt;
+}
+
+.cancel:focus{
+    background-color: #40464d;
 }
 
 .buy:hover{
@@ -36,13 +55,21 @@
 }
 
 .info{
-    background-color: rgba(70, 80, 90, 1);
+    background-color: #11889b;
     color: white;
     font-size: 14pt;
 }
 
 .info:hover{
-    background-color: rgb(40, 50, 60, 1);
+    background-color: #0e535e;
     color: white;
     font-size: 14pt;
+}
+
+.full{
+    color: #b71c1c;
+}
+
+.custom-color{
+    color: #FFFFFF;
 }

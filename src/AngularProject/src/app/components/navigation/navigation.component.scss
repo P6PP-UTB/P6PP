@@ -29,21 +29,29 @@ body{
 
 #navigation-bar{
     display: block;
+    justify-self: center;
+    align-self: center;
 }
 
 #head-div{
     padding: 10pt;
-    display: flex;
+    // display: flex;
     background-color: white;
     border-bottom-style:ridge;
     border-width: 1px;
     border-color: black;
     box-shadow: 0px 1px 20px #cecece;
-    justify-content: space-between;
+    // justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
 }
 
-#log-btns{
-    width: 135pt;
+#log-btns {
+    width: auto; /* убери фиксированную ширину */
+    justify-self: end;
+    display: flex; /* добавь flex */
+    align-items: center; /* выровнять по центру */
+    gap: 10px; /* зазор между кнопками */
 }
 
 #login-btn{
@@ -82,7 +90,161 @@ body{
 
 
 .navigation-logged-in {
+    justify-self: end;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 15px;
 }
+
+#navigation-bar{
+    white-space: nowrap;
+}
+
+#notification-button {
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#notification-button:hover{
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+#notification-button mat-icon {
+  font-size: 24px;
+  color: #EA2839; 
+}
+
+.nav-logout {
+    margin-right: 0;
+}
+
+.nav-btns {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    align-self: end;
+}
+
+.nav-balance:hover .nav-balance-mobile:hover{
+  background-color: #b71c1c;
+}
+
+
+@media (max-width: 768px) {
+    #navigation-bar {
+      display: none;
+      flex-direction: column;
+      background-color: white;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+  
+    #navigation-bar.open {
+      display: flex;
+    }
+  
+    .menu-btn {
+      display: flex;
+      position: relative;
+      justify-self: end;
+      align-self: flex-end;
+    //   position: absolute;
+    //   z-index: 111;
+    }
+  
+    #head-div {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      position: relative;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .menu-btn {
+      display: none;
+    }
+  
+    #navigation-bar {
+      display: flex;
+      flex-direction: row;
+      position: static;
+      box-shadow: none;
+    }
+  }
+  
+  .balance-desktop {
+    background-color: #EA2839;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12pt;
+    font-weight: bold;
+  }
+  
+  .balance-desktop .icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .balance-mobile {
+    display: none;
+    background-color: #EA2839;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin: 10px 0;
+    align-items: center;
+    gap: 6px;
+    font-size: 12pt;
+    font-weight: bold;
+  }
+
+  .balance-mobile:hover{
+    background-color: #b71c1c;
+    color: white;
+  }
+  
+  .balance-mobile .icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* Поведение по медиа-запросу */
+  @media (max-width: 768px) {
+    .balance-desktop {
+      display: none;
+    }
+  
+    .balance-mobile {
+      display: block;
+      width: fit-content;
+      align-self: center;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .balance-desktop {
+      display: inline-flex;
+    }
+  
+    .balance-mobile {
+      display: none;
+    }
+  }

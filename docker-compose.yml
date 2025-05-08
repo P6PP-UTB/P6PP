@@ -147,6 +147,9 @@ services:
       - auth-service
       - user-service
       - notification-service
+    volumes:
+    - ./src/AngularProject:/app
+    - /app/node_modules
 
   admin-dashboard:
     build:

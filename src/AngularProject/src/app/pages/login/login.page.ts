@@ -37,12 +37,16 @@ export class LoginPage {
       const payload = this.loginForm.value;
       this.authService.loginUser(payload).subscribe({
         next: (res) => {
-          const token = res.data; 
-          this.authService.setToken(token);
+          const { token, userId } = res.data;
+          this.authService.setSession(token, userId);
           this.router.navigate(['']);
         },
         error: (err) => {
+          console.log('ERROR: ', err);
+
           if (err.status === 401 && err.error?.message) {
+            this.loginError = err.error.message;
+          } else if (err.status === 400 && err.error.message) {
             this.loginError = err.error.message;
           } else {
             this.loginError = 'Something went wrong, try again later.';

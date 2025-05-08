@@ -3,7 +3,7 @@
     margin: auto;
     padding-bottom: 10vw;
   }
-
+  
 #block{
   margin: 0pt 20pt;
 }
@@ -55,4 +55,9 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   color: #EA2839;
   border-color: transparent;
+}
+
+#err{
+  color: #EA2839;
+  box-shadow: 0px 0px 6px #EA2839 inset;
 }
