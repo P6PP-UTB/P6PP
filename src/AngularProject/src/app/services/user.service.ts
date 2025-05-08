@@ -27,27 +27,35 @@ export class UserService {
     'https://authservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/auth';
 
   constructor(private http: HttpClient) {}
-
+  
   getUserIdFromToken(): number | null {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.warn('🚫 Токен не найден');
+      console.warn('No token found');
       return null;
     }
-
+  
     try {
       const decoded: any = jwtDecode(token);
-      const userId =
-        decoded[
-          'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
-        ];
-      return parseInt(userId);
+      console.log('Decoded token:', decoded); // Log the whole token to see its structure
+      
+      // Check different possible claim names
+      let userId = decoded['userid'] || // from AuthConstants.UserId
+                 decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+                 decoded['nameid'] ||
+                 decoded['sub'];
+                 
+      if (!userId) {
+        console.error('Could not find user ID in token. Token claims:', Object.keys(decoded));
+        return null;
+      }
+      
+      return parseInt(userId, 10);
     } catch (err) {
-      console.error('Decoding error: ', err);
+      console.error('Error decoding token:', err);
       return null;
     }
   }
-
   getCurrentUser(): Observable<any> {
     const id = this.getUserIdFromToken();
     if (!id) return of(null);

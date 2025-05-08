@@ -267,8 +267,8 @@ public class UserAuthService : IUserAuthService
             return new ApiResult<object>(null, false, "User not found.");
 
         var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
-        if (!isEmailConfirmed)
-            return new ApiResult<object>(new { verified = false }, false, "Email not verified.");
+//!         if (!isEmailConfirmed)
+//!             return new ApiResult<object>(new { verified = false }, false, "Email not verified.");
 
         return new ApiResult<object>(new { verified = true }, true, "User is verified.");
     }

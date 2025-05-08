@@ -35,7 +35,7 @@ namespace NotificationService.API.Services
             try
             {
                
-                response = await _httpClient.GetAsync<BookingResponse>("http://host.docker.internal:8080/api/Bookings/" + id);
+                response = await _httpClient.GetAsync<BookingResponse>("https://bookingservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/Bookings/" + id);
                 Console.WriteLine(response.Data);
             }
             catch (Exception e)
@@ -51,7 +51,7 @@ namespace NotificationService.API.Services
             ApiResult<ServiceResponse>? response = null;
             try
             {
-                response = await _httpClient.GetAsync<ServiceResponse>("http://host.docker.internal:8080/api/Services/" + serviceId);
+                response = await _httpClient.GetAsync<ServiceResponse>("https://bookingservice.thankfulflower-27b66160.polandcentral.azurecontainerapps.io/api/Services/" + serviceId);
                 Console.WriteLine(response.Data);
 
             }
