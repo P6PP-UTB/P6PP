@@ -1,15 +1,116 @@
 .calendar-container {
+  position: relative; 
   display: flex;
-  //height: 100vh;
+  flex-direction: column;
   font-family: Arial, sans-serif;
   color: #333;
-  padding: 20pt;
+}
+
+
+.calendar-main {
+  padding: 1rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 1vh;
+}
+
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.month-cell-mn:hover{
+  background-color: #ea283834;
+  transition: 0.3s;
+}
+.calendar-cell {
+  box-sizing: border-box;
+  height: 80px;
+  background: #ffffff;
+  outline: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-cell-header {
+  box-sizing: border-box;
+  height: 2vh;
+  background: #fafafa;
+  outline: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.calendar-cell.today {
+  background: rgba(234, 40, 57, 0.1);
+  font-weight: bold;
+}
+
+.calendar-cell.empty {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .calendar-sidebar {
-  width: 250px;
-  border-right: 1px solid #ccc;
+  width: 100%;
   padding: 1rem;
+}
+
+.day-number {
+  font-weight: bold;
+  margin-bottom: 4px;
+  align-self: flex
+}
+
+.events-in-cell {
+  width: 100%;
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.event-entry {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.colored-event-entry {
+  padding: 1px 4px;
+  border-radius: 10px;
+  color: white;
+  margin-bottom: 3px;
+
+  .event-dot {
+      display: none;
+  }
+
+  .event-title-in-cell {
+      font-size: 0.65rem;
+      line-height: 1.1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+   }
 }
 
 .event-list h4 {
@@ -39,65 +140,66 @@
   font-size: 0.8rem;
 }
 
-.calendar-main {
-  flex-grow: 1;
-  padding: 1rem;
+.event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 4px;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
-.calendar-header {
+.header-title {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  width: 100%;
 }
 
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  
+.header-title h2 {
+  margin-right: 10px;
 }
 
-.calendar-cell {
-  box-sizing: border-box;
-  height: 120px;
-  background: #ffffff;
-  outline: 1px solid #ddd;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding: 0.5rem;
-  font-size: 0.9rem;
-  position: relative;
-}
-
-.calendar-cell-header {
-  box-sizing: border-box;
-  height: 2vh;
-  background: #fafafa;
-  outline: 1px solid #ddd;
-  display: flex;
-  justify-content: center;
+.reservation-button {
+  display: inline-flex;
   align-items: center;
-  font-size: 0.9rem;
-  position: relative;
-}
-
-.calendar-cell.today {
-  background: rgba($color: #EA2839, $alpha: 0.1);
-  font-weight: bold;
-}
-
-.calendar-cell.empty {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.arrow{
-  background: none;
+  gap: 5px;
+  padding: 8px 16px;
+  background-color: #EA2839;
+  color: white;
   border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: 10px;
 }
 
-.arrow .icon {
-  width: 32px;
-  height: 32px;
+.month-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 1vw;
+  background-color: white;
+  color: #EA2839;
+  border: 1px solid #EA2839;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 1vw;
+}
+
+.month-menu {
+  position: absolute;
+  top: 100px;
+  left: 20px;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.month-menu div {
+  padding: 8px 12px;
+  cursor: pointer;
 }

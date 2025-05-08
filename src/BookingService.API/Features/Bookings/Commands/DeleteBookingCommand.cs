@@ -2,6 +2,8 @@
 using BookingService.API.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using ReservationSystem.Shared.Clients;
+using static ReservationSystem.Shared.ServiceEndpoints;
 
 namespace BookingService.API.Features.Bookings.Commands;
 
@@ -18,10 +20,12 @@ public sealed class DeleteBookingCommand : IRequest
 public sealed class DeleteBookingCommandHandler : IRequestHandler<DeleteBookingCommand>
 {
     private readonly DataContext _context;
+    private readonly NetworkHttpClient _client;
 
-    public DeleteBookingCommandHandler(DataContext context)
+    public DeleteBookingCommandHandler(DataContext context, NetworkHttpClient client)
     {
         _context = context;
+        _client = client;
     }
 
     public async Task Handle(DeleteBookingCommand request, CancellationToken cancellationToken)
@@ -38,6 +42,7 @@ public sealed class DeleteBookingCommandHandler : IRequestHandler<DeleteBookingC
         // todo: check ownership?
         // todo: payments etc.
 
+        await _client.PostAsync<object, object>(NotificationService.SendBookingCancellationEmail, new { BookingId = booking.Id }, CancellationToken.None);
         _context.Bookings.Remove(booking);
         await _context.SaveChangesAsync(cancellationToken);
     }

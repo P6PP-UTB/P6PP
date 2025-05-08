@@ -4,7 +4,9 @@ using BookingService.API.Domain.Models;
 using BookingService.API.Features.Bookings.Commands;
 using BookingService.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
+using Microsoft.Extensions.Logging;
+using Moq;
+using ReservationSystem.Shared.Clients;
 
 public class DeleteBookingCommandHandlerTests
 {
@@ -16,9 +18,10 @@ public class DeleteBookingCommandHandlerTests
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase($"DeleteBookingTestDb_{Guid.NewGuid()}")
             .Options;
+        var mockClient = new Mock<NetworkHttpClient>(new Mock<HttpClient>().Object, new Mock<ILogger<NetworkHttpClient>>().Object);
 
         _dbContext = new DataContext(options);
-        _handler = new DeleteBookingCommandHandler(_dbContext);
+        _handler = new DeleteBookingCommandHandler(_dbContext, mockClient.Object);
     }
 
     [Fact]
@@ -29,7 +32,7 @@ public class DeleteBookingCommandHandlerTests
         {
             Id = 1,
             Room = room,
-            Users = new List<int> { 123 }
+            Users = [123]
         };
         var booking = new Booking
         {
@@ -58,7 +61,7 @@ public class DeleteBookingCommandHandlerTests
     [Fact]
     public async Task Should_Throw_When_BookingNotFound()
     {
-        var command = new DeleteBookingCommand(999); 
+        var command = new DeleteBookingCommand(999);
 
         var ex = await Assert.ThrowsAsync<NotFoundException>(async () =>
             await _handler.Handle(command, CancellationToken.None));
@@ -72,7 +75,7 @@ public class DeleteBookingCommandHandlerTests
         var booking = new Booking
         {
             Id = 2,
-            ServiceId = 999, 
+            ServiceId = 999,
             UserId = 456,
             BookingDate = DateTime.UtcNow,
             Status = BookingStatus.Pending

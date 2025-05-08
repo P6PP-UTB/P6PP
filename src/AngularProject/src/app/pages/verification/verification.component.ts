@@ -11,6 +11,9 @@ import { HttpClient } from '@angular/common/http';
 })
 export class VerificationComponent {
   verified: boolean = false;
+  btn: boolean = true;
+  bad: boolean = false;
+  error: string = "";
   
   constructor(
     private route: ActivatedRoute,
@@ -19,6 +22,13 @@ export class VerificationComponent {
 
   submit() {
     console.log("submit");
+
+    //default conditions
+    this.verified = false;
+    this.btn = true;
+    this.bad = false;
+    this.error = "";
+
       this.route.queryParams.subscribe(params => {
         const userId = params['userId'];
         const token = params['token'];
@@ -29,12 +39,14 @@ export class VerificationComponent {
         console.log("link: ", url);
 
         this.http.post(url, null).subscribe({
-          next: () => {alert('Email is verified'),
+          next: () => {
             this.verified = true;
+            this.btn = false;
           },
           error: (err) => {
             console.error(err);
-            alert('Error: ' + (err.error?.message || 'unexpected error'));
+            this.bad = true;
+            this.error = 'Error: ' + (err.error?.message || 'unexpected error');
           }
         });
       });
