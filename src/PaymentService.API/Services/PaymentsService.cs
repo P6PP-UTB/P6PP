@@ -2,6 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 using PaymentService.API.Persistence.Entities.DB.Models;
 using PaymentService.API.Persistence.Repositories;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace PaymentService.API.Services;
 
@@ -137,7 +138,7 @@ public class PaymentService
         return "Failed";
     }
 
-    internal async Task<UserCredit?> GetBalanceByIdAsync(int userId, CancellationToken cancellationToken)
+    public async Task<UserCredit?> GetBalanceByIdAsync(int userId, CancellationToken cancellationToken)
     {
         string cacheKey = $"user:{userId}";
 
@@ -150,12 +151,53 @@ public class PaymentService
         return payment;
     }
 
-    internal async Task<int?> CreateBalanceAsync(UserCredit balance, CancellationToken cancellationToken)
+    public async Task<int?> CreateBalanceAsync(UserCredit balance, CancellationToken cancellationToken)
     {
         string cacheKey = $"user:{balance.UserId}";
 
         var newPayment = await _paymentRepository.AddBalanceAsync(balance, cancellationToken);
 
         return newPayment;
+    }
+    public async Task<Payment> CreateBillAsync(int id, CancellationToken cancellationToken)
+    {
+        string cacheKey = $"payment:{id}";
+
+        if (!_cache.TryGetValue(cacheKey, out Payment? payment))
+        {
+            payment = await _paymentRepository.GetByIdAsync(id, cancellationToken);
+
+        }
+
+        if (payment == null)
+        {
+            throw new Exception("Payment not found.");
+        }
+
+        string folderPath = Path.GetTempPath();
+        string invoiceFilePath = Path.Combine(folderPath, $"Bill_{id}.txt");
+
+        using (StreamWriter writer = new StreamWriter(invoiceFilePath, true))
+        {
+            // Add title
+            writer.WriteLine("Bill");
+            writer.WriteLine();
+
+            // Add payment details
+            writer.WriteLine($"UserID: {payment.UserId}");
+            writer.WriteLine($"PaymentID: {payment.PaymentID}");
+            if (payment.TransactionType == "reservation")
+            {
+                writer.WriteLine($"Price: {payment.Price} CZK");
+            }
+            else
+            {
+                writer.WriteLine($"Credit Amount: {payment.CreditAmount} credits");
+            }
+            writer.WriteLine($"Status: {payment.Status}");
+            writer.WriteLine($"Date: {payment.CreatedAt:dd-MM-yyyy}");
+        }
+        
+        return payment;
     }
 }
