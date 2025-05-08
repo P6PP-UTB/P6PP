@@ -64,7 +64,7 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
       - name: Patch env for frontend
-        if: ${{ matrix.image }} == 'angularproject'
+        if: ${{ matrix.image == 'angularproject' && secrets.ANGULAR_ENV != '' }}
         run: echo "${{ secrets.ANGULAR_ENV }}" > src/AngularProject/src/enviroments/enviroment.ts
       - name: Build and push
         uses: docker/build-push-action@v6
