@@ -38,6 +38,9 @@ jobs:
         include:
           - image: adminsettings
             dockerfile: src/AdminSettings.API/Dockerfile
+          - image: analyticsservice
+            path: src/AnalyticsService.API
+            dockerfile: Analytics/Dockerfile
           - image: admindashboard
             dockerfile: src/UserService.API/Dockerfile
           - image: angularproject
