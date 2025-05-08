@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NavigationComponent } from '../../components/navigation/navigation.component';
 
@@ -18,23 +18,23 @@ export class SignupPage {
   hideRepeatPassword = true;
   registrationError: string | null = null;
   showVerifyMessage: boolean = false;
-
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
+    private authService: AuthService
   ) {
     this.signupForm = this.fb.group({
       name: ['', [
         Validators.required,
         Validators.minLength(2),
-        Validators.pattern('^[a-zA-Z]{2,}$')]],
+        Validators.pattern(/^[\p{L}\p{M}]{2,}$/u)
+      ]],     
 
       surname: ['', [
         Validators.required,
         Validators.minLength(2),
-        Validators.pattern('^[a-zA-Z ]{2,}$')]],
+        Validators.pattern(/^[\p{L}\p{M}]{2,}$/u)]],
 
       username: ['', [
         Validators.required, 
@@ -56,36 +56,48 @@ export class SignupPage {
   }
 
   onSubmit() {
-    this.registrationError = null;
-  
-    if (this.signupForm.valid) {
-      const form = this.signupForm.value;
-  
-      const payload = {
-        userName: form.username,
-        email: form.email,
-        password: form.password,
-        firstName: form.name,
-        lastName: form.surname
-      };
-  
-      this.authService.registerUser(payload).subscribe({
-        next: () => {
-          this.showVerifyMessage = true;
-          //this.signupForm.reset();
-          //this.router.navigate(['/login']); // или куда надо
-        },
-        error: (err) => {
-          if (err.status === 400 && err.error?.message) {
-            this.registrationError = err.error.message;
-          } else {
-            this.registrationError = 'Something went wrong, try again later.';
+    setTimeout(() => {
+      this.isLoading = true;
+      console.log("Signing up...")
+      this.registrationError = null;
+    
+      if (this.signupForm.valid) {
+        const form = this.signupForm.value;
+    
+        const payload = {
+          userName: form.username,
+          email: form.email,
+          password: form.password,
+          firstName: form.name,
+          lastName: form.surname
+        };
+
+        console.log("Payload: ", payload);
+    
+        this.authService.registerUser(payload).subscribe({
+          next: () => {
+            this.isLoading = false;
+            console.log("Success. Wait couple of minutes and check email")
+            this.showVerifyMessage = true;
+          },
+          error: (err) => {
+            this.isLoading = false;
+            console.log("Error occured")
+            if (err.status === 400 && err.error?.message) {
+              console.log("ERROR: ", err.error.message);
+              this.registrationError = err.error.message;
+            } else {
+              console.log("UNEXPECTED ERROR: ", err.error.message);
+              this.registrationError = 'Something went wrong, try again later.';
+            }
           }
-        }
-      });
-  
-    } else {
-      console.warn('Invalid:', this.signupForm.value);
-    }
+        });
+    
+      } else {
+        this.isLoading = false;
+        console.warn('Invalid form:', this.signupForm.value);
+        this.registrationError = "Check all fields for errors"
+      }
+    }, 500);
   }
 }

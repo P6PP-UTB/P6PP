@@ -15,7 +15,7 @@ div{
 .container-back {
   position: relative;
   width: 100%;
-  max-width: 960px; /* Matches the image width */
+  max-width: 960px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,7 +26,7 @@ div{
 .image-slider {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9; /* automatically gives it a height */
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   margin: 0 auto;
 }
@@ -63,7 +63,7 @@ div{
 
 .content-container {
   width: 100%;
-  max-width: 960px; /* Matches the image width */
+  max-width: 960px;
   margin: 0 auto;
 }
 
@@ -73,13 +73,13 @@ div{
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
-  flex-wrap: wrap; /* Ensures responsiveness for smaller screens */
-  width: 100%; /* Matches the image width */
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .left-info {
   padding: 0 20pt;
-  flex: 1 1 60%; /* Takes 60% of the width */
+  flex: 1 1 60%;
   text-align: left;
 }
 
@@ -95,7 +95,7 @@ div{
   margin-top: 20px;
   font-size: 1rem;
   color: #333;
-  width: 100%; /* Matches the image width */
+  width: 100%;
   text-align: left;
 }
 
@@ -131,23 +131,12 @@ div{
   font-size: 24pt;
 }
 
-// .enroll {
-//   margin-top: 20px;
-//   padding: 10px 20px;
-//   font-size: 18px;
-//   background-color: #dc3545;
-//   color: white;
-//   border: none;
-//   border-radius: 5px;
-//   cursor: pointer;
-//   z-index: 1;
-// }
-
 .enroll{
   margin-top: 20px;
   background-color: #EA2839;
   color: white;
   font-size: 14pt;
+  height: 42px;
   cursor: pointer;
 }
 

@@ -9,6 +9,7 @@ using ReservationSystem.Shared.Clients;
 using Microsoft.OpenApi.Models;
 using AuthService.API.Interfaces;
 using AuthService.API.Services;
+using ReservationSystem.Shared.Cors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,14 +63,19 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+var corsSettingsSection = builder.Configuration.GetSection("Cors");
+builder.Services.Configure<CorsSettings>(corsSettingsSection);
+var corsSettings = corsSettingsSection.Get<CorsSettings>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDevClient", policy =>
     {
-        policy.WithOrigins("http://localhost:4201")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(corsSettings.AllowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -142,10 +148,11 @@ if (!app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAngularDevClient");
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<AuthService.API.Middleware.TokenBlacklistMiddleware>();
-app.UseCors("AllowAngularDevClient");
 app.MapControllers();
 
 app.Run();

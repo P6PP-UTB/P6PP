@@ -1,5 +1,6 @@
 ﻿using AdminSettings.Data;
 using AdminSettings.Persistence.Entities;
+using AdminSettings.Persistence.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace AdminSettings.Data;
@@ -19,22 +20,17 @@ public class SystemSettingsSeeder
     {
         _logger.LogInformation("Seeding default data for system settings...");
 
-        // Seed Timezone
-        if (!await _context.Timezones.AnyAsync())
+        // Seed DatabaseBackupSetting
+        if (!await _context.DatabaseBackupSettings.AnyAsync())
         {
-            _context.Timezones.AddRange(
-                new Timezone { Name = "UTC", UtcOffset = "+00:00" },
-                new Timezone { Name = "CET", UtcOffset = "+01:00" }
-            );
-        }
+            _context.DatabaseBackupSettings.Add(new DatabaseBackupSetting
+            {
+                ManualBackupEnabled = true,
+                BackupFrequency = BackupFrequency.Monthly,
+                BackupTime = new TimeOnly(0, 0)
+            });
 
-        // Seed Currency
-        if (!await _context.Currencies.AnyAsync())
-        {
-            _context.Currencies.AddRange(
-                new Currency { Name = "Euro", Symbol = "€" },
-                new Currency { Name = "Dollar", Symbol = "$" }
-            );
+            await _context.SaveChangesAsync();
         }
 
         await _context.SaveChangesAsync();
@@ -42,13 +38,12 @@ public class SystemSettingsSeeder
         // Seed SystemSettings
         if (!await _context.SystemSettings.AnyAsync())
         {
-            var timezone = await _context.Timezones.FirstAsync();
-            var currency = await _context.Currencies.FirstAsync();
+            var databaseBackupSetting = await _context.DatabaseBackupSettings.FirstAsync();
 
             _context.SystemSettings.Add(new SystemSetting
             {
-                TimezoneId = timezone.Id,
-                CurrencyId = currency.Id,
+                DatabaseBackupSettingId = databaseBackupSetting.Id,
+                DatabaseBackupSetting = databaseBackupSetting
             });
 
             await _context.SaveChangesAsync();

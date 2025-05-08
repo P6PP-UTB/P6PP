@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-reset-pass',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterModule],
   templateUrl: './reset-pass.component.html',
   styleUrl: './reset-pass.component.scss'
 })
