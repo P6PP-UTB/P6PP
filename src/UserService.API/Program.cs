@@ -1,3 +1,5 @@
+using ReservationSystem.Shared.Cors;
+using ReservationSystem.Shared.Middlewares;
 using UserService.API.Abstraction;
 using UserService.API.Extensions;
 using UserService.API.Features;
@@ -13,25 +15,18 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5189);
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngularDevClient", policy =>
-    {
-        policy.WithOrigins("http://localhost:4201")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
+var corsSettingsSection = builder.Configuration.GetSection("Cors");
+builder.Services.Configure<CorsSettings>(corsSettingsSection);
+var corsSettings = corsSettingsSection.Get<CorsSettings>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDevClient", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(corsSettings.AllowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -43,6 +38,16 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService.API.Services.UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+
+builder.Services.Configure<AuthMiddlewareOptions>(options =>
+{
+    options.ExcludedRoutes = new List<ExcludedRoute>
+    {
+        new() { Path = "/api/user", Method = "POST", MatchType = PathMatchType.Exact },
+        new() { Path = "/api/user", Method = "GET", MatchType = PathMatchType.StartsWith },
+        new() { Path = "/api/users", Method = "GET", MatchType = PathMatchType.Exact }
+    };
+});
 
 var app = builder.Build();
 
@@ -72,6 +77,8 @@ app.UseCors("AllowAngularNgClient");
 
 app.UseRouting();
 
+app.UseMiddleware<AuthMiddleware>();
+
 app.UseEndpoints(endpoints =>
 {
     // USER ENDPOINTS
@@ -81,7 +88,8 @@ app.UseEndpoints(endpoints =>
     UpdateUserEndpoint.Register(endpoints);
     CreateUserEndpoint.Register(endpoints);
     AssignUserRoleEndpoint.Register(endpoints);
-
+    DeactivateUserEndpoint.Register(endpoints);
+    ActivateUserEndpoint.Register(endpoints);
 
     // ROLE ENDPOINTS
     GetRoleByIdEndpoint.Register(endpoints);

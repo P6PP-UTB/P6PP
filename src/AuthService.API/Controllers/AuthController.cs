@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReservationSystem.Shared.Results;
@@ -34,25 +35,26 @@ public class AuthController : Controller
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // This endpoint is for authenticated users to request a password change.
-    [Authorize]
-    [HttpGet("change-password")]
-    public async Task<IActionResult> RequestPasswordChange()
-    {
-        var result = await _authService.RequestPasswordChangeAsync(HttpContext);
-        return result.Success ? Ok(result) : BadRequest(result);
-    }
-
     [Authorize]
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
     {
         if (!ModelState.IsValid)
+        {
+            foreach (var kvp in ModelState)
+            {
+                foreach (var error in kvp.Value.Errors)
+                {
+                    Console.WriteLine($"Validation error - Field: {kvp.Key}, Error: {error.ErrorMessage}");
+                }
+            }
             return BadRequest(ModelState);
+        }
 
         var result = await _authService.ChangePasswordAsync(HttpContext, model);
         return result.Success ? Ok(result) : BadRequest(result);
     }
+
 
     // This endpoint is for anonymous users to request a password reset.
     [AllowAnonymous]
@@ -105,13 +107,26 @@ public class AuthController : Controller
         }
     }
 
-     // This endpoint is for user service only¨
-     //
-     // TODO: Only Admin should be allowed to delete users
+    // This endpoint is for user service only
+    //
+    // TODO: Only Admin should be allowed to delete users
     [HttpDelete("delete/{userId}")]
     public async Task<IActionResult> DeleteUser(int userId)
     {
         var result = await _authService.DeleteUserAsync(userId);
         return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    [Authorize]
+    [HttpGet("validate")]
+    public IActionResult Validate()
+    {
+        var userId = User.FindFirst("userid")?.Value;
+        var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+        if (userId == null)
+            return Unauthorized(new ApiResult<bool>(false, false, "Invalid token."));
+
+        return Ok(new ApiResult<bool>(true, true, "Token is valid."));
     }
 }

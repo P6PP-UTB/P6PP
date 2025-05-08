@@ -1,6 +1,5 @@
 import { Component, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common'
-import { AppComponent } from '../../app.component';
 import { NavigationComponent } from "../../components/navigation/navigation.component";
 import { CalendarComponent } from "../../components/calendar/calendar.component";
 import { FooterComponent } from '../../components/footer/footer.component';
@@ -9,28 +8,31 @@ import { CourseComponent } from '../../components/course/course.component';
 import { Course } from '../../services/interfaces/course';
 
 import { CourseService } from '../../services/course.service';
-
+import { UserService } from '../../services/user.service';
+import { PaymentService } from '../../services/payment.service';
 
 @Component({
   selector: 'app-main-page',
-  imports: [FooterComponent,NavigationComponent, CommonModule, CalendarComponent, CourseComponent],
+  imports: [FooterComponent, NavigationComponent, CommonModule, CalendarComponent, CourseComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss'
 })
 export class MainPageComponent {
   @ViewChild('bgVideo') bgVideoRef!: ElementRef<HTMLVideoElement>;
-  isMuted = false;
+  isMuted = true;
   isHidden = false;
+  currentVideoTime = 0;
+  user: any;
+  isLoading: boolean = false;
 
   constructor(
     private courseService: CourseService,
+    private userService: UserService,
   ){
 
   }
-  
-  //courses: Course[] = [];
 
-  // TESTING DATA !!!COMMENT 31:3!!!
+  // TESTING DATA !!!
   courses: Course[] = [
     {
       id: 1,
@@ -51,7 +53,7 @@ export class MainPageComponent {
       end: new Date(),
       price: 200,
       serviceName: "Yoga",
-      currentCapacity: 35,
+      currentCapacity: 40,
       totalCapacity: 40,
       roomName: "Room 1",
       isCancelled: false
@@ -78,7 +80,7 @@ export class MainPageComponent {
       currentCapacity: 35,
       totalCapacity: 40,
       roomName: "Room 6",
-      isCancelled: false
+      isCancelled: true
     },
     {
       id: 5,
@@ -95,14 +97,17 @@ export class MainPageComponent {
   ];
 
   ngOnInit(){
-    this.courseService.getAllCourses().subscribe(courcesResponse => {
-      this.courses = courcesResponse.data;
-      console.log("course arr: ", this.courses);
+    this.userService.getCurrentUser().subscribe((user) => {
+      this.user = user;
+      console.log("User: ", user)
     });
 
-    //this.courseService.getAllCources().then((coursesList: Course[] = this.courses) => this.courses = coursesList)
+    this.courseService.getAllCourses().subscribe(courcesResponse => {
+      this.courses = this.courseService.filterCources(courcesResponse.data)
+      console.log("Sorted course arr: ", this.courses);
+    });
   }
-
+  
   scrollDown() {
     const cont = document.querySelector('.scroll-container');
     if(cont){
@@ -114,6 +119,17 @@ export class MainPageComponent {
     window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
   }
 
+  ngAfterViewInit() {
+    const video = this.bgVideoRef?.nativeElement;
+    if (video) {
+      video.muted = true;
+      video.autoplay = true;
+      video.play().catch(error => {
+        console.error('Autoplay failed:', error);
+      });
+    }
+  }
+
   toggleMute() {
     const video = this.bgVideoRef.nativeElement;
     this.isMuted = !this.isMuted;
@@ -122,16 +138,35 @@ export class MainPageComponent {
 
   toggleVideo() {
     const video = this.bgVideoRef?.nativeElement;
+
+
+    if (video) {
+      if (!this.isHidden) {
+       
+        this.currentVideoTime = video.currentTime;
+        video.pause();
+      }
+    }
+  
     this.isHidden = !this.isHidden;
   
-    if (this.isHidden && video) {
-      video.pause();
-    } else if (!this.isHidden && video) {
-      video.play();
-      video.muted = this.isMuted; // сохранить текущий статус звука
-    }
+    setTimeout(() => {
+      const newVideo = this.bgVideoRef?.nativeElement;
+      if (newVideo) {
+        if (!this.isHidden) {
+          newVideo.currentTime = this.currentVideoTime;
+          newVideo.muted = this.isMuted;
+          newVideo.autoplay = true;
+          newVideo.play().catch(error => {
+            console.error('Autoplay after show failed:', error);
+          });
+        } else {
+          newVideo.pause();
+        }
+      }
+    }, 0);
   }
-  
+
   onVideoEnded() {
     this.isHidden = true;
   }

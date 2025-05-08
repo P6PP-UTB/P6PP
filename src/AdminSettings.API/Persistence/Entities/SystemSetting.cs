@@ -7,15 +7,15 @@ public class SystemSetting
 {
     public int Id { get; set; }
 
-    [ForeignKey("Timezone")]
-    public int TimezoneId { get; set; }
-    public Timezone timezone { get; set; }
-
-    [ForeignKey("Currency")]
-    public int CurrencyId { get; set; }
-    public Currency currency { get; set; }
-
     public string SystemLanguage { get; } = "en-US";
+
+    public bool AuditLogEnabled { get; set; } = true;
+
+    [ForeignKey("DatabaseBackupSetting")]
+    public int DatabaseBackupSettingId { get; set; }
+    public required DatabaseBackupSetting DatabaseBackupSetting { get; set; }
+
+    public bool NotificationEnabled { get; set; } = true;
 }
 
 
