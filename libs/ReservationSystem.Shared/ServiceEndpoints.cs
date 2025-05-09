@@ -78,7 +78,7 @@ public static class ServiceEndpoints
         public static string CreatePayment => $"{BaseUrl}/api/createpayment";
         public static string GetPaymentById(int UserId) => $"{BaseUrl}/api//{UserId}";
         public static string UpdatePayment => $"{BaseUrl}/api/updatepayment";
-        public static string CreateBalance(int id) => $"{BaseUrl}/api/createbalance/{id}";
+        public static string CreateBalance => $"{BaseUrl}/api/createbalance";
         public static string GetBalanceById(int id) => $"{BaseUrl}/api/getbalance/{id}";
     }
 

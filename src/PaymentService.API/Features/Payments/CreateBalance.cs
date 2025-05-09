@@ -52,9 +52,8 @@ public static class CreateBalanceEndpoint
 {
     public static void Register(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/createbalance/{id:int}",
-            async(int id,
-                CreateBalanceRequest request,
+        app.MapPost("/api/createbalance",
+            async(CreateBalanceRequest request,
                 CreateBalanceHandler handler,
                 CreateBalanceValidator validator,
                 CancellationToken cancellationToken) =>
