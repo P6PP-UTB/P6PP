@@ -1,13 +1,38 @@
+using Microsoft.Azure.Management.AppService.Fluent.Models;
 using PaymentService.API.Data;
 using PaymentService.API.Extensions;
 using PaymentService.API.Features;
 using PaymentService.API.Features.Payments;
 using PaymentService.API.Persistence;
 using PaymentService.API.Persistence;
-// Ensure the correct namespace is used for the DatabaseInitializer and DatabaseSeeder
 
 var builder = WebApplication.CreateBuilder(args);
+var corsSettingsSection = builder.Configuration.GetSection("Cors");
+builder.Services.Configure<CorsSettings>(corsSettingsSection);
+var corsSettings = corsSettingsSection.Get<CorsSettings>();
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient", policy =>
+    {
+        if (corsSettings.AllowedOrigins != null && corsSettings.AllowedOrigins.Any())
+        {
+            policy.WithOrigins(corsSettings.AllowedOrigins.ToArray())
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+
+            if (corsSettings.SupportCredentials == true)
+            {
+                policy.AllowCredentials();
+            }
+            else
+            {
+                policy.DisallowCredentials();
+            }
+        }
+    });
+});
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5185);
@@ -15,7 +40,16 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4201")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 builder.Services.AddScoped<DapperContext>();
 
 
@@ -36,12 +70,13 @@ using (var scope = app.Services.CreateScope())
     var dbSeeder = services.GetRequiredService<DatabaseSeeder>();
     await dbSeeder.SeedAsync();
 }
-
+app.UseCors("AllowAngularDevClient");
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("AllowAngularDevClient");
 }
 
 app.UseHttpsRedirection();
@@ -57,6 +92,7 @@ app.UseEndpoints(endpoints =>
     UpdatePaymentEndpoint.Register(endpoints);
     GetBalanceByIdEndpoint.Register(endpoints);
     CreateBalanceEndpoint.Register(endpoints);
+    CreateBillEndpoint.Register(endpoints);
 
 });
 

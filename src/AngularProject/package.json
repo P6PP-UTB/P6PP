@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^19.1.0",
     "@angular/router": "^19.1.0",
     "@auth0/angular-jwt": "^5.2.0",
+    "bootstrap-icons": "^1.11.3",
     "chart.js": "^4.4.9",
     "jwt-decode": "^4.0.0",
     "ngx-toastr": "^19.0.0",

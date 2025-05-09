@@ -28,7 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminSettings.API", "src\Ad
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserService.Tests", "tests\UserService.Tests\UserService.Tests.csproj", "{C31169EF-CE1C-493D-9081-7DE22A232A37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService.API", "src\PaymentService.API\PaymentService.API.csproj", "{B0848710-83E2-417B-BF4C-6AC4FB1D27EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaymentService.API", "src\PaymentService.API\PaymentService.API.csproj", "{B0848710-83E2-417B-BF4C-6AC4FB1D27EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

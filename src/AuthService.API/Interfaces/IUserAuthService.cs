@@ -6,8 +6,7 @@ namespace AuthService.API.Interfaces
     public interface IUserAuthService
     {
         Task<ApiResult<object>> RegisterAsync(RegisterModel model);
-        Task<ApiResult<string>> LoginAsync(LoginModel model);
-        Task<ApiResult<object>> RequestPasswordChangeAsync(HttpContext httpContext);
+        Task<ApiResult<LoginResponse>> LoginAsync(LoginModel model);
         Task<ApiResult<object>> ChangePasswordAsync(HttpContext httpContext, ChangePasswordModel model);
         Task<ApiResult<object>> RequestPasswordResetAsync(string email);
         Task<ApiResult<object>> ResetPasswordAsync(ResetPasswordModel model);

@@ -2,11 +2,13 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { environment } from '../../../enviroments/enviroment';
 
 @Component({
   selector: 'app-forget-pass',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './forget-pass.component.html',
   styleUrl: './forget-pass.component.scss'
 })
@@ -15,6 +17,7 @@ export class ForgetPassComponent {
   resetError: string | null = null;
   successMessage: string | null = null;
   showVerifyMessage: boolean = false;
+  private authUrl = environment.api.auth
 
   constructor(
     private fb: FormBuilder,
@@ -32,10 +35,10 @@ export class ForgetPassComponent {
     if (this.resetForm.valid) {
       const email = this.resetForm.get('email')?.value;
   
-      console.log('Sending request to:', 'http://localhost:8005/api/auth/reset-password');
+      console.log('Sending request to:', this.authUrl + '/reset-password');
       console.log('With body:', { email });
 
-      this.http.get('http://localhost:8005/api/auth/reset-password?email=' + email)
+      this.http.get(this.authUrl + '/reset-password?email=' + email)
         .subscribe({
           next: (response) => {
             console.log('Response from backend:', response); 
