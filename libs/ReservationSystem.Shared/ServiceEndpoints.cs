@@ -1,3 +1,5 @@
+using System;
+
 namespace ReservationSystem.Shared;
 
 public static class ServiceEndpoints
@@ -5,7 +7,7 @@ public static class ServiceEndpoints
     public static class UserService
     {
         // USERS
-        private const string BaseUrl = "http://user-service:5189";
+        private static readonly  string BaseUrl = Environment.GetEnvironmentVariable("USER_SERVICE_URL") ?? "http://user-service:5189";
 
         public static string CreateUser => $"{BaseUrl}/api/user";
         public static string GetUserById(int id) => $"{BaseUrl}/api/user/{id}";
@@ -22,7 +24,7 @@ public static class ServiceEndpoints
 
     public static class AuthService
     {
-        private const string BaseUrl = "http://auth-service:8005";
+        private static readonly string BaseUrl = Environment.GetEnvironmentVariable("AUTH_SERVICE_URL") ?? "http://auth-service:8005";
         public static string Login => $"{BaseUrl}/api/auth/login";
         public static string Register => $"{BaseUrl}/api/auth/register";
         public static string ResetPassword => $"{BaseUrl}/api/auth/reset-password";
@@ -34,7 +36,7 @@ public static class ServiceEndpoints
 
     public static class NotificationService
     {
-        private const string BaseUrl = "http://notification-service:5181";
+        private static readonly string BaseUrl = Environment.GetEnvironmentVariable("NOTIFICATION_SERVICE_URL") ?? "http://notification-service:5181";
         public static string SendEmail => $"{BaseUrl}/api/notification/sendemail";
         public static string SendVerificationEmail => $"{BaseUrl}/api/notification/user/sendverificationemail";
         public static string SendPasswordResetEmail => $"{BaseUrl}/api/notification/user/sendpasswordresetemail";
@@ -50,7 +52,7 @@ public static class ServiceEndpoints
 
     public static class AdminSettingsService
     {
-        private const string BaseUrl = "http://admin-settings:9090";
+        private static readonly string BaseUrl = Environment.GetEnvironmentVariable("ADMIN_SETTINGS_SERVICE_URL") ?? "http://admin-settings:9090";
         // SystemSettings
         public static string GetSystemSettings => $"{BaseUrl}/api/system-settings";
         public static string UpdateSystemSettings => $"{BaseUrl}/api/system-settings";
@@ -75,7 +77,7 @@ public static class ServiceEndpoints
 
     public static class PaymentService
     {
-        private const string BaseUrl = "http://payment-service:5185";
+        private static readonly string BaseUrl = Environment.GetEnvironmentVariable("PAYMENT_SERVICE_URL") ?? "http://payment-service:5185";
         public static string CreatePayment => $"{BaseUrl}/api/createpayment";
         public static string GetPaymentById(int id) => $"{BaseUrl}/api/{id}";
         public static string UpdatePayment => $"{BaseUrl}/api/updatepayment";
@@ -86,7 +88,7 @@ public static class ServiceEndpoints
 
         public static class bookingService
     {
-        private const string BaseUrl = "http://booking-service:8080";
+        private static readonly string BaseUrl = Environment.GetEnvironmentVariable("BOOKING_SERVICE_URL") ?? "http://booking-service:8080";
         // Services endpoints
         public static string ListServices => $"{BaseUrl}/api/services";
         public static string GetServicesByTrainer(int trainerId) => $"{BaseUrl}/api/services/trainer/{trainerId}";
