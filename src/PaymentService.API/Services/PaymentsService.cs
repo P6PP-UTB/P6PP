@@ -154,8 +154,8 @@ public class PaymentService
     {
         string cacheKey = $"user:{balance.UserId}";
 
-        var newPayment = await _paymentRepository.AddBalanceAsync(balance, cancellationToken);
+        var newBalance = await _paymentRepository.AddBalanceAsync(balance, cancellationToken);
 
-        return newPayment;
+        return newBalance;
     }
 }

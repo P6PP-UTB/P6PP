@@ -35,7 +35,7 @@ public class CreateBalanceHandler
         var balance = new UserCredit
         {
             UserId = request.Id,
-            CreditBalance = 0,
+            CreditBalance = 0
 
         };
         var id = await _paymentService.CreateBalanceAsync(balance, cancellationToken);
