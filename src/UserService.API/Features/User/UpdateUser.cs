@@ -128,6 +128,6 @@ public static class UpdateUserEndpoint
                 return result.Success
                     ? Results.Ok(result)
                     : Results.NotFound(result);
-            });
+            }).RequireAuthorization();
     }
 }

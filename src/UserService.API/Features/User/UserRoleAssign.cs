@@ -65,6 +65,6 @@ public static class AssignUserRoleEndpoint
                 return result.Success
                     ? Results.Ok(result)
                     : Results.NotFound(result);
-            });
+            }).RequireAuthorization();
     }
 }
