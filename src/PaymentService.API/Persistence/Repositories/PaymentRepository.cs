@@ -116,8 +116,7 @@ namespace PaymentService.API.Persistence.Repositories
             using var connection = await _context.CreateConnectionAsync();
             const string query = @"
                 INSERT INTO UserCredit (UserId, CreditBalance)
-                VALUES (@UserId, @CreditBalance);
-                SELECT LAST_INSERT_ID();";
+                VALUES (@UserId, @CreditBalance);";
 
             return await connection.ExecuteScalarAsync<int?>(query, new
             {

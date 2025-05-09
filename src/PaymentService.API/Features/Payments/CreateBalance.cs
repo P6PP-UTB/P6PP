@@ -15,9 +15,6 @@ public class CreateBalanceValidator : AbstractValidator<CreateBalanceRequest>
         RuleFor(x => x.UserId)
             .GreaterThan(0).WithMessage("Neplatn� ID u�ivatele.");
 
-        RuleFor(x => x.CreditBalance)
-            .GreaterThan(0).WithMessage("Zb�vaj�c� z�vazek mus� b�t v�t�� ne� 0.");
-
     }
 }
 
