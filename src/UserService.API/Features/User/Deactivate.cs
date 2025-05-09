@@ -72,6 +72,7 @@ public static class DeactivateUserEndpoint
                         : Results.NotFound(result);
                 })
             .WithName("DeactivateUser")
+            .RequireAuthorization()
             .Produces<ApiResult<bool>>(StatusCodes.Status200OK)
             .Produces<ApiResult<bool>>(StatusCodes.Status404NotFound);
     }

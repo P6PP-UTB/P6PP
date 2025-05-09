@@ -71,6 +71,6 @@ public static class DeleteUserEndpoint
                 return result.Success
                     ? Results.Ok(result)
                     : Results.NotFound(result);
-            });
+            }).RequireAuthorization();
     }
 }
