@@ -42,27 +42,7 @@ public class DatabaseSeeder
 
         _logger.LogInformation("Payments seeded successfully.");
 
-        _logger.LogInformation("Seeding UserCredit...");
-
-        const string insertUserCreditQuery = @"
-               INSERT INTO UserCredit (UserId, CreditBalance)
-        SELECT * FROM (SELECT 1 AS UserId, 1000 AS CreditBalance) AS tmp
-        WHERE NOT EXISTS (
-            SELECT 1 FROM UserCredit WHERE UserId = 1
-        )
-        UNION ALL
-        SELECT * FROM (SELECT 2 AS UserId, 500 AS CreditBalance) AS tmp
-        WHERE NOT EXISTS (
-            SELECT 1 FROM UserCredit WHERE UserId = 2
-        )
-        UNION ALL
-        SELECT * FROM (SELECT 3 AS UserId, 250 AS CreditBalance) AS tmp
-        WHERE NOT EXISTS (
-            SELECT 1 FROM UserCredit WHERE UserId = 3
-        );
-        ";
-        await connection.ExecuteAsync(insertUserCreditQuery);
-        _logger.LogInformation("UserCredit seeded successfully.");
+        
         _logger.LogInformation("Seeding completed.");
 
 
