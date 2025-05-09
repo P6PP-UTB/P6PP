@@ -6,7 +6,7 @@ using PaymentService.API.Services;
 
 namespace PaymentService.API.Features.Payments;
 
-public record CreateBalanceRequest(int UserId, int RoleId, int CreditBalance);
+public record CreateBalanceRequest(int UserId);
 
 public class CreateBalanceValidator : AbstractValidator<CreateBalanceRequest>
 {
@@ -14,9 +14,6 @@ public class CreateBalanceValidator : AbstractValidator<CreateBalanceRequest>
     {
         RuleFor(x => x.UserId)
             .GreaterThan(0).WithMessage("Neplatn� ID u�ivatele.");
-
-        RuleFor(x => x.RoleId)
-            .GreaterThan(0).WithMessage("Neplatn� ID role.");
 
         RuleFor(x => x.CreditBalance)
             .GreaterThan(0).WithMessage("Zb�vaj�c� z�vazek mus� b�t v�t�� ne� 0.");
@@ -41,8 +38,7 @@ public class CreateBalanceHandler
         var balance = new UserCredit
         {
             UserId = request.UserId,
-            RoleId = request.RoleId,
-            CreditBalance = request.CreditBalance,
+            CreditBalance = 0,
 
         };
         var id = await _paymentService.CreateBalanceAsync(balance, cancellationToken);
@@ -59,8 +55,9 @@ public static class CreateBalanceEndpoint
 {
     public static void Register(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/createbalance",
-            async (CreateBalanceRequest request,
+        app.MapPost("/api/createbalance/{UserId}",
+            async(int UserId,
+                CreateBalanceRequest request,
                 CreateBalanceHandler handler,
                 CreateBalanceValidator validator,
                 CancellationToken cancellationToken) =>

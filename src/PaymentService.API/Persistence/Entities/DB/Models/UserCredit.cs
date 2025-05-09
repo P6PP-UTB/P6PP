@@ -8,9 +8,6 @@ namespace PaymentService.API.Persistence.Entities.DB.Models
         [Required]
         public long UserId { get; set; }
 
-        [Required]
-        public long RoleId { get; set; }
-
         public long CreditBalance { get; set; }
 
     }
