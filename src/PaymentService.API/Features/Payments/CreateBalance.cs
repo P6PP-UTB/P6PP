@@ -6,13 +6,13 @@ using PaymentService.API.Services;
 
 namespace PaymentService.API.Features.Payments;
 
-public record CreateBalanceRequest(int UserId);
+public record CreateBalanceRequest(int Id);
 
 public class CreateBalanceValidator : AbstractValidator<CreateBalanceRequest>
 {
     public CreateBalanceValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.Id)
             .GreaterThan(0).WithMessage("Neplatn� ID u�ivatele.");
 
     }
@@ -34,7 +34,7 @@ public class CreateBalanceHandler
 
         var balance = new UserCredit
         {
-            UserId = request.UserId,
+            UserId = request.Id,
             CreditBalance = 0,
 
         };
@@ -52,8 +52,8 @@ public static class CreateBalanceEndpoint
 {
     public static void Register(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/createbalance/{UserId}",
-            async(int UserId,
+        app.MapPost("/api/createbalance/{id:int}",
+            async(int id,
                 CreateBalanceRequest request,
                 CreateBalanceHandler handler,
                 CreateBalanceValidator validator,
