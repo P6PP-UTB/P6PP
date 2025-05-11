@@ -57,7 +57,6 @@ public class DatabaseInitializer
             const string createUserCreditTableQuery = @"
                 CREATE TABLE IF NOT EXISTS UserCredit (
                     UserId  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                    RoleId BIGINT NOT NULL,
                     CreditBalance BIGINT NOT NULL
                 );";
 

@@ -67,8 +67,8 @@ using (var scope = app.Services.CreateScope())
     await databaseInitializer.InitializeDatabaseAsync();
 
     //// Seed the database
-    var dbSeeder = services.GetRequiredService<DatabaseSeeder>();
-    await dbSeeder.SeedAsync();
+    //var dbSeeder = services.GetRequiredService<DatabaseSeeder>();
+    //await dbSeeder.SeedAsync();
 }
 app.UseCors("AllowAngularDevClient");
 // Configure the HTTP request pipeline.

@@ -60,6 +60,20 @@ public class CreateUserHandler
             return new ApiResult<int>(0, false, "Failed to create user, duplicate email.");
         }
         
+        
+        // Create payment balance
+        var url = ServiceEndpoints.PaymentService.CreateBalance;
+        var body = new
+        {
+            Id = id
+        };
+        
+        var response = await _httpClient.PostAsync<object, int>(url, body);
+        if (!response.Success && response.Data == 0)
+        {
+            return new ApiResult<int>(0, false, "Failed to create user balance");
+        }
+        
 
         return id is null
             ? new ApiResult<int>(0, false, "Failed to create user")
